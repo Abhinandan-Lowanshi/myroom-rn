@@ -19,14 +19,19 @@ const CustomInputText = ({
   value,
   outerContainer,
   toplabel,
+  disabled,
   isEyeVisible,
+  isNumeric,
+  maxLength,
 }) => {
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
   return (
     <View style={[style.outerContainer, outerContainer]}>
-      <Text style={style.labelStyle}>{toplabel}</Text>
       <View style={[style.containerStyle(error), containerStyleP]}>
         <TextInput
+          maxLength={maxLength}
+          editable={!disabled}
+          selectTextOnFocus={!disabled}
           style={[style.InputTextStyle(error), InputTextStyleP]}
           placeholder={placeholder}
           value={value}
@@ -34,7 +39,13 @@ const CustomInputText = ({
           onChangeText={value => onChangeText(value)}
           multiline={false}
           secureTextEntry={isEyeVisible && isPassWordHidden}
-          keyboardType={'email-address'}
+          keyboardType={
+            isNumeric
+              ? 'number-pad'
+              : isEyeVisible
+              ? 'default'
+              : 'email-address'
+          }
         />
         {isEyeVisible ? (
           <TouchableOpacity
@@ -58,10 +69,10 @@ const CustomInputText = ({
 export default CustomInputText;
 const style = StyleSheet.create({
   InputTextStyle: error => ({
-    height: hp(5),
     color: error ? Colors.RED : Colors.BLACK,
     fontSize: hp(1.6),
     flex: 1,
+    borderRadius: hp(1),
   }),
   containerStyle: error => ({
     flexDirection: 'row',
@@ -69,18 +80,22 @@ const style = StyleSheet.create({
     backgroundColor: Colors.GREY1,
     paddingLeft: hp(2),
     borderColor: error ? Colors.RED : Colors.GREY,
-    borderWidth: 0.9,
+    backgroundColor: 'white',
+    elevation: 3,
     borderRadius: hp(1),
+    borderWidth: hp(0.2),
   }),
   textError: {
     color: 'red',
     fontSize: RF(1.1),
     marginLeft: 5,
-    marginTop: 3,
+    marginTop: hp(0.6),
   },
   outerContainer: {
     alignSelf: 'center',
-    marginTop: hp(3),
+    // elevation: 5,
+    borderRadius: hp(1),
+    marginTop: hp(2),
   },
   checkBoxContainerStyle: {
     flexDirection: 'row',

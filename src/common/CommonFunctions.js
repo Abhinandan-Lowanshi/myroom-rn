@@ -15,7 +15,6 @@ const heightPercentageToDP = heightPercent => {
     typeof heightPercent === 'number'
       ? heightPercent
       : parseFloat(heightPercent);
-  // console.log('',PixelRatio.get());
   return PixelRatio.roundToNearestPixel((screenHeight * elemHeight) / 100);
 };
 

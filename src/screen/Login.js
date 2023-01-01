@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import AppLogo from '../component/applogo/AppLogo';
-import {hp} from '../common/CommonFunctions';
+import {hp, RF} from '../common/CommonFunctions';
 import CustomInputText from '../component/InputText';
 import C_Button from '../component/C_Button';
 import SocialLoginBt from '../component/SocialLoginBt';
@@ -18,15 +19,24 @@ import ScreenName from '../common/ScreenName';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import {validateEmail, validatePassword} from '../common/Validations';
+import FreezScreen from '../component/FreezScreen';
+import AsyncKeys from '../localStorage/AsyncKeys';
+import localStorageOp from '../localStorage/LocalData';
+import ErrorModal from '../component/ErrorModal';
+
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const [isFirstRender, SetIsFirstRender] = useState(true);
+  const [isLoading, SetIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
+  const [authError, setAuthError] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [apiError, setApiError] = useState(false);
+
   React.useEffect(() => {
-    if (validateEmail(email) && validatePassword(password))
+    setAuthError('');
+    if (validateEmail(email) && password.length >= 6)
       setIsSubmitDisabled(false);
     else setIsSubmitDisabled(true);
   }, [email, password]);
@@ -39,15 +49,45 @@ const Login = ({navigation}) => {
 
   const onPasswordText = password => {
     setPassword(password);
-    if (!validatePassword(password) && !password == '') setPasswordError(true);
+    if (password.length < 6 && !password == '') setPasswordError(true);
     else setPasswordError(false);
   };
 
-  const SignUp = () => {};
+  const SignUp = () => {
+    SetIsLoading(true);
+    sendRequest(
+      {
+        email: email,
+        password: password,
+      },
+      EndPoints.login,
+      'POST',
+    )
+      .then(response => {
+        SetIsLoading(false);
+        if (response.status === true) {
+          setApiError(response.message);
+          localStorageOp(true, AsyncKeys.USERDATA, response.data);
+        } else {
+          setAuthError(response.message);
+        }
+      })
+      .catch(e => {
+        SetIsLoading(false);
+      });
+  };
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
+      {FreezScreen(isLoading)}
       <ScrollView>
         <AppLogo style={style.appLogoStyle} textStyle={style.logoTextStyle} />
+        <ErrorModal
+          onPress={() => {
+            setApiError('');
+          }}
+          label={apiError}
+          visible={apiError ? true : false}></ErrorModal>
         <View style={style.contentContainerStyle}>
           <CustomInputText
             value={email}
@@ -66,10 +106,12 @@ const Login = ({navigation}) => {
             isPassworHidden={true}
             isEyeVisible={true}
           />
+          {authError && <Text style={style.textError}>{authError}</Text>}
           <C_Button
             onPress={SignUp}
             outerContainer={style.outerContainer}
             label={'LogIn'}
+            isLoading={isLoading}
             isSubmitDisabled={isSubmitDisabled}
           />
           <TouchableOpacity
@@ -80,8 +122,17 @@ const Login = ({navigation}) => {
             <Text style={style.labelforgot}>Forgot password?</Text>
           </TouchableOpacity>
           <Text style={style.labelOr}>Or</Text>
-          <SocialLoginBt icon={images.googleicon} label={'Login with Google'} />
           <SocialLoginBt
+            onPress={() => {
+              setApiError('Login with Google will available soon');
+            }}
+            icon={images.googleicon}
+            label={'Login with Google'}
+          />
+          <SocialLoginBt
+            onPress={() => {
+              setApiError('Login with Facebook will available soon');
+            }}
             labelStyle={style.fbLabelStyle}
             icon={images.Facebook}
             label={'Login with Facebook'}
@@ -145,7 +196,13 @@ const style = StyleSheet.create({
     marginTop: hp(0.5),
   },
   inputContainerStyle: {
-    marginTop: -5,
+    marginTop: 20,
   },
   fbLabelStyle: {},
+  textError: {
+    color: 'red',
+    fontSize: RF(1.4),
+    marginTop: hp(0.1),
+    marginLeft: hp(3.2),
+  },
 });

@@ -24,6 +24,8 @@ const style = StyleSheet.create({
   container: {
     height: hp(6),
     flexDirection: 'row',
+    backgroundColor: 'white',
+    elevation: 15,
   },
   iconStyle: {
     alignSelf: 'center',

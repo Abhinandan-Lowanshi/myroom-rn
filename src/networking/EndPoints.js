@@ -9,11 +9,14 @@ const EndPoints = {
   toRoomStatus: 'toRoomStatus',
   viewRoomDetails: 'viewRoomDetails',
   editRoom: 'editRoom',
+  myRoomList: 'myRoomList',
   deleteRoom: 'deleteRoom',
   getNotification: 'getNotification',
   updateUserNotificationDetails: 'updateUserNotificationDetails',
   getUserNotification: 'getUserNotification',
   sendEmailOtp: 'sendEmailOtp',
   verifyEmailotp: 'verifyEmailotp',
+  updatePassword: 'updatePassword',
+  verfyOtp: 'verfyOtp',
 };
 export default EndPoints;

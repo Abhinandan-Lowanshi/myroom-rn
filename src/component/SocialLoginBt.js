@@ -18,19 +18,22 @@ export default SocialLoginBt;
 const style = StyleSheet.create({
   outerContainer: {
     width: '90%',
-    height: hp(5),
+    height: hp(6.2),
     justifyContent: 'center',
     alignSelf: 'center',
     marginTop: hp(1.5),
     backgroundColor: Colors.WHITE,
     borderRadius: hp(0.9),
     flexDirection: 'row',
+    elevation: 5,
+    borderColor: Colors.GREY,
+    borderWidth: hp(0.2),
   },
   labelStyle: {
     color: Colors.BLACK,
     alignSelf: 'center',
     fontWeight: '600',
-    fontSize: RF(1.9),
+    fontSize: RF(1.7),
   },
   iconStyle: {
     height: hp(4),

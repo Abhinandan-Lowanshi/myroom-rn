@@ -2,7 +2,7 @@ import EndPoints from './EndPoints';
 const sendRequest = async (payload, endPoint, method) => {
   try {
     const response = await fetch(EndPoints.baseUrl + endPoint, {
-      method: 'POST',
+      method: method,
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
@@ -11,9 +11,7 @@ const sendRequest = async (payload, endPoint, method) => {
     });
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.log('erro', error);
-  }
+  } catch (e) {}
 };
 
 export default sendRequest;
