@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 
@@ -8,7 +8,10 @@ export const slice = createSlice({
     loading: false,
     myposts: [],
     signInData: {},
-    accountData: {}
+    accountData: {},
+    locationInfo: {},
+    homeNavigation: {},
+    uploadData: {},
   },
   reducers: {
     startL: state => {
@@ -23,22 +26,53 @@ export const slice = createSlice({
     signInData: (state, actions) => {
       state.signInData = actions.payload;
     },
+    uploadData: (state, actions) => {
+      state.uploadData = actions.payload;
+    },
     accountData: (state, actions) => {
       state.accountData = actions.payload;
+    },
+    locationInfo: (state, actions) => {
+      state.locationInfo = actions.payload;
+    },
+    homeNavigation: (state, actions) => {
+      state.homeNavigation = actions.payload;
+    },
+    roomDataHome: (state, actions) => {
+      state.roomDataHome = actions.payload;
     },
   },
 });
 
-export const { startL, endL, allMyRooms, signInData, accountData } = slice.actions;
+export const {
+  startL,
+  endL,
+  allMyRooms,
+  signInData,
+  accountData,
+  locationInfo,
+  homeNavigation,
+  uploadData,
+  roomDataHome,
+} = slice.actions;
 
 export const startLoader = () => dispatch => {
   dispatch(startL());
+};
+export const setHomeNavigation = data => dispatch => {
+  dispatch(homeNavigation(data));
 };
 export const endtLoader = () => dispatch => {
   dispatch(endL());
 };
 export const setSignUp = data => dispatch => {
   dispatch(signInData(data));
+};
+export const setUploadData = data => dispatch => {
+  dispatch(uploadData(data));
+};
+export const setRoomDataHome = data => dispatch => {
+  dispatch(roomDataHome(data));
 };
 
 export const getAllMyRooms = () => dispatch => {
@@ -51,7 +85,6 @@ export const getAllMyRooms = () => dispatch => {
       dispatch(endL());
       if (res.status === true) {
         dispatch(allMyRooms(res.data));
-
       }
     })
     .catch(e => {
@@ -59,8 +92,11 @@ export const getAllMyRooms = () => dispatch => {
     });
 };
 
-export const getAccountImfo = (data) => dispatch => {
-  dispatch(accountData(data))
+export const getAccountImfo = data => dispatch => {
+  dispatch(accountData(data));
+};
 
-}
+export const setLocation = data => dispatch => {
+  dispatch(locationInfo(data));
+};
 export default slice.reducer;

@@ -2,52 +2,46 @@ import react, {useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {hp} from '../common/CommonFunctions';
+import Colors from '../common/Colors';
+import {hp, RF} from '../common/CommonFunctions';
 
-const CustomPicker = ({data, onItemChange, label, container}) => {
+const CustomPicker = ({
+  data,
+  onItemChange,
+  container,
+  placeholder,
+  outerContainer,
+  labelTop,
+}) => {
   const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
 
-  const renderLabel = () => {
-    if (value || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && {color: 'blue'}]}>{label}</Text>
-      );
-    }
-    return null;
-  };
   return (
-    <View style={[styles.container, container]}>
-      {/* {renderLabel()} */}
-      <Dropdown
-        style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder={!isFocus ? 'Select item' : '...'}
-        searchPlaceholder="Search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={item => {
-          onItemChange(item);
-          setIsFocus(false);
-        }}
-        renderLeftIcon={() => (
-          <AntDesign
-            style={styles.icon}
-            color={isFocus ? 'blue' : 'black'}
-            name="Safety"
-            size={20}
-          />
-        )}
-      />
+    <View style={[outerContainer, styles.outerContainer]}>
+      <Text style={styles.topLabel}>{labelTop}</Text>
+      <View style={[styles.container, container]}>
+        <Dropdown
+          style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
+          placeholderStyle={styles.placeholderStyle}
+          selectedTextStyle={styles.selectedTextStyle}
+          inputSearchStyle={styles.inputSearchStyle}
+          iconStyle={styles.iconStyle}
+          data={data}
+          search
+          maxHeight={400}
+          labelField="label"
+          valueField="value"
+          placeholder={placeholder}
+          searchPlaceholder="Search..."
+          value={value}
+          onFocus={() => setIsFocus(true)}
+          onBlur={() => setIsFocus(false)}
+          onChange={item => {
+            onItemChange(item);
+            setIsFocus(false);
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -59,7 +53,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     width: '90%',
     alignSelf: 'center',
-    borderRadius: hp(1.2),
+    borderRadius: hp(0.8),
+    height: hp(6.5),
+    elevation: 3,
+    borderColor: Colors.GREY,
+    borderRadius: hp(1),
+    borderWidth: hp(0.2),
+  },
+  outerContainer: {},
+  topLabel: {
+    fontSize: RF(1.3),
+    color: Colors.BLACK,
+    marginLeft: hp(3),
+    marginTop: hp(1),
+    marginBottom: hp(0.5),
   },
   dropdown: {
     height: hp(5.2),
@@ -75,20 +82,23 @@ const styles = StyleSheet.create({
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: RF(1.1),
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: RF(1.6),
+    marginLeft: hp(1.5),
+    color: Colors.BLACK,
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: RF(1.6),
+    color: Colors.BLACK,
+    marginLeft: hp(1.5),
   },
   iconStyle: {
     width: 20,
     height: 20,
   },
   inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
+    height: hp(8),
   },
 });

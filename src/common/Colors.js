@@ -10,4 +10,5 @@ export default Colors = {
   RED: 'red',
   WHITE: 'white',
   BLUE: '#2222e3',
+  GREEN: '#4ef542',
 };

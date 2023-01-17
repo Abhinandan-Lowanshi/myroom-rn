@@ -22,4 +22,7 @@ export default Screen = {
   Search: 'Search',
   Splash: 'Splash',
   EmailVerify: 'EmailVerify',
+  UploadFormSTP2: 'UploadFormSTP2',
+  UploadNavigator: 'UploadNavigator',
+  DetailsScreen: 'DetailsScreen',
 };

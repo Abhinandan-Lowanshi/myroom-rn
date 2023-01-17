@@ -67,7 +67,7 @@ const EmailVerify = ({navigation}) => {
 
   return (
     <View style={StyleGlobel.containerStyle}>
-      <Header label={'Verify Email'} />{' '}
+      <Header label={'Verify Email'} navigation={navigation} />
       <ErrorModal
         onPress={() => {
           setApiError('');

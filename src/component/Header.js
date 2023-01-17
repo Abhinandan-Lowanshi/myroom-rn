@@ -1,20 +1,26 @@
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Colors from '../common/Colors';
 import {hp} from '../common/CommonFunctions';
 
-const Header = ({label}) => {
+const Header = ({label, navigation}) => {
   return (
-    <TouchableOpacity style={style.container}>
-      <Icon
-        style={style.iconStyle}
-        name="left"
-        size={hp(3.6)}
-        color={Colors.PRIMARY}
-      />
-      <Text style={style.labelSignUp}>{label}</Text>
-    </TouchableOpacity>
+    <View style={style.container}>
+      <TouchableOpacity
+        style={style.containerInner}
+        onPress={() => {
+          navigation.goBack();
+        }}>
+        <Icon
+          style={style.iconStyle}
+          name="left"
+          size={hp(3.6)}
+          color={Colors.PRIMARY}
+        />
+        <Text style={style.labelSignUp}>{label}</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -37,5 +43,8 @@ const style = StyleSheet.create({
     color: Colors.PRIMARY,
     marginLeft: hp(0.4),
     fontSize: hp(2.6),
+  },
+  containerInner: {
+    flexDirection: 'row',
   },
 });

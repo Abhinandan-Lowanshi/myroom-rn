@@ -18,5 +18,6 @@ const EndPoints = {
   verifyEmailotp: 'verifyEmailotp',
   updatePassword: 'updatePassword',
   verfyOtp: 'verfyOtp',
+  findRoom: 'findRoom',
 };
 export default EndPoints;

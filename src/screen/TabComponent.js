@@ -1,7 +1,7 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './Home';
-import Upload from './Upload';
+import UploadNavigator from './Upload';
 import Fav from './Fav';
 import MyAccount from './MyAccount';
 import MyPost from './MyPost';
@@ -13,9 +13,9 @@ import {hp} from '../common/CommonFunctions';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ScreenName from '../common/ScreenName';
 import AppLogo from '../component/applogo/AppLogo';
-
+import {useDispatch} from 'react-redux';
 const Tab = createBottomTabNavigator();
-
+import {setHomeNavigation} from '../redux/Slice';
 const TabComponent = ({navigation}) => {
   return (
     <>
@@ -77,8 +77,8 @@ const TabComponent = ({navigation}) => {
               />
             ),
           }}
-          name={ScreenName.Upload}
-          component={Upload}
+          name={ScreenName.UploadNavigator}
+          component={UploadNavigator}
         />
         <Tab.Screen
           options={{

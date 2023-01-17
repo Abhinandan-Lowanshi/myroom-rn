@@ -146,7 +146,7 @@ const ForgotPassword = ({navigation}) => {
   };
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <Header label={'Forgot Password'} />
+      <Header label={'Forgot Password'} navigation={navigation} />
       <FreezScreen isLoading={loading} />
       <ErrorModal
         onPress={() => {

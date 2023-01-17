@@ -1,20 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { hp, RF } from '../common/CommonFunctions';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
+import {hp, RF} from '../common/CommonFunctions';
 import CustomInputText from '../component/InputText';
 import C_Button from '../component/C_Button';
 import Colors from '../common/Colors';
 import Header from '../component/Header';
 import LabelComponent from '../component/LabelComponent';
-import { validateEmail, validatePassword } from '../common/Validations';
+import {validateEmail, validatePassword} from '../common/Validations';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
-import { useDispatch } from 'react-redux';
+import {useDispatch} from 'react-redux';
 import ErrorModal from '../component/ErrorModal';
 import FreezScreen from '../component/FreezScreen';
-import { setSignUp } from '../redux/Slice';
+import {setSignUp} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
-const SignUp = ({ navigation }) => {
+const SignUp = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [emailError, setErrorEmail] = useState(false);
   const [name, setName] = useState('');
@@ -82,7 +82,7 @@ const SignUp = ({ navigation }) => {
   const getOtp = () => {
     if (email) {
       setLoading(true);
-      sendRequest({ email: email }, EndPoints.sendEmailOtp, 'POST')
+      sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
         .then(response => {
           setLoading(false);
           if (response.status === true) {
@@ -114,8 +114,8 @@ const SignUp = ({ navigation }) => {
     setEmailApiError('');
   };
   return (
-    <View style={{ backgroundColor: 'white', flex: 1 }}>
-      <Header label={'SignUp'} />
+    <View style={{backgroundColor: 'white', flex: 1}}>
+      <Header label={'SignUp'} navigation={navigation} />
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}

@@ -11,11 +11,12 @@ import {store} from './src/redux/store';
 import Search from './src/screen/Search';
 import Splash from './src/screen/Splash';
 import EmailVerify from './src/screen/EmailVerify';
+import EditProfile from './src/screen/EditProfile';
+import DetailsScreen from './src/screen/DetailsScreen';
 import {Provider} from 'react-redux';
+import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 const Stack = createNativeStackNavigator();
 const App = () => {
-  console.log('DATATATTAA');
-
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -37,7 +38,16 @@ const App = () => {
             name={ScreenName.TabComponent}
             component={TabComponent}
           />
+          <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
+          <Stack.Screen
+            name={ScreenName.UploadFormSTP2}
+            component={UploadFormSTP2}
+          />
           <Stack.Screen name={ScreenName.Search} component={Search} />
+          <Stack.Screen
+            name={ScreenName.DetailsScreen}
+            component={DetailsScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
