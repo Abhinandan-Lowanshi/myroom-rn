@@ -33,8 +33,8 @@ const SignUp = ({navigation}) => {
     if (
       name.length < 4 ||
       !validateEmail(email) ||
-      password.length === 0 ||
-      rePassword.length === 0 ||
+      password.length < 6 ||
+      rePassword.length < 6 ||
       !isPasswordMatch
     ) {
       setIsSubmitDisabled(true);

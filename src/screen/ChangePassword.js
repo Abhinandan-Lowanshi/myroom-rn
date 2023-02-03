@@ -14,74 +14,67 @@ import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
 
-const EditProfile = ({navigation}) => {
+const ChangePassword = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
-  const [name, setName] = useState(accountData?.usr_firstName);
-  const [nameError, setErrorName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState(accountData?.usr_phone);
-  const [mobileNumberError, setMobileNumberError] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [currentPasswordError, setCurrentPasswordError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [emailApiError, setEmailApiError] = useState('');
-
+  const [password, SetPassword] = useState('');
+  const [passwordError, setErrorPassword] = useState(false);
+  const [rePassword, setRePassword] = useState('');
+  const [rePasswordError, setRePasswordError] = useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (name.length < 4 || mobileNumber.length === 0) {
+    if (
+      password.length < 6 ||
+      currentPassword.length < 6 ||
+      rePassword.length < 6
+    ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [name, mobileNumber]);
+  }, [password, currentPassword, rePassword]);
 
-  // const emailOnChange = email => {
-  //     setEmail(email);
-  //     setEmailApiError('');
-  //     if (!validateEmail(email) && !email == '') setErrorEmail(true);
-  //     else setErrorEmail(false);
-  // };
-
-  const nameOnChange = name => {
-    setName(name);
-    if (name !== '' && name.length < 4) {
-      setErrorName(true);
+  const passwordOnChange = password => {
+    SetPassword(password);
+    if (password !== '' && password.length < 6) {
+      setErrorPassword(true);
     } else {
-      setErrorName(false);
+      setErrorPassword(false);
     }
   };
 
-  const onMobileNumberText = mobileNumber => {
-    setMobileNumber(mobileNumber);
-    if (mobileNumber.length < 10 && !mobileNumber == '')
-      setMobileNumberError(true);
-    else setMobileNumberError(false);
+  const onCurrentPasswordText = currentPassword => {
+    setCurrentPassword(currentPassword);
+    if (currentPassword.length < 6 && !currentPassword == '')
+      setCurrentPasswordError(true);
+    else setCurrentPasswordError(false);
+  };
+  const rePasswordOnChange = rePassword => {
+    setRePassword(rePassword);
+    if (rePassword.length < 6 && !rePassword == '') setRePasswordError(true);
+    else setRePasswordError(false);
   };
 
   const updateProfile = () => {
-    if (accountData?.usr_email && name && mobileNumber) {
+    if (accountData?.usr_email && password && currentPassword) {
       setLoading(true);
       sendRequest(
         {
           user_id: 2,
-          usr_firstName: name,
-          usr_lastName: '',
-          usr_phone: mobileNumber,
-          usr_parmentAdrss: '',
-          usr_currentAdrss: '',
+          old_password: currentPassword,
+          new_password: password,
         },
-        EndPoints.editUserProfile,
+        EndPoints.resetPassword,
         'POST',
       )
         .then(response => {
           setLoading(false);
+          setEmailApiError(response.message);
           if (response.status === true) {
-            dispatch(
-              getAccountImfo({
-                ...accountData,
-                usr_firstName: name,
-                usr_phone: mobileNumber,
-              }),
-              navigation.goBack(),
-            );
           } else {
             setEmailApiError(response.message);
             //go back
@@ -94,11 +87,12 @@ const EditProfile = ({navigation}) => {
   };
 
   const onPressDismiss = () => {
+    console.log('  setEmailApiError(response.message);');
     setEmailApiError('');
   };
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
-      <Header label={'Edit Profile'} navigation={navigation} />
+      <Header label={'Change Password'} navigation={navigation} />
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}
@@ -107,38 +101,46 @@ const EditProfile = ({navigation}) => {
       <ScrollView>
         <View style={style.contentContainerStyle}>
           <CustomInputText
-            value={name}
-            onChangeText={nameOnChange}
-            outerContainer={style.outerContainerSocial}
-            error={nameError}
-            placeholder={'Enter FullName'}
-            errorMessage={'Invalid Name'}
-          />
-          {/* <CustomInputText
-                        value={email}
-                        onChangeText={emailOnChange}
-                        outerContainer={style.outerContainerSocial}
-                        error={emailError}
-                        placeholder={'Enter Email'}
-                        errorMessage={'Invalid Email'}
-                    /> */}
-          <CustomInputText
             isNumeric={true}
             maxLength={10}
-            value={mobileNumber}
-            onChangeText={onMobileNumberText}
+            value={currentPassword}
+            onChangeText={onCurrentPasswordText}
             outerContainer={style.outerContainerSocial}
-            error={mobileNumberError}
-            placeholder={'Enter Mobile Number'}
-            errorMessage={'Invalid Mobile Number'}
+            error={currentPasswordError}
+            placeholder={'Enter Current Password'}
+            errorMessage={'Enter Current Password'}
           />
+          <CustomInputText
+            value={password}
+            onChangeText={passwordOnChange}
+            outerContainer={style.outerContainerSocial}
+            error={passwordError}
+            placeholder={'Enter Password'}
+            errorMessage={'Invalid Password'}
+          />
+          <CustomInputText
+            value={rePassword}
+            onChangeText={rePasswordOnChange}
+            outerContainer={style.outerContainerSocial}
+            error={rePasswordError}
+            placeholder={'Re-enter Password'}
+            errorMessage={'Invalid Password'}
+          />
+          {/* <CustomInputText
+                            value={email}
+                            onChangeText={emailOnChange}
+                            outerContainer={style.outerContainerSocial}
+                            error={emailError}
+                            placeholder={'Enter Email'}
+                            errorMessage={'Invalid Email'}
+                        /> */}
 
           <C_Button
             isLoading={loading}
             onPress={updateProfile}
             outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}
-            label={'Update Profile'}
+            label={'Change Password'}
           />
         </View>
       </ScrollView>
@@ -146,7 +148,7 @@ const EditProfile = ({navigation}) => {
   );
 };
 
-export default EditProfile;
+export default ChangePassword;
 const style = StyleSheet.create({
   logoTextStyle: {
     fontSize: hp(5),

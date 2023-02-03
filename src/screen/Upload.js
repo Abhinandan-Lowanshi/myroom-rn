@@ -67,6 +67,8 @@ const Upload = ({navigation}) => {
   const [colonyError, setColonyError] = useState(false);
   const [city, setCity] = useState('');
   const [cityError, setCityError] = useState(false);
+  const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState(false);
 
   useEffect(() => {
     if (
@@ -82,7 +84,8 @@ const Upload = ({navigation}) => {
       rent.length < 3 ||
       houseNumber.length < 1 ||
       colony.length < 2 ||
-      city.length < 2
+      city.length < 2 ||
+      description.length < 2
     ) {
       setIsSubmitDisabled(true);
     } else {
@@ -102,6 +105,7 @@ const Upload = ({navigation}) => {
     houseNumber,
     colony,
     city,
+    description,
   ]);
 
   const nameOnChange = name => {
@@ -134,6 +138,14 @@ const Upload = ({navigation}) => {
       setCityError(true);
     } else {
       setCityError(false);
+    }
+  };
+  const descriptionOnChange = description => {
+    setDescription(description);
+    if (description !== '' && description.length < 2) {
+      setDescriptionError(true);
+    } else {
+      setDescriptionError(false);
     }
   };
   const colonyOnChange = colony => {
@@ -179,6 +191,7 @@ const Upload = ({navigation}) => {
       rm_state: '',
       rm_latitude: '22.7149',
       rm_longitude: '75.8899',
+      rm_description: description,
     };
     dispatch(setUploadData(data));
     navigation.navigate(ScreenName.UploadFormSTP2);
@@ -312,12 +325,22 @@ const Upload = ({navigation}) => {
           placeholder={'Enter City'}
           errorMessage={'Enter City'}
         />
+        <CustomInputText
+          multiline={true}
+          maxLength={300}
+          onChangeText={descriptionOnChange}
+          value={description}
+          InputTextStyleP={style.InputTextStyle}
+          error={descriptionError}
+          placeholder={'Enter Description'}
+          errorMessage={'Enter Description'}
+        />
 
         <C_Button
           isLoading={false}
           onPress={() => onNextPress()}
           // outerContainer={style.outerContainer}
-          isSubmitDisabled={isSubmitDisabled}
+          isSubmitDisabled={false}
           label={'Next'}
         />
       </View>
@@ -334,6 +357,11 @@ const style = StyleSheet.create({
   },
   outerContainer: {
     marginTop: hp(1),
+  },
+  InputTextStyle: {
+    marginTop: hp(1),
+    height: hp(10),
+    textAlignVertical: 'top',
   },
   labelHouseNoMessage: {
     color: Colors.BLACK1,

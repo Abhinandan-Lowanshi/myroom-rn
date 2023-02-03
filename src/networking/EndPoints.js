@@ -19,5 +19,8 @@ const EndPoints = {
   updatePassword: 'updatePassword',
   verfyOtp: 'verfyOtp',
   findRoom: 'findRoom',
+  toFavorite: 'toFavorite',
+  favoriteList: 'favoriteList',
+  addRoom: 'addRoom',
 };
 export default EndPoints;

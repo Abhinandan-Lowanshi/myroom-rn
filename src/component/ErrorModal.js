@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Modal, StyleSheet, Text, View} from 'react-native';
 import Colors from '../common/Colors';
 import {hp} from '../common/CommonFunctions';
 import C_Button from './C_Button';
-const ErrorModal = ({label, visible, onPress}) => {
+const ErrorModal = props => {
   return (
     <Modal
       transparent={true}
@@ -12,7 +12,7 @@ const ErrorModal = ({label, visible, onPress}) => {
         justifyContent: 'center',
         alignItems: 'center',
       }}
-      visible={visible}>
+      visible={props?.visible}>
       <View
         style={{
           marginTop: '50%',
@@ -30,12 +30,12 @@ const ErrorModal = ({label, visible, onPress}) => {
             marginBottom: hp(1.5),
             fontWeight: '600',
           }}>
-          {label}
+          {props.label}
         </Text>
 
         <C_Button
           // isLoading={loading}
-          onPress={onPress}
+          onPress={props?.onPress}
           labelStyle={style.labelStyle}
           outerContainer={style.outerContainer}
           isSubmitDisabled={false}

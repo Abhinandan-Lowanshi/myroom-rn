@@ -18,8 +18,9 @@ const Header = ({label, navigation}) => {
           size={hp(3.6)}
           color={Colors.PRIMARY}
         />
-        <Text style={style.labelSignUp}>{label}</Text>
       </TouchableOpacity>
+      <Text style={style.labelSignUp}>{label}</Text>
+      <Text style={{color: Colors.WHITE}}>kkkk</Text>
     </View>
   );
 };
@@ -32,6 +33,7 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: 'white',
     elevation: 15,
+    justifyContent: 'space-between',
   },
   iconStyle: {
     alignSelf: 'center',
@@ -41,7 +43,6 @@ const style = StyleSheet.create({
     fontSize: hp(3),
     alignSelf: 'center',
     color: Colors.PRIMARY,
-    marginLeft: hp(0.4),
     fontSize: hp(2.6),
   },
   containerInner: {

@@ -9,14 +9,17 @@ import FullScreenLoader from '../component/FullScreenLoader';
 import ScreenName from '../common/ScreenName';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
+import DeleteConformation from '../component/DeleteConformation';
+import {clearAllData} from '../localStorage/LocalData';
 const MyAccount = ({navigation}) => {
+  const [visible, setVisible] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
   const loading = useSelector(state => state.AllData.loading);
 
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(startL());
-    sendRequest({user_id: 2}, EndPoints.myAccountDetails, 'POST')
+    sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
       .then(res => {
         dispatch(endL());
 
@@ -28,11 +31,34 @@ const MyAccount = ({navigation}) => {
         dispatch(endL());
       });
   }, []);
+
+  const logout = () => {
+    setVisible(false);
+    clearAllData();
+    navigation.navigate(ScreenName.Login);
+  };
+
   return loading ? (
     <FullScreenLoader />
   ) : (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>
       <View style={styles.container}>
+        <DeleteConformation
+          labelTop={'Logout'}
+          labelPositive={'Logout'}
+          labelNegative={'Cancel'}
+          visible={visible}
+          confirmationMessage={'Are you sure you want to  '}
+          confirmationMessageHigh={'logout?'}
+          onPressPositive={logout}
+          closeModal={() => {
+            setError('');
+            setVisible(false);
+          }}
+          onPressNegative={() => {
+            setVisible(false);
+          }}
+        />
         <View style={styles.profileContainer}>
           <Image
             style={styles.profileImage}
@@ -75,11 +101,18 @@ const MyAccount = ({navigation}) => {
           type={ScreenName.EditProfile}
         />
         <AccountTouchableCom
+          onPress={() => {
+            navigation.navigate(ScreenName.changePassword);
+          }}
           label={'Change Password'}
           type={ScreenName.changePassword}
         />
         <AccountTouchableCom label={'Contact Us'} type={ScreenName.ContactUs} />
-        <AccountTouchableCom label={'Logout'} type={ScreenName.Logout} />
+        <AccountTouchableCom
+          label={'Logout'}
+          type={ScreenName.Logout}
+          onPress={() => setVisible(true)}
+        />
       </View>
     </ScrollView>
   );

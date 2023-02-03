@@ -42,10 +42,7 @@ const getLocation = () => {
           subscribeLocationLocation();
         } else {
         }
-      } catch (err) {
-        console.log(err, 'errr');
-        console.warn(err);
-      }
+      } catch (err) {}
     }
   };
   const getOneTimeLocation = () => {

@@ -12,6 +12,9 @@ export const slice = createSlice({
     locationInfo: {},
     homeNavigation: {},
     uploadData: {},
+    favData: [],
+    isHomeUpdate: false,
+    isFavUpdate: false,
   },
   reducers: {
     startL: state => {
@@ -22,6 +25,12 @@ export const slice = createSlice({
     },
     allMyRooms: (state, actions) => {
       state.myposts = actions.payload;
+    },
+    isHomeUpdate: (state, actions) => {
+      state.isHomeUpdate = actions.payload;
+    },
+    isFavUpdate: (state, actions) => {
+      state.isFavUpdate = actions.payload;
     },
     signInData: (state, actions) => {
       state.signInData = actions.payload;
@@ -41,6 +50,9 @@ export const slice = createSlice({
     roomDataHome: (state, actions) => {
       state.roomDataHome = actions.payload;
     },
+    favData: (state, actions) => {
+      state.favData = actions.payload;
+    },
   },
 });
 
@@ -54,6 +66,9 @@ export const {
   homeNavigation,
   uploadData,
   roomDataHome,
+  favData,
+  isHomeUpdate,
+  isFavUpdate,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -75,21 +90,8 @@ export const setRoomDataHome = data => dispatch => {
   dispatch(roomDataHome(data));
 };
 
-export const getAllMyRooms = () => dispatch => {
-  dispatch(startL());
-  let ob = {
-    user_id: 2,
-  };
-  sendRequest(ob, EndPoints.myRoomList, 'POST')
-    .then(res => {
-      dispatch(endL());
-      if (res.status === true) {
-        dispatch(allMyRooms(res.data));
-      }
-    })
-    .catch(e => {
-      dispatch(endL());
-    });
+export const getAllMyRooms = data => dispatch => {
+  dispatch(allMyRooms(data));
 };
 
 export const getAccountImfo = data => dispatch => {
@@ -99,4 +101,14 @@ export const getAccountImfo = data => dispatch => {
 export const setLocation = data => dispatch => {
   dispatch(locationInfo(data));
 };
+export const setFavData = data => dispatch => {
+  dispatch(favData(data));
+};
+export const updateHome = data => dispatch => {
+  dispatch(isHomeUpdate(data));
+};
+export const updateFav = data => dispatch => {
+  dispatch(isFavUpdate(data));
+};
+
 export default slice.reducer;

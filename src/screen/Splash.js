@@ -1,16 +1,21 @@
-import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import React, {useEffect} from 'react';
+import {Text, View} from 'react-native';
 import ScreenName from '../common/ScreenName';
 import StyleGlobel from '../Style/StyleGlobel';
-const Splash = ({ navigation }) => {
+import localStorageOp from '../localStorage/LocalData';
+import AsyncKeys from '../localStorage/AsyncKeys';
+const Splash = ({navigation}) => {
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate(ScreenName.TabComponent);
+      localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
+        if (res?.data?.usr_id) navigation.navigate(ScreenName.TabComponent);
+        else navigation.navigate(ScreenName.Login);
+      });
     }, 2000);
   });
   return (
     <View style={StyleGlobel.containerStyle}>
-      <Text style={{ fontSize: 20 }}>Splash</Text>
+      <Text style={{fontSize: 20}}>Splash</Text>
     </View>
   );
 };

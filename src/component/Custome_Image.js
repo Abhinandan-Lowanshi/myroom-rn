@@ -14,8 +14,9 @@ const Custome_Image = props => {
   const [isBroken, setIsBroken] = React.useState(false);
 
   return (
-    <View style={[props.container]}>
+    <View style={[style.container, props.container]}>
       <FastImage
+        resizeMode={props?.resizeMode || FastImage.resizeMode.cover}
         style={{flex: 1, borderRadius: 5}}
         onLoadEnd={() => {
           setLoadImage(false);
@@ -43,10 +44,6 @@ const Custome_Image = props => {
 export default Custome_Image;
 const style = StyleSheet.create({
   container: {
-    height: 100,
-    width: 100,
-    elevation: 10,
-    borderRadius: 5,
-    margin: 10,
+    flex: 1,
   },
 });

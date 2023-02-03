@@ -7,7 +7,11 @@ const setData = async (key, value) => {
     // saving error
   }
 };
-
+export const clearAllData = () => {
+  AsyncStorage.getAllKeys()
+    .then(keys => $reactNative.AsyncStorage.multiRemove(keys))
+    .then(() => alert('success'));
+};
 const getData = async key => {
   try {
     const jsonValue = await AsyncStorage.getItem(key);

@@ -16,7 +16,7 @@ export default Screen = {
   MyPost: 'MyPost',
   Settings: 'Settings',
   EditProfile: 'EditProfile',
-  changePassword: 'changePassword',
+  changePassword: 'ChangePassword',
   ContactUs: 'ContactUs',
   Logout: 'Logout',
   Search: 'Search',

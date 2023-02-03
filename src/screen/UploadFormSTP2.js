@@ -17,9 +17,16 @@ import Colors from '../common/Colors';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import C_Button from '../component/C_Button';
 import Stapper from '../component/Stapper';
-
-const UploadFormSTP2 = () => {
+import {uploadImage} from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
+import {useSelector, useDispatch} from 'react-redux';
+import ScreenName from '../common/ScreenName';
+import localStorageOp from '../localStorage/LocalData';
+// var FormData = require('form-data');
+const UploadFormSTP2 = ({navigation}) => {
   const [image, setImage] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const uploadData = useSelector(state => state.AllData.uploadData);
 
   const openCamera = async () => {
     let options = {
@@ -37,7 +44,6 @@ const UploadFormSTP2 = () => {
       selectionLimit: 0,
     };
     await launchImageLibrary(options, response => {
-      console.log(response.assets);
       let imageData = response.assets;
       let temp = [...image];
       imageData?.forEach(item => {
@@ -76,6 +82,66 @@ const UploadFormSTP2 = () => {
         }}></FlatList>
     );
   };
+  // const prepareImage = () => {
+  //   let tempImage = [];
+  //   if (image.length > 0) {
+  //     image.forEach(item => {
+  //       tempImage.push({
+  //         name: item?.fileName,
+  //         type: item?.type,
+  //         uri: item?.uri,
+  //       });
+  //     });
+
+  //     return tempImage;
+  //   }
+  // };
+
+  const uploadRoom = async () => {
+    setIsLoading(true);
+    if (image.length > 2) {
+      var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
+      const formdata = new FormData();
+      image.forEach(item => {
+        formdata.append('Images[]', {
+          uri: item?.uri,
+          name: item?.fileName,
+          type: item?.type,
+        });
+      });
+      formdata.append('rm_usr_fkey', userData?.data?.usr_id);
+      formdata.append('rm_own_Fullname', uploadData?.rm_own_Fullname);
+      formdata.append('rm_own_mble_num', uploadData?.rm_own_mble_num);
+      formdata.append('rm_furnisd_status', uploadData?.rm_furnisd_status);
+      formdata.append('rm_availble', uploadData?.rm_availble);
+      formdata.append('rm_prking_avblity', uploadData?.rm_prking_avblity);
+      formdata.append('rm_depndecy', uploadData?.rm_depndecy);
+      formdata.append('rm_colny', uploadData?.rm_colny);
+      formdata.append('rm_house_no', uploadData?.rm_house_no);
+      formdata.append('rm_city', uploadData?.rm_city);
+      formdata.append('rm_state', uploadData?.rm_state);
+      formdata.append('rm_size', uploadData?.rm_size);
+      formdata.append('rm_rent', uploadData?.rm_rent);
+      formdata.append('rm_flor', uploadData?.rm_flor);
+      formdata.append('rm_latitude', '22.7149');
+      formdata.append('rm_longitude', '75.8899');
+      formdata.append('rm_description', uploadData?.rm_description);
+
+      uploadImage(formdata, EndPoints.addRoom, 'POST')
+        .then(response => {
+          setIsLoading(false);
+          if (response.status === true) {
+            // navigation.navigate(ScreenName.Fav);
+            console.log(response, 'Response');
+          }
+        })
+        .catch(error => {
+          setIsLoading(false);
+          console.log(error, 'error');
+        });
+    }
+  };
+
   return (
     <View style={StyleGlobel.containerStyle}>
       <Stapper fromSTP1={false} />
@@ -89,10 +155,10 @@ const UploadFormSTP2 = () => {
       </TouchableOpacity>
       {renderImges()}
       <C_Button
-        isLoading={false}
-        // onPress={getOtp}
+        isLoading={isLoading}
+        onPress={uploadRoom}
         // outerContainer={style.outerContainer}
-        isSubmitDisabled={true}
+        isSubmitDisabled={false}
         label={'Proceed'}
       />
     </View>

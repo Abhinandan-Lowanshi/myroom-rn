@@ -23,13 +23,14 @@ const CustomInputText = ({
   isEyeVisible,
   isNumeric,
   maxLength,
+  multiline,
 }) => {
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
   return (
     <View style={[style.outerContainer, outerContainer]}>
       <View style={[style.containerStyle(error), containerStyleP]}>
         <TextInput
-          maxLength={maxLength}
+          maxLength={maxLength || 50}
           editable={!disabled}
           selectTextOnFocus={!disabled}
           style={[style.InputTextStyle(error), InputTextStyleP]}
@@ -37,7 +38,7 @@ const CustomInputText = ({
           value={value}
           placeholderTextColor={Colors.BLACK}
           onChangeText={value => onChangeText(value)}
-          multiline={false}
+          multiline={multiline}
           secureTextEntry={isEyeVisible && isPassWordHidden}
           keyboardType={
             isNumeric

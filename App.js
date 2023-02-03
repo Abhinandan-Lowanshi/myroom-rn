@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './src/screen/Home';
@@ -13,10 +13,19 @@ import Splash from './src/screen/Splash';
 import EmailVerify from './src/screen/EmailVerify';
 import EditProfile from './src/screen/EditProfile';
 import DetailsScreen from './src/screen/DetailsScreen';
+import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 const Stack = createNativeStackNavigator();
 const App = () => {
+  const [token, setToken] = useState('');
+  useEffect(() => {
+    getToken;
+  }, []);
+  const getToken = async () => {
+    var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
+    setToken(userData?.token);
+  };
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -24,7 +33,7 @@ const App = () => {
           screenOptions={{
             headerShown: false,
           }}>
-          {/* <Stack.Screen name={ScreenName.Splash} component={Splash} />
+          <Stack.Screen name={ScreenName.Splash} component={Splash} />
           <Stack.Screen name={ScreenName.Login} component={Login} />
           <Stack.Screen name={ScreenName.Home} component={HomeScreen} />
           <Stack.Screen name={ScreenName.SignUp} component={SignUp} />
@@ -32,13 +41,17 @@ const App = () => {
           <Stack.Screen
             name={ScreenName.ForgotPassword}
             component={ForgotPassword}
-          /> */}
+          />
 
           <Stack.Screen
             name={ScreenName.TabComponent}
             component={TabComponent}
           />
           <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
+          <Stack.Screen
+            name={ScreenName.changePassword}
+            component={ChangePassword}
+          />
           <Stack.Screen
             name={ScreenName.UploadFormSTP2}
             component={UploadFormSTP2}

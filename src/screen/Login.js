@@ -67,7 +67,8 @@ const Login = ({navigation}) => {
         SetIsLoading(false);
         if (response.status === true) {
           setApiError(response.message);
-          localStorageOp(true, AsyncKeys.USERDATA, response.data);
+          localStorageOp(true, AsyncKeys.USERDATA, response);
+          navigation.navigate(ScreenName.TabComponent);
         } else {
           setAuthError(response.message);
         }
