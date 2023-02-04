@@ -340,7 +340,7 @@ const Upload = ({navigation}) => {
           isLoading={false}
           onPress={() => onNextPress()}
           // outerContainer={style.outerContainer}
-          isSubmitDisabled={false}
+          isSubmitDisabled={isSubmitDisabled}
           label={'Next'}
         />
       </View>

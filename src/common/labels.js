@@ -8,5 +8,6 @@ const Labels = {
   Dependency: 'Dependency',
   Furnished: 'Furnished',
   Description: 'Description',
+  Search: 'Search',
 };
 export default Labels;

@@ -7,6 +7,15 @@ const data = {
     {label: '3BHK', value: '3BHK', id: 5},
     {label: 'More then 3BHK', value: 'More then 3BHK', id: 6},
   ],
+  ROOM_RADIUS: [
+    {label: 'Default', value: 'Default', id: 1},
+    {label: '1KM', value: '1', id: 2},
+    {label: '2KM', value: '2', id: 3},
+    {label: '3KM', value: '3', id: 4},
+    {label: '4KM', value: '4', id: 5},
+    {label: '5KM', value: '5', id: 6},
+    {label: '10KM', value: '10', id: 7},
+  ],
   ROOM_STATUS_FR: [
     {label: 'Furnished', value: 'Furnished', id: 1},
     {label: 'Unfurnished', value: 'Unfurnished', id: 2},

@@ -1,10 +1,17 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, Text, ToastAndroid, View} from 'react-native';
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  ToastAndroid,
+  View,
+} from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
 import {
   getAllMyRooms,
   setFavData,
+  startL,
   UpdateFavData,
   updateHome,
 } from '../redux/Slice';
@@ -38,6 +45,7 @@ const Home = ({route, navigation}) => {
 
   useEffect(() => {
     if (favUpdate) {
+      dispatch(startL(true));
       getData();
       dispatch(updateFav(false));
     }
@@ -133,6 +141,7 @@ const Home = ({route, navigation}) => {
         .then(res => {
           setLoading(false);
           setRefreshing(false);
+          dispatch(startL(false));
           if (res.status === true) {
             console.log(res.data.length, 'res');
             if (res.data.length > 0) {
@@ -155,6 +164,7 @@ const Home = ({route, navigation}) => {
           setLoading(false);
           setIsFaild(true);
           setRefreshing(false);
+          dispatch(startL(false));
           setError({
             error: '',
             header: '',
@@ -164,7 +174,11 @@ const Home = ({route, navigation}) => {
   };
 
   return (
-    <ScrollView style={StyleGlobel.containerStyle}>
+    <ScrollView
+      style={StyleGlobel.containerStyle}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       {loading ? (
         <FullScreenLoader />
       ) : isFaild ? (
@@ -192,8 +206,7 @@ const Home = ({route, navigation}) => {
               myRoomList={roomDataHome}
               onPress={onPressRoom}
               onPressFav={onPressFav}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
+              refreshing={false}
             />
           ) : null}
         </View>

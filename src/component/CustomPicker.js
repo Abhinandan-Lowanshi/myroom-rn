@@ -18,7 +18,7 @@ const CustomPicker = ({
 
   return (
     <View style={[outerContainer, styles.outerContainer]}>
-      <Text style={styles.topLabel}>{labelTop}</Text>
+      {labelTop && <Text style={styles.topLabel}>{labelTop}</Text>}
       <View style={[styles.container, container]}>
         <Dropdown
           style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}

@@ -17,8 +17,8 @@ export const slice = createSlice({
     isFavUpdate: false,
   },
   reducers: {
-    startL: state => {
-      state.loading = true;
+    startL: (state, actions) => {
+      state.loading = actions.payload;
     },
     endL: state => {
       state.loading = false;

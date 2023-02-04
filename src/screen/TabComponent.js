@@ -10,17 +10,31 @@ import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import Colors from '../common/Colors';
 import {hp} from '../common/CommonFunctions';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ScreenName from '../common/ScreenName';
 import AppLogo from '../component/applogo/AppLogo';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 const Tab = createBottomTabNavigator();
 import {setHomeNavigation} from '../redux/Slice';
 const TabComponent = ({navigation}) => {
+  const loading = useSelector(state => state.AllData.loading);
+
   return (
     <>
       <View style={style.headerContainer}>
-        <AppLogo style={style.logo} textStyle={style.textStyle}></AppLogo>
+        <AppLogo style={style.logo} textStyle={style.textStyle} />
+        {loading ? (
+          <ActivityIndicator
+            style={style.loaderHome}
+            color={Colors.PRIMARY}
+            size={hp(3)}></ActivityIndicator>
+        ) : null}
         <View style={style.iconContainer}>
           <TouchableOpacity
             onPress={() => {
@@ -150,5 +164,8 @@ const style = StyleSheet.create({
   textStyle: {fontSize: hp(2.8)},
   logo: {
     marginLeft: hp(2),
+  },
+  loaderHome: {
+    marginLeft: hp(1),
   },
 });

@@ -20,7 +20,7 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const [token, setToken] = useState('');
   useEffect(() => {
-    getToken;
+    getToken();
   }, []);
   const getToken = async () => {
     var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');

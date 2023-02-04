@@ -6,7 +6,7 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import StyleGlobel from '../Style/StyleGlobel';
 import {useSelector, useDispatch} from 'react-redux';
-import {setFavData, updateHome, updateFav} from '../redux/Slice';
+import {setFavData, updateHome, updateFav, startL} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -22,7 +22,9 @@ const Fav = ({navigation, route}) => {
 
   useEffect(() => {
     if (isHomeUpdate) {
+      dispatch(startL(true));
       getData();
+      dispatch(updateHome(false));
     }
   }, [isFocused]);
 
@@ -51,10 +53,12 @@ const Fav = ({navigation, route}) => {
       .then(res => {
         setRefreshing(false);
         setLoading(false);
+        dispatch(startL(false));
         dispatch(updateHome(false));
         dispatch(setFavData(res?.data));
       })
       .catch(err => {
+        dispatch(startL(false));
         setLoading(false);
         setRefreshing(false);
       });
