@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   ToastAndroid,
   View,
@@ -29,6 +30,7 @@ import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import Banner from '../component/Banner';
 import {ImageSlider} from 'react-native-image-slider-banner';
+import {hp} from '../common/CommonFunctions';
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -128,6 +130,7 @@ const Home = ({route, navigation}) => {
   const getData = () => {
     setIsFaild(false);
     if (data.longitude && data.latitude) {
+      console.log(data.longitude, data.latitude, 'data.longitude');
       sendRequest(
         {
           user_id: 'Dummy',
@@ -175,6 +178,7 @@ const Home = ({route, navigation}) => {
 
   return (
     <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
       style={StyleGlobel.containerStyle}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -186,6 +190,7 @@ const Home = ({route, navigation}) => {
       ) : (
         <View>
           <ImageSlider
+            previewImageContainerStyle={style.previewImageContainerStyle}
             data={[
               {
                 img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5a5uCP-n4teeW2SApcIqUrcQApev8ZVCJkA&usqp=CAU',
@@ -201,14 +206,16 @@ const Home = ({route, navigation}) => {
             // onItemChanged={item => console.log('item', item)}
             closeIconColor="#fff"
           />
-          {roomDataHome?.length > 0 ? (
-            <RenderRoom
-              myRoomList={roomDataHome}
-              onPress={onPressRoom}
-              onPressFav={onPressFav}
-              refreshing={false}
-            />
-          ) : null}
+          <View style={{marginHorizontal: hp(1)}}>
+            {roomDataHome?.length > 0 ? (
+              <RenderRoom
+                myRoomList={roomDataHome}
+                onPress={onPressRoom}
+                onPressFav={onPressFav}
+                refreshing={false}
+              />
+            ) : null}
+          </View>
         </View>
       )}
       {getLocation()}
@@ -217,3 +224,8 @@ const Home = ({route, navigation}) => {
 };
 
 export default Home;
+const style = StyleSheet.create({
+  previewImageContainerStyle: {
+    borderRadius: hp(2),
+  },
+});

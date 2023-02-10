@@ -29,6 +29,7 @@ const CustomPicker = ({
           data={data}
           search
           maxHeight={400}
+          itemTextStyle={styles.itemTextStyle}
           labelField="label"
           valueField="value"
           placeholder={placeholder}
@@ -83,6 +84,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: RF(1.1),
+    color: Colors.BLACK,
   },
   placeholderStyle: {
     fontSize: RF(1.6),
@@ -100,5 +102,9 @@ const styles = StyleSheet.create({
   },
   inputSearchStyle: {
     height: hp(8),
+    color: Colors.BLACK,
+  },
+  itemTextStyle: {
+    color: Colors.BLACK,
   },
 });

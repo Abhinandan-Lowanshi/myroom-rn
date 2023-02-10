@@ -16,6 +16,7 @@ import DetailsScreen from './src/screen/DetailsScreen';
 import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
+import localStorageOp from './src/localStorage/LocalData';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const [token, setToken] = useState('');
