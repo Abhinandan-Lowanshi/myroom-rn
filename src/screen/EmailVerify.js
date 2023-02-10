@@ -9,6 +9,7 @@ import C_Button from '../component/C_Button';
 import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
+import localStorageOp from '../localStorage/LocalData';
 
 const EmailVerify = ({navigation}) => {
   const signInData = useSelector(state => state.AllData.signInData);

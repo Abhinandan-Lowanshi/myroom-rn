@@ -15,6 +15,7 @@ export const slice = createSlice({
     favData: [],
     isHomeUpdate: false,
     isFavUpdate: false,
+    searchRooms: {},
   },
   reducers: {
     startL: (state, actions) => {
@@ -53,6 +54,9 @@ export const slice = createSlice({
     favData: (state, actions) => {
       state.favData = actions.payload;
     },
+    searchRooms: (state, actions) => {
+      state.searchRooms = actions.payload;
+    },
   },
 });
 
@@ -69,6 +73,7 @@ export const {
   favData,
   isHomeUpdate,
   isFavUpdate,
+  searchRooms,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -109,6 +114,9 @@ export const updateHome = data => dispatch => {
 };
 export const updateFav = data => dispatch => {
   dispatch(isFavUpdate(data));
+};
+export const setSearchRoomData = data => dispatch => {
+  dispatch(searchRooms(data));
 };
 
 export default slice.reducer;

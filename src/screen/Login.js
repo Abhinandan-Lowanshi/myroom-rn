@@ -23,6 +23,7 @@ import FreezScreen from '../component/FreezScreen';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import localStorageOp from '../localStorage/LocalData';
 import ErrorModal from '../component/ErrorModal';
+import {CommonActions} from '@react-navigation/native';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -68,7 +69,13 @@ const Login = ({navigation}) => {
         if (response.status === true) {
           setApiError(response.message);
           localStorageOp(true, AsyncKeys.USERDATA, response);
-          navigation.navigate(ScreenName.TabComponent);
+          // navigation.navigate(ScreenName.TabComponent);
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.TabComponent}],
+            }),
+          );
         } else {
           setAuthError(response.message);
         }

@@ -24,6 +24,7 @@ const RenderRoom = ({
   onPressActive,
   onPressDelete,
   onPressEdit,
+  container,
 }) => {
   const renderItem = ({item}) => {
     return (
@@ -31,7 +32,7 @@ const RenderRoom = ({
         onPress={() => onPress(item)}
         activeOpacity={0.8}
         //  activeOpacity={1}
-        style={style.container}>
+        style={[style.container, container]}>
         {isFromMyPost && (
           <View style={style.innerContainer}>
             <TouchableOpacity
@@ -126,7 +127,9 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     borderRadius: hp(1),
     elevation: hp(1),
+    marginHorizontal: hp(0.2),
     paddingBottom: hp(2),
+    marginBottom: hp(1),
   },
   rentContainer: {
     flexDirection: 'row',

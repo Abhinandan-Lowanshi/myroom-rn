@@ -11,6 +11,8 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import DeleteConformation from '../component/DeleteConformation';
 import {clearAllData} from '../localStorage/LocalData';
+import {CommonActions} from '@react-navigation/native';
+
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
@@ -35,7 +37,15 @@ const MyAccount = ({navigation}) => {
   const logout = () => {
     setVisible(false);
     clearAllData();
-    navigation.navigate(ScreenName.Login);
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{name: ScreenName.Login}],
+      }),
+    );
+
+    // navigation.navigate(ScreenName.Login);
   };
 
   return loading ? (
