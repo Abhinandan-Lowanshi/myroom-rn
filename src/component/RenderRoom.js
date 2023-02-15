@@ -9,11 +9,9 @@ import {
 } from 'react-native';
 import {hp, RF} from '../common/CommonFunctions';
 import Colors from '../common/Colors';
-import Custome_Image from './Custome_Image';
+import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
-import DeteleConformation from './DeleteConformation';
-import DeleteConformation from './DeleteConformation';
 const RenderRoom = ({
   myRoomList,
   isFromMyPost,
@@ -60,7 +58,7 @@ const RenderRoom = ({
           </View>
         )}
         <View>
-          <Custome_Image
+          <Custom_Image
             uri={item?.images[0]?.img_name}
             container={style.image}
           />

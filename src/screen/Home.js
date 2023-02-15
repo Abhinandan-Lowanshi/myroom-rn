@@ -3,19 +3,12 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  Text,
   ToastAndroid,
   View,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  getAllMyRooms,
-  setFavData,
-  startL,
-  UpdateFavData,
-  updateHome,
-} from '../redux/Slice';
+import {startL, updateHome} from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
@@ -24,23 +17,20 @@ import EndPoints from '../networking/EndPoints';
 import {setRoomDataHome, updateFav} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
-import {updateFavList} from '../common/FavFunction';
-import {useCallback} from 'react';
 import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
-import Banner from '../component/Banner';
 import {ImageSlider} from 'react-native-image-slider-banner';
 import {hp} from '../common/CommonFunctions';
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [isFaild, setIsFaild] = useState(false);
+  const [isFailed, setIsFailed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
-  console.log(roomDataHome);
+  console.log(roomDataHome, 'home');
   const dispatch = useDispatch();
   let counter = 10;
   const isFocused = useIsFocused();
@@ -128,7 +118,7 @@ const Home = ({route, navigation}) => {
     }
   };
   const getData = () => {
-    setIsFaild(false);
+    setIsFailed(false);
     if (data.longitude && data.latitude) {
       console.log(data.longitude, data.latitude, 'data.longitude');
       sendRequest(
@@ -156,7 +146,7 @@ const Home = ({route, navigation}) => {
               // });
             }
           } else {
-            setIsFaild(true);
+            setIsFailed(true);
             setError({
               error: res.message,
               header: '',
@@ -165,7 +155,7 @@ const Home = ({route, navigation}) => {
         })
         .catch(err => {
           setLoading(false);
-          setIsFaild(true);
+          setIsFailed(true);
           setRefreshing(false);
           dispatch(startL(false));
           setError({
@@ -183,9 +173,10 @@ const Home = ({route, navigation}) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
+      {getLocation()}
       {loading ? (
         <FullScreenLoader />
-      ) : isFaild ? (
+      ) : isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
         <View>
@@ -203,7 +194,6 @@ const Home = ({route, navigation}) => {
               },
             ]}
             autoPlay={true}
-            // onItemChanged={item => console.log('item', item)}
             closeIconColor="#fff"
           />
           <View style={{marginHorizontal: hp(1)}}>
@@ -218,7 +208,6 @@ const Home = ({route, navigation}) => {
           </View>
         </View>
       )}
-      {getLocation()}
     </ScrollView>
   );
 };

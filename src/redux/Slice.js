@@ -9,13 +9,14 @@ export const slice = createSlice({
     myposts: [],
     signInData: {},
     accountData: {},
-    locationInfo: {},
+    locationInfo: [],
     homeNavigation: {},
     uploadData: {},
     favData: [],
     isHomeUpdate: false,
     isFavUpdate: false,
     searchRooms: {},
+    roomDataHome: [],
   },
   reducers: {
     startL: (state, actions) => {

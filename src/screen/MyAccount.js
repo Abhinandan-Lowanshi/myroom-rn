@@ -44,8 +44,6 @@ const MyAccount = ({navigation}) => {
         routes: [{name: ScreenName.Login}],
       }),
     );
-
-    // navigation.navigate(ScreenName.Login);
   };
 
   return loading ? (
@@ -93,16 +91,20 @@ const MyAccount = ({navigation}) => {
               </Text>
             </View>
           )}
-          <View style={styles.staticsInnerContainer}>
+          {/* <View style={styles.staticsInnerContainer}>
             <Text style={styles.labelPersonalText(true)}>Current Location</Text>
             <Text style={styles.labelInnerContainer}>Ward no 3 Shukhliya</Text>
-          </View>
+          </View> */}
         </View>
         <AccountTouchableCom
-          label={'Settings'}
-          type={ScreenName.Settings}
+          onPress={() => {
+            navigation.navigate(ScreenName.MyPost);
+          }}
+          label={'My Post'}
+          type={ScreenName.MyPost}
           outerContainer={styles.outerContainer}
         />
+        <AccountTouchableCom label={'Settings'} type={ScreenName.Settings} />
         <AccountTouchableCom
           onPress={() => {
             navigation.navigate(ScreenName.EditProfile);

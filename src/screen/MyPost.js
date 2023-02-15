@@ -11,6 +11,7 @@ import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import FullScreenLoader from '../component/FullScreenLoader';
+import Header from '../component/Header';
 
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -89,6 +90,7 @@ const MyPost = ({navigation}) => {
   };
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
+      <Header label={'My Post'} navigation={navigation} />
       {loading ? (
         <FullScreenLoader />
       ) : (

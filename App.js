@@ -13,6 +13,7 @@ import Splash from './src/screen/Splash';
 import EmailVerify from './src/screen/EmailVerify';
 import EditProfile from './src/screen/EditProfile';
 import DetailsScreen from './src/screen/DetailsScreen';
+import MyPost from './src/screen/MyPost';
 import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
@@ -48,6 +49,7 @@ const App = () => {
             name={ScreenName.TabComponent}
             component={TabComponent}
           />
+          <Stack.Screen name={ScreenName.MyPost} component={MyPost} />
           <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
           <Stack.Screen
             name={ScreenName.changePassword}
