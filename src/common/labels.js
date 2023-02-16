@@ -13,5 +13,6 @@ const Labels = {
   fullAddress: 'Full Address',
   Distance: 'Distance',
   Time: 'Time To Reach Room',
+  Notification: 'Notification',
 };
 export default Labels;

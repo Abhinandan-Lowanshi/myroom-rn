@@ -18,6 +18,7 @@ import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 import localStorageOp from './src/localStorage/LocalData';
+import Notification from './src/screen/Notification';
 const Stack = createNativeStackNavigator();
 const App = () => {
   const [token, setToken] = useState('');
@@ -51,6 +52,10 @@ const App = () => {
           />
           <Stack.Screen name={ScreenName.MyPost} component={MyPost} />
           <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
+          <Stack.Screen
+            name={ScreenName.Notification}
+            component={Notification}
+          />
           <Stack.Screen
             name={ScreenName.changePassword}
             component={ChangePassword}

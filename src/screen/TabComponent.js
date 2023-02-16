@@ -47,7 +47,10 @@ const TabComponent = ({navigation}) => {
               size={hp(2.8)}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenName.Notification);
+            }}>
             <Icon1
               style={style.notificationIcon}
               name="notifications-none"

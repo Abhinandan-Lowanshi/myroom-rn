@@ -28,21 +28,25 @@ import ImageScaleType from '../common/ImageScaleType';
 import MapView, {Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 const DetailsScreen = props => {
-  console.log(props, 'DetailsScreen12');
   const {navigation} = props;
   const [like, setLike] = useState(false);
   const [mapOnFocus, setMapOnFocus] = useState(false);
   const [imageData, setImageData] = useState({});
-  const [visible, setVisible] = useState(false);
   const propData = props?.route?.params?.item;
+  const [visible, setVisible] = useState(false);
+  const [item, setItem] = useState({});
   const onPressFav = props?.route?.params?.onPressFav;
+  const isFromNotification = props?.route?.params?.isFromNotification;
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const data = useSelector(state => state.AllData.locationInfo);
   const [locationData, setLocationData] = useState({});
   useEffect(() => {
     setLike(propData?.favorite_key);
-    console.log(propData?.rm_latitude, propData, 'propData?.rm_latitude');
+    setItem(propData);
+    if (isFromNotification) {
+      getRoomFromServer();
+    }
   }, []);
 
   const setZoom = () => {
@@ -95,7 +99,7 @@ const DetailsScreen = props => {
     //   }
     return level;
   };
-
+  const getRoomFromServer = () => {};
   const ShowFullImage = () => {
     return (
       <Modal

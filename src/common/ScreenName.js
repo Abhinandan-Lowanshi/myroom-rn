@@ -26,4 +26,5 @@ export default Screen = {
   UploadNavigator: 'UploadNavigator',
   DetailsScreen: 'DetailsScreen',
   MapSearch: 'MapSearch',
+  Notification: 'Notification',
 };
