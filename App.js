@@ -19,16 +19,17 @@ import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 import localStorageOp from './src/localStorage/LocalData';
 import Notification from './src/screen/Notification';
+// import {
+//   requestUserPermission,
+//   notificationListener,
+// } from './src/Utils/notificationServices';
 const Stack = createNativeStackNavigator();
 const App = () => {
-  const [token, setToken] = useState('');
-  useEffect(() => {
-    getToken();
-  }, []);
-  const getToken = async () => {
-    var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
-    setToken(userData?.token);
-  };
+  //   useEffect(() => {
+  //     requestUserPermission();
+  //     notificationListener();
+  //   }, []);
+
   return (
     <Provider store={store}>
       <NavigationContainer>

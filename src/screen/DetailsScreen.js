@@ -27,16 +27,21 @@ import Colors from '../common/Colors';
 import ImageScaleType from '../common/ImageScaleType';
 import MapView, {Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
+import sendRequest from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
+import ErrorModal from '../component/ErrorModal';
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
   const [mapOnFocus, setMapOnFocus] = useState(false);
   const [imageData, setImageData] = useState({});
   const propData = props?.route?.params?.item;
   const [visible, setVisible] = useState(false);
   const [item, setItem] = useState({});
   const onPressFav = props?.route?.params?.onPressFav;
-  const isFromNotification = props?.route?.params?.isFromNotification;
+  const roomInfo = props?.route?.params;
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const data = useSelector(state => state.AllData.locationInfo);
@@ -44,8 +49,9 @@ const DetailsScreen = props => {
   useEffect(() => {
     setLike(propData?.favorite_key);
     setItem(propData);
-    if (isFromNotification) {
-      getRoomFromServer();
+    if (roomInfo?.isServer) {
+      setLoading(true);
+      getRoomFromServer(roomInfo?.roomId);
     }
   }, []);
 
@@ -99,7 +105,31 @@ const DetailsScreen = props => {
     //   }
     return level;
   };
-  const getRoomFromServer = () => {};
+  const getRoomFromServer = roomId => {
+    sendRequest(
+      {
+        user_id: 'dummy',
+        room_id: roomId,
+      },
+      EndPoints.viewRoomDetails,
+      'POST',
+    )
+      .then(res => {
+        setLoading(false);
+        if (res.status === true) {
+          if (!res?.data?.length === 0) {
+            setItem(res?.data);
+          } else {
+            console.log(res?.data, '124');
+            setApiError(res?.message);
+          }
+        }
+      })
+      .catch(err => {
+        setLoading(false);
+        setApiError(err.toString());
+      });
+  };
   const ShowFullImage = () => {
     return (
       <Modal
@@ -252,8 +282,8 @@ const DetailsScreen = props => {
             uri: 'https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510__340.jpg',
           }}></Image>
         <View style={style.ownerNameContainer}>
-          <Text style={style.labelName}>{propData?.rm_own_Fullname}</Text>
-          <Text style={style.labelmoble}>{propData?.rm_own_Fullname}</Text>
+          <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
+          <Text style={style.labelmoble}>{item?.rm_own_Fullname}</Text>
         </View>
         <View style={style.containerContact}>
           <IconButton_Entypo
@@ -273,140 +303,153 @@ const DetailsScreen = props => {
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
       <Header label={Labels?.Details} navigation={navigation} />
-      <ScrollView style={{opacity: visible ? 0.2 : 1}}>
-        <FlatList
-          horizontal={true}
-          data={propData?.images}
-          renderItem={renderImages}
-        />
-        <View style={style.contentContainer}>
-          <View style={style.addressView}>
-            <View style={style.addressContainer}>
-              <Text style={style.sizelabel}>{propData?.rm_size}</Text>
-              <Text style={style.labelAddress}>
-                {`${propData?.rm_house_no},${propData?.rm_colny}, ${propData?.rm_city}`}
-              </Text>
+      {roomInfo?.isServer && loading ? (
+        <FullScreenLoader />
+      ) : (
+        <ScrollView style={{opacity: visible ? 0.2 : 1}}>
+          <FlatList
+            horizontal={true}
+            data={item?.images}
+            renderItem={renderImages}
+          />
+          <View style={style.contentContainer}>
+            <View style={style.addressView}>
+              <View style={style.addressContainer}>
+                <Text style={style.sizelabel}>{item?.rm_size}</Text>
+                <Text style={style.labelAddress}>
+                  {`${item?.rm_house_no},${item?.rm_colny}, ${item?.rm_city}`}
+                </Text>
+              </View>
+              {props?.route?.params?.isFrom === 'MyPost' ? null : (
+                <IconButton_Entypo
+                  value={like}
+                  tValue={IconName?.heartActive}
+                  fValue={IconName?.heartDeActive}
+                  isLike={true}
+                  onPress={() => {
+                    setLike(!like);
+                    onPressFav({roomId: item?.rm_pkey, like: !like}).then(
+                      res => {
+                        if (res === false) {
+                          setLike(like);
+                        }
+                      },
+                    );
+                  }}
+                />
+              )}
             </View>
-            {props?.route?.params?.isFrom === 'MyPost' ? null : (
-              <IconButton_Entypo
-                value={like}
-                tValue={IconName?.heartActive}
-                fValue={IconName?.heartDeActive}
-                isLike={true}
-                onPress={() => {
-                  setLike(!like);
-                  onPressFav({roomId: propData?.rm_pkey, like: !like}).then(
-                    res => {
-                      if (res === false) {
-                        setLike(like);
-                      }
-                    },
-                  );
-                }}
+            <View
+              style={{
+                marginTop: 20,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <ContentHeader
+                label={labels.ListingAgent}
+                headerContainer={{marginTop: 0}}
               />
-            )}
-          </View>
-          <View
-            style={{
-              marginTop: 20,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <ContentHeader
-              label={labels.ListingAgent}
-              headerContainer={{marginTop: 0}}
-            />
-            <Text style={style.labelRent}>{`\u20B9${propData?.rm_rent}`}</Text>
-          </View>
+              <Text style={style.labelRent}>{`\u20B9${item?.rm_rent}`}</Text>
+            </View>
 
-          {ownerDetails()}
-          <ContentHeader label={labels.Specification} />
-          <View style={style.contantConatainer2}>
-            <SpecificationDetails
-              label={labels?.Availablefor}
-              labelAns={propData?.rm_availble}
-            />
-            <SpecificationDetails
-              label={labels?.ParkingAvailability}
-              labelAns={propData?.rm_prking_avblity}
-            />
-            <SpecificationDetails
-              label={labels?.WhichFloor}
-              labelAns={propData?.rm_flor}
-            />
-            <SpecificationDetails
-              label={labels?.Dependency}
-              labelAns={propData?.rm_depndecy}
-            />
-            <SpecificationDetails
-              label={labels?.Furnished}
-              labelAns={propData?.rm_furnisd_status}
-            />
-          </View>
-          <ContentHeader label={labels?.Description} />
-          <Text style={style.labelDescription}>{propData?.rm_description}</Text>
-          {/* <ShareLayout /> */}
-          <RoomInformation />
-        </View>
-        {propData?.rm_latitude && (
-          <View style={style.mapContainer(windowHeight, mapOnFocus)}>
-            <MapView
-              style={style.map}
-              zoomEnabled={true}
-              initialRegion={{
-                latitude: propData ? parseFloat(propData?.rm_latitude) : 0.0,
-                longitude: propData ? parseFloat(propData?.rm_longitude) : 0.0,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
-              }}>
-              <MapViewDirections
-                onReady={item => {
-                  setLocationData(item?.legs[0]);
-                }}
-                optimizeWaypoints={true}
-                splitWaypoints={true}
-                origin={{
-                  latitude: data?.latitude,
-                  longitude: data?.longitude,
-                }}
-                destination={{
-                  latitude: parseFloat(propData?.rm_latitude),
-                  longitude: parseFloat(propData?.rm_longitude),
-                }}
-                apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
-                strokeWidth={hp(0.5)}
-                strokeColor={Colors.PRIMARY}
+            {ownerDetails()}
+            <ContentHeader label={labels.Specification} />
+            <View style={style.contantConatainer2}>
+              <SpecificationDetails
+                label={labels?.Availablefor}
+                labelAns={item?.rm_availble}
               />
-              <Marker
-                title={'Room location'}
-                pinColor={'green'}
-                key={0}
-                coordinate={{
-                  latitude: parseFloat(propData?.rm_latitude),
-                  longitude: parseFloat(propData?.rm_longitude),
-                }}></Marker>
-              <Marker
-                title={'Your location'}
-                key={1}
-                coordinate={{
-                  latitude: data?.latitude,
-                  longitude: data?.longitude,
-                }}></Marker>
-            </MapView>
-            <TouchableOpacity
-              style={style.fullMapContainer}
+              <SpecificationDetails
+                label={labels?.ParkingAvailability}
+                labelAns={item?.rm_prking_avblity}
+              />
+              <SpecificationDetails
+                label={labels?.WhichFloor}
+                labelAns={item?.rm_flor}
+              />
+              <SpecificationDetails
+                label={labels?.Dependency}
+                labelAns={item?.rm_depndecy}
+              />
+              <SpecificationDetails
+                label={labels?.Furnished}
+                labelAns={item?.rm_furnisd_status}
+              />
+            </View>
+            <ContentHeader label={labels?.Description} />
+            <Text style={style.labelDescription}>{item?.rm_description}</Text>
+            {/* <ShareLayout /> */}
+            <RoomInformation />
+          </View>
+          {item?.rm_latitude && (
+            <View style={style.mapContainer(windowHeight, mapOnFocus)}>
+              <MapView
+                style={style.map}
+                zoomEnabled={true}
+                initialRegion={{
+                  latitude: item ? parseFloat(item?.rm_latitude) : 0.0,
+                  longitude: item ? parseFloat(item?.rm_longitude) : 0.0,
+                  latitudeDelta: 0.05,
+                  longitudeDelta: 0.05,
+                }}>
+                <MapViewDirections
+                  onReady={item => {
+                    setLocationData(item?.legs[0]);
+                  }}
+                  optimizeWaypoints={true}
+                  splitWaypoints={true}
+                  origin={{
+                    latitude: data?.latitude,
+                    longitude: data?.longitude,
+                  }}
+                  destination={{
+                    latitude: parseFloat(item?.rm_latitude),
+                    longitude: parseFloat(item?.rm_longitude),
+                  }}
+                  apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
+                  strokeWidth={hp(0.5)}
+                  strokeColor={Colors.PRIMARY}
+                />
+                <Marker
+                  title={'Room location'}
+                  pinColor={'green'}
+                  key={0}
+                  coordinate={{
+                    latitude: parseFloat(item?.rm_latitude),
+                    longitude: parseFloat(item?.rm_longitude),
+                  }}></Marker>
+                <Marker
+                  title={'Your location'}
+                  key={1}
+                  coordinate={{
+                    latitude: data?.latitude,
+                    longitude: data?.longitude,
+                  }}></Marker>
+              </MapView>
+              <TouchableOpacity
+                style={style.fullMapContainer}
+                onPress={() => {
+                  setMapOnFocus(!mapOnFocus);
+                }}>
+                <MaterialIcons
+                  size={hp(4.5)}
+                  color={Colors.BLACK}
+                  name={mapOnFocus ? 'fullscreen-exit' : 'fullscreen'}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {roomInfo?.isServer && (
+            <ErrorModal
               onPress={() => {
-                setMapOnFocus(!mapOnFocus);
-              }}>
-              <MaterialIcons
-                size={hp(4.5)}
-                color={Colors.BLACK}
-                name={mapOnFocus ? 'fullscreen-exit' : 'fullscreen'}
-              />
-            </TouchableOpacity>
-          </View>
-        )}
-      </ScrollView>
+                setApiError('');
+              }}
+              label={apiError}
+              visible={apiError ? true : false}></ErrorModal>
+          )}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

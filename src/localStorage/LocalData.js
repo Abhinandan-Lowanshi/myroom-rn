@@ -21,7 +21,7 @@ const getData = async key => {
   }
 };
 
-const localStorageOp = (isSet, key, value) => {
+const localStorageOp = (isSet = false, key, value) => {
   if (isSet) {
     setData(key, value);
   } else {

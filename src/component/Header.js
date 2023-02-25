@@ -37,7 +37,6 @@ const style = StyleSheet.create({
   },
   iconStyle: {
     alignSelf: 'center',
-    marginLeft: hp(0.8),
   },
   labelSignUp: {
     fontSize: hp(3),

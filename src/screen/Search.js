@@ -1,36 +1,49 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Colors from '../common/Colors';
-import {hp} from '../common/CommonFunctions';
+import {hp, RF} from '../common/CommonFunctions';
 import Labels from '../common/labels';
 import data from '../common/SpinnerData';
 import CustomPicker from '../component/CustomPicker';
-import Header from '../component/Header';
+// import Header from '../component/Header';
 import StyleGlobel from '../Style/StyleGlobel';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import {useDispatch, useSelector} from 'react-redux';
-import {setSearchRoomData} from '../redux/Slice';
+import {setRoomDataHome, setSearchRoomData, updateHome} from '../redux/Slice';
 import RenderRoom from '../component/RenderRoom';
 import FullScreenLoader from '../component/FullScreenLoader';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
+import Filter from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
+import C_Button from '../component/C_Button';
+import {useMemo} from 'react';
 
 const Search = ({navigation}) => {
   const [radius, setAvailableStatus] = useState('');
   const [location, setLocation] = useState({});
   const [address, setAddress] = useState('');
-  const [Loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [filterVisible, setFilterVisible] = useState(false);
   const [isFilterApplied, setIsFilterApplied] = useState(false);
   const [roomData, setRoomData] = useState([]);
-  // const [searchRooms, setSearchRooms] = useState({});
+  const [searchRooms, setSearchRooms] = useState({});
+  const [message, setMessage] = useState('Search rooms around you');
   const dispatch = useDispatch();
-  const searchRooms = useSelector(state => state.AllData.roomDataHome);
   useEffect(() => {
     setRoomData(searchRooms);
+    dispatch(updateHome(false));
   }, [searchRooms]);
   const [data, setData] = React.useState([
     {value: 'Single Room', id: 1, isApplied: false},
@@ -41,6 +54,7 @@ const Search = ({navigation}) => {
     {value: 'More then 3BHK', id: 6, isApplied: false},
   ]);
   const getRooms = (location = null) => {
+    setMessage('');
     // setIsFaild(false);
     setLoading(true);
     if (location) {
@@ -60,14 +74,14 @@ const Search = ({navigation}) => {
             console.log(res.data.length, 'res');
             removeFilter();
             if (res.data.length > 0) {
-              // setSearchRooms(res?.data);
+              setSearchRooms(res?.data);
             } else {
-              // setError({
-              //   error: 'No rooms find at your location',
-              //   header: 'Sorry!',
-              // });
+              setMessage('No room at your searched location');
+              setSearchRooms({});
             }
           } else {
+            setSearchRooms({});
+            setMessage('Something went wrong');
             // setIsFaild(true);
             // setError({
             //   error: res.message,
@@ -79,6 +93,8 @@ const Search = ({navigation}) => {
           console.log(err, 'location.lat && location.lon 55');
           removeFilter();
           setLoading(false);
+          setMessage('Something went wrong');
+          setSearchRooms({});
           // setIsFaild(true);
           // setRefreshing(false);
           // dispatch(startL(false));
@@ -89,41 +105,86 @@ const Search = ({navigation}) => {
         });
     }
   };
+  const Header = ({label, navigation}) => {
+    return (
+      <View style={style.container}>
+        <TouchableOpacity
+          style={style.containerInner}
+          onPress={() => {
+            navigation.goBack();
+          }}>
+          <Icon
+            style={style.iconStyle}
+            name="left"
+            size={hp(3.6)}
+            color={Colors.PRIMARY}
+          />
+        </TouchableOpacity>
+        <Text style={style.labelSignUp}>{label}</Text>
+        <TouchableOpacity style={style.containerFilter}>
+          <Filter
+            style={style.iconStyle}
+            name={'filter'}
+            size={hp(3.6)}
+            color={Colors.PRIMARY}
+          />
+          <View
+            style={{
+              borderRadius: hp(90),
+              backgroundColor: Colors.WHITE,
+              elevation: hp(5),
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: hp(1.7),
+              width: hp(1.7),
+              position: 'absolute',
+              right: 0,
+            }}>
+            <Text
+              style={{
+                color: Colors.BLACK,
+                alignSelf: 'center',
+                fontSize: RF(1.4),
+              }}>
+              1
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const GooglePlacesInput = () => {
     return (
       <GooglePlacesAutocomplete
-        textInputProps={{
-          placeholderTextColor: Colors.BLACK,
-        }}
+        style={style.containerPlaceHolder}
         onFail={error => {
           console.log(error, 'errorerror');
         }}
-        // autoFillOnNotFound={error => {
-        //   console.log(error, 'errorerror100');
-        // }}
         onTimeout={error => {
           console.log(error, 'errorerror');
+        }}
+        textInputProps={{
+          returnKeyType: 'search',
         }}
         keepResultsAfterBlur={true}
         keyboardShouldPersistTaps={'always'}
         styles={{
           textInputContainer: {},
           textInput: {
-            height: hp(6.5),
+            height: hp(6),
             color: Colors.BLACK,
             fontSize: 16,
             elevation: hp(2),
             borderColor: Colors.GREY,
             borderWidth: hp(0.25),
             borderRadius: hp(1),
-            marginHorizontal: hp(2),
+            marginHorizontal: hp(1),
+            marginTop: hp(1),
           },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          },
-          listView: {
-            color: Colors.BLACK,
-          },
+          // predefinedPlacesDescription: {
+          //   color: '#1faadb',
+          // },
           description: {color: Colors.BLACK},
         }}
         placeholder="Search location"
@@ -158,9 +219,10 @@ const Search = ({navigation}) => {
         return (item.favorite_key = data?.like);
       } else return item;
     });
-    dispatch(setRoomData(temp));
+    dispatch(setRoomDataHome(temp));
   };
   const onPressFav = async value1 => {
+    console.log('onPressFav');
     let value = {...value1};
     let data = {
       user_id: 2,
@@ -170,6 +232,7 @@ const Search = ({navigation}) => {
     performFavOp(value);
 
     try {
+      console.log('onPressFav181');
       const response = await favFunction(data);
       if (response.status === true) {
         if (
@@ -179,6 +242,8 @@ const Search = ({navigation}) => {
           // setIsUpdate(!isUpdate);
           // dispatch(updateHome(true));
           // showToast(response?.message);
+          // dispatch(updateHome(true));
+          // dispatch(updateFav(true));
           return true;
         } else {
           performFavOp({
@@ -234,134 +299,253 @@ const Search = ({navigation}) => {
       setRoomData(searchRooms);
     }
   };
-
-  const RenderFilter = () => {
+  const RenderFilterItem = ({item}) => {
     return (
-      <View
-        style={{
-          width: '90%',
-          position: 'absolute',
-          top: hp(7),
-          alignSelf: 'center',
-          backgroundColor: Colors.WHITE,
-          borderRadius: hp(1),
-          elevation: 10,
-          borderColor: isFilterApplied ? Colors.PRIMARY : Colors.WHITE,
-          borderWidth: hp(0.2),
-          marginTop: hp(7),
+      <TouchableOpacity
+        onPress={() => {
+          let temp = JSON.parse(JSON.stringify(data));
+          temp?.map(item1 => {
+            if (item1?.id === item?.id) {
+              item1.isApplied = !item1?.isApplied;
+            }
+            return item1;
+          });
+          let filterApplied = temp?.some(item => {
+            return item?.isApplied === true;
+          });
+          setData(temp);
+          setIsFilterApplied(filterApplied);
+          // getFilteredData(temp, filterApplied);
         }}>
         <View
           style={{
-            height: hp(0.5),
-            borderTopLeftRadius: hp(1),
-            borderTopRightRadius: hp(1),
-          }}></View>
-        <View
-          style={{
-            paddingHorizontal: hp(2),
-            paddingVertical: hp(1),
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
           <View
             style={{
               flexDirection: 'row',
-              flex: 1,
+            }}>
+            <View
+              style={{
+                width: hp(2),
+                height: hp(2),
+                borderWidth: hp(0.1),
+                alignSelf: 'center',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: hp(0.4),
+                // backgroundColor: '#8a8888',
+                backgroundColor: Colors.PRIMARYLITE,
+                borderColor: Colors.PRIMARY,
+              }}>
+              <MaterialCommunityIcons
+                name={'check'}
+                size={hp(1.5)}
+                color={Colors.WHITE}
+              />
+            </View>
+            <Text
+              style={{
+                fontSize: hp(1.8),
+                paddingVertical: hp(1),
+                color: Colors.BLACK,
+                fontWeight: '600',
+                marginLeft: hp(1),
+              }}>
+              {item.value}
+            </Text>
+          </View>
+          <Text
+            style={[
+              {
+                fontSize: hp(1.8),
+                paddingVertical: hp(1),
+                color: Colors.BLACK,
+                fontWeight: '600',
+                marginLeft: hp(1),
+              },
+              {alignSelf: 'flex-end'},
+            ]}>
+            1
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  //   [data],
+  // );
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          let temp = JSON.parse(JSON.stringify(data));
+          temp?.map(item1 => {
+            if (item1?.id === item?.id) {
+              item1.isApplied = !item1?.isApplied;
+            }
+            return item1;
+          });
+          setData(temp);
+
+          // let filterApplied = temp?.some(item => {
+          //   return item?.isApplied === true;
+          // });
+          // setIsFilterApplied(filterApplied);
+          // getFilteredData(temp, filterApplied);
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            <View
+              style={{
+                width: hp(2),
+                height: hp(2),
+                borderWidth: hp(0.1),
+                alignSelf: 'center',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: hp(0.4),
+                // backgroundColor: '#8a8888',
+                backgroundColor: item?.isApplied
+                  ? Colors.PRIMARYLITE
+                  : Colors.WHITE,
+                borderColor: Colors.PRIMARY,
+              }}>
+              {item?.isApplied && (
+                <MaterialCommunityIcons
+                  name={'check'}
+                  size={hp(1.5)}
+                  color={Colors.WHITE}
+                />
+              )}
+            </View>
+            <Text
+              style={{
+                fontSize: hp(1.8),
+                paddingVertical: hp(1),
+                color: Colors.BLACK,
+                fontWeight: '600',
+                marginLeft: hp(1),
+              }}>
+              {item?.value}
+            </Text>
+          </View>
+          <Text
+            style={[
+              {
+                fontSize: hp(1.8),
+                paddingVertical: hp(1),
+                color: Colors.BLACK,
+                fontWeight: '600',
+                marginLeft: hp(1),
+              },
+              {alignSelf: 'flex-end'},
+            ]}>
+            1
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+  const RenderFilter = () => {
+    return (
+      <Modal
+        transparent={true}
+        style={{
+          flex: 1,
+        }}
+        visible={true}>
+        <View style={{flex: 1, backgroundColor: 'grey', opacity: 0.5}}></View>
+        <View
+          style={{
+            width: '100%',
+            position: 'absolute',
+            bottom: hp(0),
+            alignSelf: 'center',
+            backgroundColor: Colors.WHITE,
+            borderRadius: hp(1),
+            elevation: 10,
+            // borderColor: isFilterApplied ? Colors.PRIMARY : Colors.WHITE,
+            // borderWidth: hp(0.2),
+            paddingVertical: hp(3),
+            paddingHorizontal: hp(2),
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
               justifyContent: 'space-between',
+              marginBottom: hp(2),
             }}>
             <Text
               style={{
-                color: isFilterApplied ? Colors.PRIMARY : Colors.BLACK,
-                fontSize: hp(2),
+                color: Colors.BLACK1,
+                fontWeight: '600',
+                fontSize: RF(2.5),
               }}>
-              {isFilterApplied ? 'Filter applied' : 'Apply filter'}
+              Room Categories
             </Text>
-            <TouchableOpacity
-              onPress={() => {
-                setFilterVisible(!filterVisible);
-              }}>
-              <AntDesign
-                name={filterVisible ? 'upcircleo' : 'downcircleo'}
+            <TouchableOpacity style={style.closeIcon}>
+              <MaterialCommunityIcons
+                name={'close'}
                 size={hp(3)}
-                color={isFilterApplied ? Colors.PRIMARY : Colors.GREY}
+                color={Colors.BLACK}
               />
             </TouchableOpacity>
           </View>
-          {filterVisible ? (
-            <FlatList
-              data={data}
-              numColumns={3}
-              renderItem={({item}) => {
-                return (
-                  <View
-                    style={{
-                      marginHorizontal: hp(1),
-                      alignSelf: 'center',
-                      marginTop: hp(1),
-                    }}>
-                    <Text
-                      onPress={() => {
-                        let temp = JSON.parse(JSON.stringify(data));
-                        temp?.map(item1 => {
-                          if (item1?.id === item?.id) {
-                            item1.isApplied = !item1?.isApplied;
-                          }
-                          return item1;
-                        });
-                        console.log();
-                        let filterApplied = temp?.some(item => {
-                          return item?.isApplied === true;
-                        });
-                        setData(temp);
-                        setIsFilterApplied(filterApplied);
-                        getFilteredData(temp, filterApplied);
-                      }}
-                      style={{
-                        alignSelf: 'flex-end',
-                        fontSize: hp(1.8),
-                        paddingHorizontal: hp(1.8),
-                        paddingVertical: hp(0.6),
-                        backgroundColor: item.isApplied
-                          ? Colors.PRIMARY
-                          : Colors.PRIMARYLITE1,
-                        borderRadius: hp(1),
-                        color: Colors.WHITE,
-                      }}>
-                      {item.value}
-                    </Text>
-                  </View>
-                );
-              }}></FlatList>
-          ) : null}
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={item => item.id}
+          />
+          <C_Button
+            onPress={() => {}}
+            outerContainer={style.outerContainer}
+            isSubmitDisabled={false}
+            label={'show 2 rooms'}
+          />
         </View>
-      </View>
+      </Modal>
     );
   };
+
   const SearchView = () => {
     return <View style={style.searchContainer}></View>;
   };
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Search} navigation={navigation} />
-      <View style={{zIndex: 2}}>
-        <GooglePlacesInput />
-      </View>
-      <View
-        style={{
-          marginHorizontal: hp(1),
-          marginTop: hp(7),
-        }}>
-        {Loading ? (
-          <FullScreenLoader />
-        ) : (
-          <View style={{}}>
-            <RenderRoom
-              myRoomList={roomData}
-              onPress={onPressRoom}
-              onPressFav={onPressFav}
-              refreshing={false}
-            />
-          </View>
-        )}
-      </View>
+      <GooglePlacesInput />
+      <RenderFilter />
+      {loading ? (
+        <FullScreenLoader />
+      ) : (
+        <View style={style.containerList}>
+          {message && (
+            <Text
+              style={{
+                color: 'black',
+                alignSelf: 'center',
+                fontSize: RF(2.3),
+                marginTop: '50%',
+              }}>
+              {message}
+            </Text>
+          )}
+          <RenderRoom
+            myRoomList={searchRooms}
+            onPress={onPressRoom}
+            onPressFav={onPressFav}
+            refreshing={false}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -399,5 +583,48 @@ const style = StyleSheet.create({
   },
   placeholder: {
     backgroundColor: 'red',
+  },
+  containerList: {
+    width: '100%',
+    top: hp(7.5),
+    zIndex: -1,
+    bottom: hp(1),
+  },
+  containerPlaceHolder: {
+    position: 'absolute',
+    top: hp(7.5),
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+    marginHorizontal: hp(1),
+    elevation: hp(5),
+  },
+  container: {
+    height: hp(6),
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    elevation: 15,
+    justifyContent: 'space-between',
+    paddingHorizontal: hp(1),
+  },
+  iconStyle: {
+    alignSelf: 'center',
+  },
+  labelSignUp: {
+    fontSize: hp(3),
+    alignSelf: 'center',
+    color: Colors.PRIMARY,
+    fontSize: hp(2.6),
+  },
+  containerInner: {
+    flexDirection: 'row',
+  },
+  containerFilter: {
+    alignSelf: 'center',
+  },
+  closeIcon: {
+    alignSelf: 'flex-end',
+  },
+  outerContainer: {
+    height: hp(5),
   },
 });

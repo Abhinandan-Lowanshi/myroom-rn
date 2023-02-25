@@ -48,8 +48,8 @@ const Notification = ({route, navigation}) => {
         style={style.containerNotification}
         onPress={() => {
           navigation.navigate(ScreenName.DetailsScreen, {
-            id,
-            isFromNotification: true,
+            roomId: item?.payload?.rm_pkey,
+            isServer: true,
             onPressFav,
           });
         }}>
