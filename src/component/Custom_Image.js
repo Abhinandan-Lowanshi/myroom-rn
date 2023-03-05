@@ -10,7 +10,7 @@ const Custom_Image = props => {
     <View style={[style.container, props.container]}>
       <FastImage
         resizeMode={props?.resizeMode || FastImage.resizeMode.cover}
-        style={{flex: 1, borderRadius: 5}}
+        style={props?.imageStyle || {flex: 1, borderRadius: 5}}
         onLoadEnd={() => {
           setLoadImage(false);
         }}

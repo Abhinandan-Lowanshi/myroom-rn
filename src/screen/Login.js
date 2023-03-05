@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {
-  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -18,16 +17,16 @@ import Colors from '../common/Colors';
 import ScreenName from '../common/ScreenName';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
-import {validateEmail, validatePassword} from '../common/Validations';
-import FreezScreen from '../component/FreezScreen';
+import {validateEmail} from '../common/Validations';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import localStorageOp from '../localStorage/LocalData';
 import ErrorModal from '../component/ErrorModal';
 import {CommonActions} from '@react-navigation/native';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
-  const [isLoading, SetIsLoading] = useState(false);
+  const [loading, SetIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -87,7 +86,7 @@ const Login = ({navigation}) => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'white'}}>
-      {FreezScreen(isLoading)}
+      {loading && <LowOpacityLoader />}
       <ScrollView>
         <AppLogo style={style.appLogoStyle} textStyle={style.logoTextStyle} />
         <ErrorModal
@@ -119,7 +118,7 @@ const Login = ({navigation}) => {
             onPress={SignUp}
             outerContainer={style.outerContainer}
             label={'LogIn'}
-            isLoading={isLoading}
+            loading={loading}
             isSubmitDisabled={isSubmitDisabled}
           />
           <TouchableOpacity
@@ -127,14 +126,14 @@ const Login = ({navigation}) => {
             onPress={() => {
               navigation.navigate('ForgotPassword');
             }}>
-            <Text style={style.labelforgot}>Forgot password?</Text>
+            <Text style={style.labelForgot}>Forgot password?</Text>
           </TouchableOpacity>
           <Text style={style.labelOr}>Or</Text>
           <SocialLoginBt
             onPress={() => {
               setApiError('Login with Google will available soon');
             }}
-            icon={images.googleicon}
+            icon={images.googleIcon}
             label={'Login with Google'}
           />
           <SocialLoginBt
@@ -149,8 +148,8 @@ const Login = ({navigation}) => {
             onPress={() => {
               navigation.navigate(ScreenName.SignUp);
             }}
-            style={style.signUpContainerSytle}>
-            <Text style={style.labelsign2}>Don't have an account? SingUp</Text>
+            style={style.signUpContainerStyle}>
+            <Text style={style.labelSign2}>Don't have an account? SingUp</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -186,18 +185,15 @@ const style = StyleSheet.create({
     marginTop: hp(3),
     color: Colors.BLACK,
   },
-  signUpContainerSytle: {
+  signUpContainerStyle: {
     flexDirection: 'row',
     alignSelf: 'center',
     marginTop: hp(1),
   },
-  labelsign1: {
-    color: Colors.BLACK,
-  },
-  labelsign2: {
+  labelSign2: {
     color: Colors.PRIMARY,
   },
-  labelforgot: {
+  labelForgot: {
     color: Colors.PRIMARY,
     alignSelf: 'flex-end',
     marginRight: hp(2),

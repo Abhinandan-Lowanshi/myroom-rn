@@ -21,6 +21,7 @@ import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
 import {hp} from '../common/CommonFunctions';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -175,7 +176,7 @@ const Home = ({route, navigation}) => {
       }>
       {getLocation()}
       {loading ? (
-        <FullScreenLoader />
+        <LowOpacityLoader />
       ) : isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (

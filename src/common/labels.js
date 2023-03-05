@@ -13,6 +13,8 @@ const Labels = {
   fullAddress: 'Full Address',
   Distance: 'Distance',
   Time: 'Time To Reach Room',
-  Notification: 'Notification',
+  FILTER: 'FILTER',
+  RESET: 'RESET',
+  ALL: 'ALL',
 };
 export default Labels;

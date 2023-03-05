@@ -30,6 +30,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
@@ -304,7 +305,7 @@ const DetailsScreen = props => {
       <ShowFullImage />
       <Header label={Labels?.Details} navigation={navigation} />
       {roomInfo?.isServer && loading ? (
-        <FullScreenLoader />
+        <LowOpacityLoader />
       ) : (
         <ScrollView style={{opacity: visible ? 0.2 : 1}}>
           <FlatList

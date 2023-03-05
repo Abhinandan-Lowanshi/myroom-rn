@@ -34,6 +34,7 @@ import PopupRoomView from '../component/PopupRoomView';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/dist/Entypo';
 import IconName from '../common/IconName';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const MapSearch = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -114,7 +115,7 @@ const MapSearch = ({route, navigation}) => {
       contentContainerStyle={{flexGrow: 1}}
       style={StyleGlobel.containerStyle}>
       {data.length === 0 ? (
-        <FullScreenLoader />
+        <LowOpacityLoader />
       ) : (
         <View style={style.mapContainer}>
           <MapView

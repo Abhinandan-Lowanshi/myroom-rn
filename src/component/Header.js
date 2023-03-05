@@ -34,6 +34,7 @@ const style = StyleSheet.create({
     backgroundColor: 'white',
     elevation: 15,
     justifyContent: 'space-between',
+    paddingHorizontal: hp(1),
   },
   iconStyle: {
     alignSelf: 'center',

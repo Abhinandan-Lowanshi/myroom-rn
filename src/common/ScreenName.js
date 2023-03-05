@@ -27,4 +27,6 @@ export default Screen = {
   DetailsScreen: 'DetailsScreen',
   MapSearch: 'MapSearch',
   Notification: 'Notification',
+  EditProfile: 'EditProfile',
+  EditRoom: 'EditRoom',
 };

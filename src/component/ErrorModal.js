@@ -13,6 +13,7 @@ const ErrorModal = props => {
         alignItems: 'center',
       }}
       visible={props?.visible}>
+      <View style={style.lowOpacity}></View>
       <View
         style={{
           marginTop: '50%',
@@ -54,5 +55,12 @@ const style = StyleSheet.create({
   },
   labelStyle: {
     fontSize: hp(2),
+  },
+  lowOpacity: {
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'grey',
+    opacity: 0.5,
+    position: 'absolute',
   },
 });

@@ -12,6 +12,7 @@ import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import Colors from '../common/Colors';
 import {RF} from '../common/CommonFunctions';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const Fav = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const favList = useSelector(state => state.AllData.favData);
@@ -123,7 +124,7 @@ const Fav = ({navigation, route}) => {
   return (
     <View style={StyleGlobel.containerStyle}>
       {loading ? (
-        <FullScreenLoader />
+        <LowOpacityLoader />
       ) : favList?.length > 0 ? (
         <RenderRoom
           myRoomList={favList}

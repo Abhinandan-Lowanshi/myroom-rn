@@ -12,6 +12,7 @@ import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import FullScreenLoader from '../component/FullScreenLoader';
 import Header from '../component/Header';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -25,7 +26,9 @@ const MyPost = ({navigation}) => {
     getRooms();
   }, []);
   const onPressActive = () => {};
-  const onPressEdit = () => {};
+  const onPressEdit = () => {
+    navigation.navigate(ScreenName.EditRoom);
+  };
   const onPressDelete = id => {
     setError('');
 
@@ -91,42 +94,38 @@ const MyPost = ({navigation}) => {
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
       <Header label={'My Post'} navigation={navigation} />
-      {loading ? (
-        <FullScreenLoader />
-      ) : (
-        <>
-          <RenderRoom
-            onPress={onPressRoom}
-            myRoomList={myRoomList}
-            isFromMyPost={true}
-            refreshing={refreshing}
-            onPressActive={onPressActive}
-            onPressEdit={onPressEdit}
-            onPressDelete={onPressDelete}
-            onRefresh={() => {
-              onRefresh();
-            }}
-          />
-          <DeleteConformation
-            warningMessage={
-              'By deleting this post all data related to the post will also be deleted'
-            }
-            error={error}
-            isLoading={isLoading}
-            labelPositive={'Delete'}
-            labelNegative={'Cancel'}
-            visible={visible}
-            onPressPositive={deleteRoom}
-            closeModal={() => {
-              setError('');
-              setVisible(false);
-            }}
-            onPressNegative={() => {
-              setVisible(false);
-            }}
-          />
-        </>
-      )}
+      {loading && <LowOpacityLoader />}
+
+      <RenderRoom
+        onPress={onPressRoom}
+        myRoomList={myRoomList}
+        isFromMyPost={true}
+        refreshing={refreshing}
+        onPressActive={onPressActive}
+        onPressEdit={onPressEdit}
+        onPressDelete={onPressDelete}
+        onRefresh={() => {
+          onRefresh();
+        }}
+      />
+      <DeleteConformation
+        warningMessage={
+          'By deleting this post all data related to the post will also be deleted'
+        }
+        error={error}
+        isLoading={isLoading}
+        labelPositive={'Delete'}
+        labelNegative={'Cancel'}
+        visible={visible}
+        onPressPositive={deleteRoom}
+        closeModal={() => {
+          setError('');
+          setVisible(false);
+        }}
+        onPressNegative={() => {
+          setVisible(false);
+        }}
+      />
     </View>
   );
 

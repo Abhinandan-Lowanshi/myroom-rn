@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Image, ScrollView} from 'react-native';
+import {View, Text, StyleSheet, Image, ScrollView, Alert} from 'react-native';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {hp, RF} from '../common/CommonFunctions';
 import AccountTouchableCom from '../component/AccountTouchableCom';
@@ -12,44 +12,44 @@ import EndPoints from '../networking/EndPoints';
 import DeleteConformation from '../component/DeleteConformation';
 import {clearAllData} from '../localStorage/LocalData';
 import {CommonActions} from '@react-navigation/native';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
-  const loading = useSelector(state => state.AllData.loading);
-
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(startL());
+    setLoading(true);
     sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
       .then(res => {
-        dispatch(endL());
-
+        setLoading(false);
         if (res.status === true) {
           dispatch(getAccountImfo(res.data));
         }
       })
       .catch(e => {
-        dispatch(endL());
+        setLoading(false);
       });
   }, []);
 
   const logout = () => {
     setVisible(false);
-    clearAllData();
-
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{name: ScreenName.Login}],
-      }),
-    );
+    if (clearAllData()) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: ScreenName.Login}],
+        }),
+      );
+    } else {
+      Alert('Something went wrong');
+    }
   };
 
-  return loading ? (
-    <FullScreenLoader />
-  ) : (
+  return (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>
+      {loading && <LowOpacityLoader />}
       <View style={styles.container}>
         <DeleteConformation
           labelTop={'Logout'}
@@ -60,7 +60,7 @@ const MyAccount = ({navigation}) => {
           confirmationMessageHigh={'logout?'}
           onPressPositive={logout}
           closeModal={() => {
-            setError('');
+            // setError('');
             setVisible(false);
           }}
           onPressNegative={() => {

@@ -13,6 +13,7 @@ import FreezScreen from '../component/FreezScreen';
 import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const EditProfile = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -99,6 +100,7 @@ const EditProfile = ({navigation}) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <Header label={'Edit Profile'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}
@@ -134,7 +136,7 @@ const EditProfile = ({navigation}) => {
           />
 
           <C_Button
-            isLoading={loading}
+            // isLoading={loading}
             onPress={updateProfile}
             outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}

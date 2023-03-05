@@ -9,8 +9,13 @@ const setData = async (key, value) => {
 };
 export const clearAllData = () => {
   AsyncStorage.getAllKeys()
-    .then(keys => $reactNative.AsyncStorage.multiRemove(keys))
-    .then(() => alert('success'));
+    .then(keys => AsyncStorage.multiRemove(keys))
+    .then(() => {
+      return true;
+    })
+    .catch(() => {
+      return false;
+    });
 };
 const getData = async key => {
   try {
