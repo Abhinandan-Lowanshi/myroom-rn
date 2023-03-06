@@ -19,6 +19,7 @@ import EndPoints from '../networking/EndPoints';
 import {useSelector, useDispatch} from 'react-redux';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const UploadFormSTP2 = ({navigation}) => {
   const [image, setImage] = React.useState([]);
   const [loading, setIsLoading] = React.useState(false);
@@ -85,7 +86,7 @@ const UploadFormSTP2 = ({navigation}) => {
       var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
       const formdata = new FormData();
       image.forEach(item => {
-        formdata.append('Images[]', {
+        formdata.append('Images', {
           uri: item?.uri,
           name: item?.fileName,
           type: item?.type,
@@ -115,11 +116,12 @@ const UploadFormSTP2 = ({navigation}) => {
           if (response.status === true) {
             navigation.navigate(ScreenName.Upload);
             console.log(response, 'Response');
+          } else {
+            console.log(response, 'error');
           }
         })
         .catch(error => {
           setIsLoading(false);
-          console.log(error, 'error');
         });
     }
   };

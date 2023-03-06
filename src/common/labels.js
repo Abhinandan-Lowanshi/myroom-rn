@@ -16,5 +16,6 @@ const Labels = {
   FILTER: 'FILTER',
   RESET: 'RESET',
   ALL: 'ALL',
+  Notification: 'Notification',
 };
 export default Labels;

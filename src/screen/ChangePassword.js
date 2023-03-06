@@ -26,16 +26,23 @@ const ChangePassword = ({navigation}) => {
   const [passwordError, setErrorPassword] = useState(false);
   const [rePassword, setRePassword] = useState('');
   const [rePasswordError, setRePasswordError] = useState(false);
+  const [passwordMatched, setPasswordMatched] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
     if (
       password.length < 8 ||
       currentPassword.length < 8 ||
-      rePassword.length < 8
+      rePassword.length < 8 ||
+      !(rePassword === password)
     ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
+    }
+    if (rePassword !== password) {
+      setPasswordMatched('Password not matched');
+    } else {
+      setPasswordMatched('');
     }
   }, [password, currentPassword, rePassword]);
 
@@ -82,6 +89,7 @@ const ChangePassword = ({navigation}) => {
           }
         })
         .catch(e => {
+          setEmailApiError(response.message);
           setLoading(false);
         });
     }
@@ -109,6 +117,7 @@ const ChangePassword = ({navigation}) => {
             error={currentPasswordError}
             placeholder={'Enter Current Password'}
             errorMessage={'Enter Current Password'}
+            isEyeVisible={true}
           />
           <CustomInputText
             value={password}
@@ -117,6 +126,7 @@ const ChangePassword = ({navigation}) => {
             error={passwordError}
             placeholder={'Enter Password'}
             errorMessage={'Invalid Password'}
+            isEyeVisible={true}
           />
           <CustomInputText
             value={rePassword}
@@ -125,15 +135,9 @@ const ChangePassword = ({navigation}) => {
             error={rePasswordError}
             placeholder={'Re-enter Password'}
             errorMessage={'Invalid Password'}
+            isEyeVisible={true}
           />
-          {/* <CustomInputText
-                            value={email}
-                            onChangeText={emailOnChange}
-                            outerContainer={style.outerContainerSocial}
-                            error={emailError}
-                            placeholder={'Enter Email'}
-                            errorMessage={'Invalid Email'}
-                        /> */}
+          <Text style={style.matchedPassword}>{passwordMatched}</Text>
 
           <C_Button
             // isLoading={loading}
@@ -180,6 +184,13 @@ const style = StyleSheet.create({
     marginTop: hp(2),
   },
   textError: {
+    alignSelf: 'flex-end',
+    color: 'red',
+    fontSize: RF(1.4),
+    marginTop: hp(0.1),
+    marginRight: hp(3.2),
+  },
+  matchedPassword: {
     alignSelf: 'flex-end',
     color: 'red',
     fontSize: RF(1.4),

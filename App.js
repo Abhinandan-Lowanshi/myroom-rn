@@ -20,6 +20,7 @@ import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 import localStorageOp from './src/localStorage/LocalData';
 import Notification from './src/screen/Notification';
 import EditRoom from './src/screen/EditRoom';
+import GetLocationByMap from './src/component/GetLocationByMap';
 // import {
 //   requestUserPermission,
 //   notificationListener,
@@ -55,6 +56,10 @@ const App = () => {
           <Stack.Screen name={ScreenName.MyPost} component={MyPost} />
           <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
           <Stack.Screen name={ScreenName.EditRoom} component={EditRoom} />
+          <Stack.Screen
+            name={ScreenName.GetLocationByMap}
+            component={GetLocationByMap}
+          />
           <Stack.Screen
             name={ScreenName.Notification}
             component={Notification}

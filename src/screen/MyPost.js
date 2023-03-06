@@ -21,14 +21,48 @@ const MyPost = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [roomId, setRoomId] = useState('');
+  const myRoomList = useSelector(state => state.AllData.myposts);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     setLoading(true);
     getRooms();
   }, []);
-  const onPressActive = () => {};
-  const onPressEdit = () => {
-    navigation.navigate(ScreenName.EditRoom);
+  const onPressActive = item => {
+    let data = {
+      room_id: item?.rm_pkey,
+      status_type: !item?.rm_status,
+    };
+    setLoading(true);
+    sendRequest(data, EndPoints.toRoomStatus, 'POST')
+      .then(res => {
+        setLoading(false);
+        setRefreshing(false);
+        if (res?.status === true) {
+          updateRoomStatus(data);
+        }
+      })
+      .catch(e => {
+        setLoading(false);
+        setRefreshing(false);
+      });
   };
+
+  const updateRoomStatus = data => {
+    let temp = JSON.parse(JSON.stringify(myRoomList));
+    temp?.map(item => {
+      if (item.rm_pkey === data?.room_id) {
+        return (item.rm_status = data?.status_type);
+      } else {
+        return item;
+      }
+    });
+    dispatch(getAllMyRooms(temp));
+  };
+  const onPressEdit = item => {
+    navigation.navigate(ScreenName.EditRoom, item);
+  };
+
   const onPressDelete = id => {
     setError('');
 
@@ -37,9 +71,7 @@ const MyPost = ({navigation}) => {
       setVisible(true);
     }
   };
-  const data = useSelector(state => state.AllData.loading);
-  const myRoomList = useSelector(state => state.AllData.myposts);
-  const dispatch = useDispatch();
+
   const onRefresh = () => {
     setRefreshing(true);
     getRooms();
@@ -47,10 +79,10 @@ const MyPost = ({navigation}) => {
   const getRooms = () => {
     sendRequest({user_id: 'roomId'}, EndPoints.myRoomList, 'POST')
       .then(res => {
+        setLoading(false);
         setRefreshing(false);
         if (res?.status === true) {
           dispatch(getAllMyRooms(res?.data));
-          setLoading(false);
         }
       })
       .catch(e => {

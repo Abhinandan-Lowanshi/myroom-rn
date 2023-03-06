@@ -35,6 +35,7 @@ const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [check, setCheck] = useState(false);
   const [apiError, setApiError] = useState('');
   const [mapOnFocus, setMapOnFocus] = useState(false);
   const [imageData, setImageData] = useState({});
@@ -53,7 +54,7 @@ const DetailsScreen = props => {
     if (roomInfo?.isServer) {
       setLoading(true);
       getRoomFromServer(roomInfo?.roomId);
-    }
+    } else setCheck(true);
   }, []);
 
   const setZoom = () => {
@@ -118,11 +119,13 @@ const DetailsScreen = props => {
       .then(res => {
         setLoading(false);
         if (res.status === true) {
-          if (!res?.data?.length === 0) {
+          if (res.message === 'Room details get successfully.') {
             setItem(res?.data);
+            setCheck(true);
           } else {
-            console.log(res?.data, '124');
-            setApiError(res?.message);
+            setApiError(
+              'Room details not found, may be room has been deleted or de-activated by the owner of the room.',
+            );
           }
         }
       })
@@ -274,6 +277,11 @@ const DetailsScreen = props => {
     );
   };
 
+  const handleDismiss = () => {
+    setApiError('');
+    navigation.goBack();
+  };
+
   const ownerDetails = () => {
     return (
       <View style={style.ownerView}>
@@ -304,9 +312,8 @@ const DetailsScreen = props => {
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
       <Header label={Labels?.Details} navigation={navigation} />
-      {roomInfo?.isServer && loading ? (
-        <LowOpacityLoader />
-      ) : (
+      {roomInfo?.isServer && loading && <LowOpacityLoader />}
+      {check && (
         <ScrollView style={{opacity: visible ? 0.2 : 1}}>
           <FlatList
             horizontal={true}
@@ -440,16 +447,14 @@ const DetailsScreen = props => {
               </TouchableOpacity>
             </View>
           )}
-
-          {roomInfo?.isServer && (
-            <ErrorModal
-              onPress={() => {
-                setApiError('');
-              }}
-              label={apiError}
-              visible={apiError ? true : false}></ErrorModal>
-          )}
         </ScrollView>
+      )}
+      {apiError && (
+        <ErrorModal
+          onPress={handleDismiss}
+          hideBackground={true}
+          label={apiError}
+          visible={apiError ? true : false}></ErrorModal>
       )}
     </SafeAreaView>
   );

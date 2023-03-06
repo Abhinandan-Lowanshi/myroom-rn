@@ -27,7 +27,7 @@ const EditProfile = ({navigation}) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (name.length < 4 || mobileNumber.length === 0) {
+    if (name?.length < 4 || mobileNumber?.length === 0) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
@@ -43,7 +43,7 @@ const EditProfile = ({navigation}) => {
 
   const nameOnChange = name => {
     setName(name);
-    if (name !== '' && name.length < 4) {
+    if (name !== '' && name?.length < 4) {
       setErrorName(true);
     } else {
       setErrorName(false);
@@ -52,7 +52,7 @@ const EditProfile = ({navigation}) => {
 
   const onMobileNumberText = mobileNumber => {
     setMobileNumber(mobileNumber);
-    if (mobileNumber.length < 10 && !mobileNumber == '')
+    if (mobileNumber?.length < 10 && !mobileNumber == '')
       setMobileNumberError(true);
     else setMobileNumberError(false);
   };

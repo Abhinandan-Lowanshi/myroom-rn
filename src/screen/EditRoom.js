@@ -1,45 +1,87 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import {hp, RF} from '../common/CommonFunctions';
+import React, {useState, useEffect} from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  Image,
+} from 'react-native';
+import CustomPicker from '../component/CustomPicker';
 import CustomInputText from '../component/InputText';
-import C_Button from '../component/C_Button';
+import {hp, RF} from '../common/CommonFunctions';
+import data from '../common/SpinnerData';
+import StyleGlobel from '../Style/StyleGlobel';
 import Colors from '../common/Colors';
-import Header from '../component/Header';
-import {validateEmail} from '../common/Validations';
-import sendRequest from '../networking/ApiFunctions';
-import EndPoints from '../networking/EndPoints';
-import ErrorModal from '../component/ErrorModal';
-import FreezScreen from '../component/FreezScreen';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import C_Button from '../component/C_Button';
 import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
-import {getAccountImfo} from '../redux/Slice';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {setUploadData} from '../redux/Slice';
+import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import sendRequest from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
 
-const EditRoom = ({navigation}) => {
-  const accountData = useSelector(state => state.AllData.accountData);
-  const [name, setName] = useState(accountData?.usr_firstName);
-  const [nameError, setErrorName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState(accountData?.usr_phone);
-  const [mobileNumberError, setMobileNumberError] = useState(false);
+const EditRoom = props => {
+  const {navigation} = props;
+  const roomInfo = props?.route?.params;
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [emailApiError, setEmailApiError] = useState('');
+  const [name, setName] = useState(roomInfo?.rm_own_Fullname || '');
+  const [nameError, setErrorName] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState(
+    roomInfo?.rm_own_mble_num || '',
+  );
+  const [mobileNumberError, setMobileNumberError] = useState(false);
+  const [roomSize, setRoomSize] = useState(roomInfo?.rm_size || '');
+  const [furnishedStatus, setFurnishedStatus] = useState(
+    roomInfo?.rm_furnisd_status || '',
+  );
+  const [parkingStatus, setParkingStatus] = useState(
+    roomInfo?.rm_prking_avblity || '',
+  );
+  const [availableStatus, setAvailableStatus] = useState(
+    roomInfo?.rm_availble || '',
+  );
+  const [dependencyStatus, setDependencyStatus] = useState(
+    roomInfo?.rm_depndecy || '',
+  );
+  const [whichFloor, setWhichFloor] = useState(roomInfo?.rm_flor || '');
+  const [whichFloorError, setWhichFloorError] = useState(false);
+  const [rent, setRent] = useState(roomInfo?.rm_rent || '');
+  const [rentError, setRentError] = useState(false);
 
-  const dispatch = useDispatch();
   useEffect(() => {
-    if (name.length < 4 || mobileNumber.length === 0) {
+    if (
+      name.length < 4 ||
+      mobileNumber.length < 10 ||
+      roomSize.length === 0 ||
+      furnishedStatus.length === 0 ||
+      availableStatus === 0 ||
+      parkingStatus.length === 0 ||
+      dependencyStatus.length === 0 ||
+      whichFloor.length < 2 ||
+      rent.length < 3
+    ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [name, mobileNumber]);
-
-  // const emailOnChange = email => {
-  //     setEmail(email);
-  //     setEmailApiError('');
-  //     if (!validateEmail(email) && !email == '') setErrorEmail(true);
-  //     else setErrorEmail(false);
-  // };
+  }, [
+    name,
+    mobileNumber,
+    roomSize,
+    furnishedStatus,
+    availableStatus,
+    parkingStatus,
+    dependencyStatus,
+    whichFloor,
+    rent,
+  ]);
 
   const nameOnChange = name => {
     setName(name);
@@ -50,140 +92,196 @@ const EditRoom = ({navigation}) => {
     }
   };
 
-  const onMobileNumberText = mobileNumber => {
-    setMobileNumber(mobileNumber);
-    if (mobileNumber.length < 10 && !mobileNumber == '')
-      setMobileNumberError(true);
-    else setMobileNumberError(false);
-  };
-
-  const updateProfile = () => {
-    if (accountData?.usr_email && name && mobileNumber) {
-      setLoading(true);
-      sendRequest(
-        {
-          user_id: 2,
-          usr_firstName: name,
-          usr_lastName: '',
-          usr_phone: mobileNumber,
-          usr_parmentAdrss: '',
-          usr_currentAdrss: '',
-        },
-        EndPoints.editUserProfile,
-        'POST',
-      )
-        .then(response => {
-          setLoading(false);
-          if (response.status === true) {
-            dispatch(
-              getAccountImfo({
-                ...accountData,
-                usr_firstName: name,
-                usr_phone: mobileNumber,
-              }),
-              navigation.goBack(),
-            );
-          } else {
-            setEmailApiError(response.message);
-            //go back
-          }
-        })
-        .catch(e => {
-          setLoading(false);
-        });
+  const rentOnChange = rent => {
+    setRent(rent);
+    if (rent !== '' && rent.length < 3) {
+      setRentError(true);
+    } else {
+      setRentError(false);
     }
   };
 
-  const onPressDismiss = () => {
-    setEmailApiError('');
+  const onWhichFloorOnChange = whichFloor => {
+    setWhichFloor(whichFloor);
+    if (whichFloor !== '' && whichFloor.length < 2) {
+      setWhichFloorError(true);
+    } else {
+      setWhichFloorError(false);
+    }
+  };
+
+  const onNextPress = () => {
+    let data = {
+      rm_own_Fullname: name,
+      rm_own_mble_num: mobileNumber,
+      rm_size: roomSize,
+      rm_furnisd_status: furnishedStatus,
+      rm_availble: availableStatus,
+      rm_prking_avblity: parkingStatus,
+      rm_depndecy: dependencyStatus,
+      rm_flor: whichFloor,
+      rm_rent: rent,
+    };
+    let rowData = {
+      room_id: roomInfo?.rm_pkey.toString(),
+      data: data,
+    };
+    console.log(rowData);
+    updateRoom({
+      room_id: '52',
+      data: {
+        rm_own_fullname: 'vishal',
+      },
+    });
+  };
+
+  const updateRoom = data => {
+    setLoading(true);
+    sendRequest(data, EndPoints.editRoom, 'POST')
+      .then(response => {
+        console.log(response, 'Response');
+        setLoading(false);
+        if (response.status === true) {
+          // navigation.navigate(ScreenName.Upload);
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        console.log(error, 'error');
+      });
+  };
+
+  const mobileNumberOnChange = mobileNumber => {
+    setMobileNumber(mobileNumber);
+    if (mobileNumber !== '' && mobileNumber.length < 10) {
+      setMobileNumberError(true);
+    } else {
+      setMobileNumberError(false);
+    }
   };
   return (
-    <View style={{backgroundColor: 'white', flex: 1}}>
+    <>
       <Header label={'Edit Room'} navigation={navigation} />
-      {loading && <LowOpacityLoader />}
-      <ErrorModal
-        onPress={onPressDismiss}
-        label={emailApiError}
-        visible={emailApiError ? true : false}></ErrorModal>
-      <FreezScreen isLoading={loading} />
-      <ScrollView>
-        <View style={style.contentContainerStyle}>
+      <ScrollView style={StyleGlobel.containerStyle}>
+        {loading && <LowOpacityLoader />}
+        <View style={{marginBottom: hp(2)}}>
           <CustomInputText
-            value={name}
             onChangeText={nameOnChange}
-            outerContainer={style.outerContainerSocial}
+            value={name}
+            maxLength={30}
             error={nameError}
-            placeholder={'Enter FullName'}
-            errorMessage={'Invalid Name'}
+            outerContainer={style.outerContainer}
+            placeholder={'Enter Name'}
+            errorMessage={'Enter valid Name'}
           />
-          {/* <CustomInputText
-                        value={email}
-                        onChangeText={emailOnChange}
-                        outerContainer={style.outerContainerSocial}
-                        error={emailError}
-                        placeholder={'Enter Email'}
-                        errorMessage={'Invalid Email'}
-                    /> */}
           <CustomInputText
-            isNumeric={true}
             maxLength={10}
+            isNumeric={true}
+            onChangeText={mobileNumberOnChange}
             value={mobileNumber}
-            onChangeText={onMobileNumberText}
-            outerContainer={style.outerContainerSocial}
             error={mobileNumberError}
             placeholder={'Enter Mobile Number'}
             errorMessage={'Invalid Mobile Number'}
           />
 
-          <C_Button
-            // isLoading={loading}
-            onPress={updateProfile}
+          <CustomPicker
+            value={roomSize}
+            container={style.pickerstyle}
+            onItemChange={value => setRoomSize(value?.value)}
+            placeholder={'Select'}
+            labelTop={'Select room size'}
+            data={data.ROOM_SIZE}
+          />
+
+          <CustomPicker
+            value={furnishedStatus}
+            labelTop={'Select Furnished status'}
+            placeholder={'Select'}
+            container={style.pickerstyle}
+            onItemChange={value => setFurnishedStatus(value?.value)}
+            data={data.ROOM_STATUS_FR}
+          />
+
+          <CustomPicker
+            value={availableStatus}
+            labelTop={'Select availability of room'}
+            placeholder={'Select'}
+            container={style.pickerstyle}
+            onItemChange={value => setAvailableStatus(value?.value)}
+            data={data.ROOM_AVAILABLE}
+          />
+
+          <CustomPicker
+            value={parkingStatus}
+            container={style.pickerstyle}
+            placeholder={'Select'}
+            labelTop={'Select parking availability of room'}
+            onItemChange={value => setParkingStatus(value?.value)}
+            data={data.ROOM_PARKING_AVAILABILITY}
+          />
+
+          <CustomPicker
+            value={dependencyStatus}
+            container={style.pickerstyle}
+            placeholder={'Select'}
+            labelTop={'Select independency of room'}
+            onItemChange={value => setDependencyStatus(value?.value)}
+            data={data.ROOM_DEPENDENT_STATUS}
+          />
+
+          <CustomInputText
+            onChangeText={onWhichFloorOnChange}
+            value={whichFloor}
+            maxLength={20}
             outerContainer={style.outerContainer}
+            error={whichFloorError}
+            placeholder={'On which floor'}
+            errorMessage={'Enter floor'}
+          />
+
+          <CustomInputText
+            onChangeText={rentOnChange}
+            value={rent}
+            maxLength={12}
+            outerContainer={style.outerContainer}
+            error={rentError}
+            isNumeric={true}
+            placeholder={'Enter Rent'}
+            errorMessage={'Enter Rent'}
+          />
+
+          <C_Button
+            isLoading={false}
+            onPress={() => onNextPress()}
+            // outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}
-            label={'Update Profile'}
+            label={'Next'}
           />
         </View>
       </ScrollView>
-    </View>
+    </>
   );
 };
 
 export default EditRoom;
+
 const style = StyleSheet.create({
-  logoTextStyle: {
-    fontSize: hp(5),
-    color: 'red',
-  },
-  appLogoStyle: {
-    marginTop: hp(10),
-    alignSelf: 'center',
-  },
-  contentContainerStyle: {
-    flex: 1,
-  },
-  textInputContainerStyle: {
-    width: '100%',
+  pickerstyle: {
+    elevation: 5,
+    // marginTop: hp(2.3),
   },
   outerContainer: {
-    marginTop: hp(5),
-    marginBottom: hp(10),
+    marginTop: hp(1),
   },
-  outerContainerSocial: {},
-  labelOr: {
-    alignSelf: 'center',
-    marginVertical: hp(3),
-    color: Colors.BLACK,
+  InputTextStyle: {
+    marginTop: hp(1),
+    height: hp(10),
+    textAlignVertical: 'top',
   },
-  signUpContainerSytle: {
-    flexDirection: 'row',
-    alignSelf: 'center',
-    marginTop: hp(2),
-  },
-  textError: {
-    alignSelf: 'flex-end',
-    color: 'red',
-    fontSize: RF(1.4),
-    marginTop: hp(0.1),
-    marginRight: hp(3.2),
+  labelHouseNoMessage: {
+    color: Colors.BLACK1,
+    fontSize: RF(1.3),
+    marginLeft: hp(3),
+    marginTop: hp(1),
   },
 });

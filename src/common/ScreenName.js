@@ -29,4 +29,5 @@ export default Screen = {
   Notification: 'Notification',
   EditProfile: 'EditProfile',
   EditRoom: 'EditRoom',
+  GetLocationByMap: 'GetLocationByMap',
 };

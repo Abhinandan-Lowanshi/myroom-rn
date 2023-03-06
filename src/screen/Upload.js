@@ -22,6 +22,7 @@ import UploadFormSTP2 from './UploadFormSTP2';
 import Stapper from '../component/Stapper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {setUploadData} from '../redux/Slice';
+import GetLocationByMap from '../component/GetLocationByMap';
 const Stack = createNativeStackNavigator();
 
 const UploadNavigator = () => {
@@ -173,6 +174,32 @@ const Upload = ({navigation}) => {
     }
   };
 
+  const CoordinateView = props => {
+    return (
+      <View style={{}}>
+        <Text
+          style={{
+            fontSize: RF(1.6),
+            color: Colors.BLACK,
+            marginTop: hp(1),
+          }}>
+          {props?.label}
+        </Text>
+        <Text
+          style={{
+            width: '40%',
+            fontSize: RF(1.6),
+            color: Colors.WHITE,
+            marginTop: hp(0.3),
+            backgroundColor: Colors.PRIMARYLITE,
+            borderRadius: 3,
+            padding: hp(1),
+          }}>
+          0.0510502
+        </Text>
+      </View>
+    );
+  };
   const onNextPress = () => {
     let data = {
       rm_usr_fkey: 2,
@@ -275,10 +302,38 @@ const Upload = ({navigation}) => {
           placeholder={'On which floor'}
           errorMessage={'Enter floor'}
         />
+
+        <TouchableOpacity
+          style={{
+            // justifyContent: 'center',
+            alignSelf: 'center',
+            width: '90%',
+            backgroundColor: Colors.GREY1,
+            paddingLeft: hp(2),
+            backgroundColor: 'white',
+            elevation: 3,
+            borderColor: false ? Colors.RED : Colors.GREY,
+            borderRadius: hp(1),
+            borderWidth: hp(0.2),
+            marginTop: hp(1),
+            paddingBottom: hp(1.7),
+          }}>
+          <Text
+            style={{
+              fontSize: RF(1.6),
+              color: Colors.BLACK,
+              marginTop: hp(1),
+              alignSelf: 'center',
+            }}>
+            Tap to add room location for better room finding
+          </Text>
+          <CoordinateView label={'Latitude'} />
+          <CoordinateView label={'Longitude'} />
+        </TouchableOpacity>
         <Text style={style.labelHouseNoMessage}>
           Don't worry if your house number shows wrong.
         </Text>
-        <CustomInputText
+        {/* <CustomInputText
           onChangeText={locationOnChange}
           value={roomLocation}
           maxLength={100}
@@ -286,7 +341,7 @@ const Upload = ({navigation}) => {
           error={roomLocationError}
           placeholder={'Room Location'}
           errorMessage={'Enter Room Location'}
-        />
+        /> */}
         <CustomInputText
           onChangeText={rentOnChange}
           value={rent}
@@ -364,7 +419,7 @@ const style = StyleSheet.create({
     textAlignVertical: 'top',
   },
   labelHouseNoMessage: {
-    color: Colors.BLACK1,
+    color: Colors.RED,
     fontSize: RF(1.3),
     marginLeft: hp(3),
     marginTop: hp(1),

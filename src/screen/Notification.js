@@ -16,14 +16,17 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import StyleGlobel from '../Style/StyleGlobel';
 import ScreenName from '../common/ScreenName';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const Notification = ({route, navigation}) => {
   const [notification, setNotification] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     getNotification();
   }, []);
 
   const getNotification = () => {
+    setLoading(true);
     sendRequest(
       {
         id: 4,
@@ -32,6 +35,7 @@ const Notification = ({route, navigation}) => {
       'POST',
     )
       .then(res => {
+        setLoading(false);
         if (res.status === true) {
           if (res.data.length) {
             setNotification(res.data);
@@ -39,7 +43,9 @@ const Notification = ({route, navigation}) => {
           }
         }
       })
-      .catch(err => {});
+      .catch(err => {
+        setLoading(false);
+      });
   };
 
   const renderRoom = ({item}) => {
@@ -67,6 +73,7 @@ const Notification = ({route, navigation}) => {
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Notification} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <FlatList data={notification} renderItem={renderRoom} style={{flex: 1}} />
     </SafeAreaView>
   );

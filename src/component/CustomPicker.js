@@ -12,10 +12,10 @@ const CustomPicker = ({
   placeholder,
   outerContainer,
   labelTop,
+  value,
 }) => {
-  const [value, setValue] = useState(null);
+  // const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
-
   return (
     <View style={[outerContainer, styles.outerContainer]}>
       {labelTop && <Text style={styles.topLabel}>{labelTop}</Text>}
