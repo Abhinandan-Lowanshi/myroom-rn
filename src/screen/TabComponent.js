@@ -4,7 +4,7 @@ import Home from './Home';
 import UploadNavigator from './Upload';
 import Fav from './Fav';
 import MyAccount from './MyAccount';
-import MyPost from './MyPost';
+import MapSearch from './MapSearch';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -47,7 +47,10 @@ const TabComponent = ({navigation}) => {
               size={hp(2.8)}
             />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ScreenName.Notification);
+            }}>
             <Icon1
               style={style.notificationIcon}
               name="notifications-none"
@@ -82,6 +85,21 @@ const TabComponent = ({navigation}) => {
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
+            tabBarLabel: 'Map',
+            tabBarIcon: ({color, size, focused}) => (
+              <Icon2
+                name="map-legend"
+                color={focused ? Colors.PRIMARY : Colors.PRIMARYLITE1}
+                size={size}
+              />
+            ),
+          }}
+          name={ScreenName.MapSearch}
+          component={MapSearch}
+        />
+        <Tab.Screen
+          options={{
+            tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: 'Upload',
             tabBarIcon: ({color, size, focused}) => (
               <Icon1
@@ -94,7 +112,7 @@ const TabComponent = ({navigation}) => {
           name={ScreenName.UploadNavigator}
           component={UploadNavigator}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: 'My Post',
@@ -108,7 +126,7 @@ const TabComponent = ({navigation}) => {
           }}
           name={ScreenName.MyPost}
           component={MyPost}
-        />
+        /> */}
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},

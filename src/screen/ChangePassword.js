@@ -13,6 +13,7 @@ import FreezScreen from '../component/FreezScreen';
 import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const ChangePassword = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -25,22 +26,29 @@ const ChangePassword = ({navigation}) => {
   const [passwordError, setErrorPassword] = useState(false);
   const [rePassword, setRePassword] = useState('');
   const [rePasswordError, setRePasswordError] = useState(false);
+  const [passwordMatched, setPasswordMatched] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
     if (
-      password.length < 6 ||
-      currentPassword.length < 6 ||
-      rePassword.length < 6
+      password.length < 8 ||
+      currentPassword.length < 8 ||
+      rePassword.length < 8 ||
+      !(rePassword === password)
     ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
+    if (rePassword !== password) {
+      setPasswordMatched('Password not matched');
+    } else {
+      setPasswordMatched('');
+    }
   }, [password, currentPassword, rePassword]);
 
   const passwordOnChange = password => {
     SetPassword(password);
-    if (password !== '' && password.length < 6) {
+    if (password !== '' && password.length < 8) {
       setErrorPassword(true);
     } else {
       setErrorPassword(false);
@@ -49,13 +57,13 @@ const ChangePassword = ({navigation}) => {
 
   const onCurrentPasswordText = currentPassword => {
     setCurrentPassword(currentPassword);
-    if (currentPassword.length < 6 && !currentPassword == '')
+    if (currentPassword.length < 8 && !currentPassword == '')
       setCurrentPasswordError(true);
     else setCurrentPasswordError(false);
   };
   const rePasswordOnChange = rePassword => {
     setRePassword(rePassword);
-    if (rePassword.length < 6 && !rePassword == '') setRePasswordError(true);
+    if (rePassword.length < 8 && !rePassword == '') setRePasswordError(true);
     else setRePasswordError(false);
   };
 
@@ -81,6 +89,7 @@ const ChangePassword = ({navigation}) => {
           }
         })
         .catch(e => {
+          setEmailApiError(response.message);
           setLoading(false);
         });
     }
@@ -93,6 +102,7 @@ const ChangePassword = ({navigation}) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <Header label={'Change Password'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}
@@ -101,14 +111,13 @@ const ChangePassword = ({navigation}) => {
       <ScrollView>
         <View style={style.contentContainerStyle}>
           <CustomInputText
-            isNumeric={true}
-            maxLength={10}
             value={currentPassword}
             onChangeText={onCurrentPasswordText}
             outerContainer={style.outerContainerSocial}
             error={currentPasswordError}
             placeholder={'Enter Current Password'}
             errorMessage={'Enter Current Password'}
+            isEyeVisible={true}
           />
           <CustomInputText
             value={password}
@@ -117,6 +126,7 @@ const ChangePassword = ({navigation}) => {
             error={passwordError}
             placeholder={'Enter Password'}
             errorMessage={'Invalid Password'}
+            isEyeVisible={true}
           />
           <CustomInputText
             value={rePassword}
@@ -125,18 +135,12 @@ const ChangePassword = ({navigation}) => {
             error={rePasswordError}
             placeholder={'Re-enter Password'}
             errorMessage={'Invalid Password'}
+            isEyeVisible={true}
           />
-          {/* <CustomInputText
-                            value={email}
-                            onChangeText={emailOnChange}
-                            outerContainer={style.outerContainerSocial}
-                            error={emailError}
-                            placeholder={'Enter Email'}
-                            errorMessage={'Invalid Email'}
-                        /> */}
+          <Text style={style.matchedPassword}>{passwordMatched}</Text>
 
           <C_Button
-            isLoading={loading}
+            // isLoading={loading}
             onPress={updateProfile}
             outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}
@@ -180,6 +184,13 @@ const style = StyleSheet.create({
     marginTop: hp(2),
   },
   textError: {
+    alignSelf: 'flex-end',
+    color: 'red',
+    fontSize: RF(1.4),
+    marginTop: hp(0.1),
+    marginRight: hp(3.2),
+  },
+  matchedPassword: {
     alignSelf: 'flex-end',
     color: 'red',
     fontSize: RF(1.4),

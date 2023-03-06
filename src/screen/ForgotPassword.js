@@ -10,6 +10,7 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import FreezScreen from '../component/FreezScreen';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const ForgotPassword = ({navigation}) => {
   const [isOTPVerified, setIsOTPVerified] = useState(false);
   const [isOTPAvailable, setIsOTPAvailable] = useState(false);
@@ -45,7 +46,7 @@ const ForgotPassword = ({navigation}) => {
     } else if (isOTPAvailable && !isOTPVerified) {
       if (email && otp) {
         setLoading(true);
-        sendRequest({email: email, otp: otp}, EndPoints.verfyOtp, 'POST')
+        sendRequest({email: email, otp: otp}, EndPoints.verifyOtp, 'POST')
           .then(response => {
             setLoading(false);
             if (response.status === true) {
@@ -147,7 +148,7 @@ const ForgotPassword = ({navigation}) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <Header label={'Forgot Password'} navigation={navigation} />
-      <FreezScreen isLoading={loading} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={() => {
           setApiError('');
@@ -217,7 +218,6 @@ const ForgotPassword = ({navigation}) => {
                 ? 'Submit OTP'
                 : 'Submit Email'
             }
-            isLoading={loading}
             isSubmitDisabled={submitDisabled}
           />
         </View>

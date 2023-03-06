@@ -11,7 +11,7 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import {useDispatch} from 'react-redux';
 import ErrorModal from '../component/ErrorModal';
-import FreezScreen from '../component/FreezScreen';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 import {setSignUp} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 const SignUp = ({navigation}) => {
@@ -33,8 +33,8 @@ const SignUp = ({navigation}) => {
     if (
       name.length < 4 ||
       !validateEmail(email) ||
-      password.length < 6 ||
-      rePassword.length < 6 ||
+      password.length < 8 ||
+      rePassword.length < 8 ||
       !isPasswordMatch
     ) {
       setIsSubmitDisabled(true);
@@ -69,17 +69,18 @@ const SignUp = ({navigation}) => {
 
   const onChangePassword = password => {
     setPassword(password);
-    if (password.length < 6 && !password == '') setErrorPassword(true);
+    if (password.length < 8 && !password == '') setErrorPassword(true);
     else setErrorPassword(false);
   };
 
   const onRePasswordText = password => {
     setRePassword(password);
-    if (password.length < 6 && !password == '') setRePasswordError(true);
+    if (password.length < 8 && !password == '') setRePasswordError(true);
     else setRePasswordError(false);
   };
 
   const getOtp = () => {
+    navigation.navigate(ScreenName.EmailVerify);
     if (email) {
       setLoading(true);
       sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
@@ -116,11 +117,11 @@ const SignUp = ({navigation}) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <Header label={'SignUp'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}
         visible={emailApiError ? true : false}></ErrorModal>
-      {FreezScreen(loading)}
       <ScrollView>
         <View style={style.contentContainerStyle}>
           {/* <LabelComponent label={'SignUp'}></LabelComponent> */}
@@ -162,7 +163,6 @@ const SignUp = ({navigation}) => {
             <Text style={style.textError}>Password not matched</Text>
           )}
           <C_Button
-            isLoading={loading}
             onPress={getOtp}
             outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}

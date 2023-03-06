@@ -43,6 +43,7 @@ const DeleteConformation = ({
         backgroundColor: 'rgba(0,0,0,0.5)',
       }}
       visible={visible}>
+      <View style={style.lowOpacity}></View>
       <View style={style.container}>
         <TouchableOpacity disabled={isLoading} onPress={() => closeModal()}>
           <MaterialCommunityIcons
@@ -200,5 +201,12 @@ const style = StyleSheet.create({
     fontSize: RF(1.8),
     fontWeight: '600',
     color: '#ba0d16',
+  },
+  lowOpacity: {
+    height: '100%',
+    width: '100%',
+    backgroundColor: 'grey',
+    opacity: 0.5,
+    position: 'absolute',
   },
 });

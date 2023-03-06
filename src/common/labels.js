@@ -9,5 +9,13 @@ const Labels = {
   Furnished: 'Furnished',
   Description: 'Description',
   Search: 'Search',
+  LocationInfo: 'Room Location information',
+  fullAddress: 'Full Address',
+  Distance: 'Distance',
+  Time: 'Time To Reach Room',
+  FILTER: 'FILTER',
+  RESET: 'RESET',
+  ALL: 'ALL',
+  Notification: 'Notification',
 };
 export default Labels;

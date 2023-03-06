@@ -18,6 +18,8 @@ import Geolocation from '@react-native-community/geolocation';
 import {useDispatch} from 'react-redux';
 import {setLocation} from '../redux/Slice';
 const getLocation = () => {
+  console.log('getLocation');
+  const [update, setUpdate] = useState(true);
   const dispatch = useDispatch();
   useEffect(() => {
     requestLocationPermission();
@@ -52,7 +54,11 @@ const getLocation = () => {
       position => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
-        dispatch(setLocation(position.coords));
+        if (update) {
+          setUpdate(false);
+          dispatch(setLocation(position.coords));
+          console.log(position, 'subscribeLocationLocation55');
+        }
       },
       error => {
         //   setLocationStatus(error.message);
@@ -71,7 +77,14 @@ const getLocation = () => {
         //Will give you the location on location change
 
         //   setLocationStatus('You are Here');
-        console.log(position);
+        if (update) {
+          setUpdate(false);
+          dispatch(setLocation(position.coords));
+          console.log(position, 'subscribeLocationLocation55');
+        }
+        // setTimeout(() => {
+        //   dispatch(setLocation(position.coords));
+        // }, 5000);
 
         //getting the Longitude from the location json
         const currentLongitude = JSON.stringify(position.coords.longitude);

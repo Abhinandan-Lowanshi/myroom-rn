@@ -65,6 +65,16 @@ const AccountTouchableCom = ({
           />
         );
       }
+      case ScreenName.MyPost: {
+        return (
+          <Icon2
+            style={style.iconStyle}
+            name={'post-outline'}
+            size={hp(4)}
+            color={Colors.PRIMARY}
+          />
+        );
+      }
     }
   };
   return (

@@ -10,6 +10,7 @@ import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const EmailVerify = ({navigation}) => {
   const signInData = useSelector(state => state.AllData.signInData);
@@ -24,7 +25,7 @@ const EmailVerify = ({navigation}) => {
     setLoading(true);
     sendRequest(
       {email: signInData?.email, otp: otp},
-      EndPoints.verifyEmailotp,
+      EndPoints.verifyEmailOtp,
       'POST',
     )
       .then(response => {
@@ -36,7 +37,7 @@ const EmailVerify = ({navigation}) => {
                 localStorageOp(true, AsyncKeys.USERDATA, response.data);
                 navigation.navigate(ScreenName.TabComponent);
               } else {
-                setApiError(response?.message);
+                setApiError('Something went wrong');
                 setLoading(false);
               }
             })
@@ -44,7 +45,7 @@ const EmailVerify = ({navigation}) => {
               setLoading(false);
             });
         } else {
-          setApiError(response?.message);
+          setApiError('Something went wrong');
           setLoading(false);
         }
       })
@@ -69,6 +70,7 @@ const EmailVerify = ({navigation}) => {
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={'Verify Email'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={() => {
           setApiError('');
@@ -86,7 +88,6 @@ const EmailVerify = ({navigation}) => {
         placeholder={'Enter 6 digit otp'}
       />
       <C_Button
-        isLoading={loading}
         onPress={SignUp}
         isSubmitDisabled={isSubmitDisabled}
         label={'Sign Up'}

@@ -13,6 +13,7 @@ import FreezScreen from '../component/FreezScreen';
 import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const EditProfile = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -26,7 +27,7 @@ const EditProfile = ({navigation}) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (name.length < 4 || mobileNumber.length === 0) {
+    if (name?.length < 4 || mobileNumber?.length === 0) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
@@ -42,7 +43,7 @@ const EditProfile = ({navigation}) => {
 
   const nameOnChange = name => {
     setName(name);
-    if (name !== '' && name.length < 4) {
+    if (name !== '' && name?.length < 4) {
       setErrorName(true);
     } else {
       setErrorName(false);
@@ -51,7 +52,7 @@ const EditProfile = ({navigation}) => {
 
   const onMobileNumberText = mobileNumber => {
     setMobileNumber(mobileNumber);
-    if (mobileNumber.length < 10 && !mobileNumber == '')
+    if (mobileNumber?.length < 10 && !mobileNumber == '')
       setMobileNumberError(true);
     else setMobileNumberError(false);
   };
@@ -99,6 +100,7 @@ const EditProfile = ({navigation}) => {
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <Header label={'Edit Profile'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
       <ErrorModal
         onPress={onPressDismiss}
         label={emailApiError}
@@ -134,7 +136,7 @@ const EditProfile = ({navigation}) => {
           />
 
           <C_Button
-            isLoading={loading}
+            // isLoading={loading}
             onPress={updateProfile}
             outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}

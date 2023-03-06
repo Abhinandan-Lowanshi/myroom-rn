@@ -11,6 +11,8 @@ import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import FullScreenLoader from '../component/FullScreenLoader';
+import Header from '../component/Header';
+import LowOpacityLoader from '../component/LowOpacityLoader';
 
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -19,12 +21,48 @@ const MyPost = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [roomId, setRoomId] = useState('');
+  const myRoomList = useSelector(state => state.AllData.myposts);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     setLoading(true);
     getRooms();
   }, []);
-  const onPressActive = () => {};
-  const onPressEdit = () => {};
+  const onPressActive = item => {
+    let data = {
+      room_id: item?.rm_pkey,
+      status_type: !item?.rm_status,
+    };
+    setLoading(true);
+    sendRequest(data, EndPoints.toRoomStatus, 'POST')
+      .then(res => {
+        setLoading(false);
+        setRefreshing(false);
+        if (res?.status === true) {
+          updateRoomStatus(data);
+        }
+      })
+      .catch(e => {
+        setLoading(false);
+        setRefreshing(false);
+      });
+  };
+
+  const updateRoomStatus = data => {
+    let temp = JSON.parse(JSON.stringify(myRoomList));
+    temp?.map(item => {
+      if (item.rm_pkey === data?.room_id) {
+        return (item.rm_status = data?.status_type);
+      } else {
+        return item;
+      }
+    });
+    dispatch(getAllMyRooms(temp));
+  };
+  const onPressEdit = item => {
+    navigation.navigate(ScreenName.EditRoom, item);
+  };
+
   const onPressDelete = id => {
     setError('');
 
@@ -33,9 +71,7 @@ const MyPost = ({navigation}) => {
       setVisible(true);
     }
   };
-  const data = useSelector(state => state.AllData.loading);
-  const myRoomList = useSelector(state => state.AllData.myposts);
-  const dispatch = useDispatch();
+
   const onRefresh = () => {
     setRefreshing(true);
     getRooms();
@@ -43,10 +79,10 @@ const MyPost = ({navigation}) => {
   const getRooms = () => {
     sendRequest({user_id: 'roomId'}, EndPoints.myRoomList, 'POST')
       .then(res => {
+        setLoading(false);
         setRefreshing(false);
         if (res?.status === true) {
           dispatch(getAllMyRooms(res?.data));
-          setLoading(false);
         }
       })
       .catch(e => {
@@ -89,42 +125,39 @@ const MyPost = ({navigation}) => {
   };
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
-      {loading ? (
-        <FullScreenLoader />
-      ) : (
-        <>
-          <RenderRoom
-            onPress={onPressRoom}
-            myRoomList={myRoomList}
-            isFromMyPost={true}
-            refreshing={refreshing}
-            onPressActive={onPressActive}
-            onPressEdit={onPressEdit}
-            onPressDelete={onPressDelete}
-            onRefresh={() => {
-              onRefresh();
-            }}
-          />
-          <DeleteConformation
-            warningMessage={
-              'By deleting this post all data related to the post will also be deleted'
-            }
-            error={error}
-            isLoading={isLoading}
-            labelPositive={'Delete'}
-            labelNegative={'Cancel'}
-            visible={visible}
-            onPressPositive={deleteRoom}
-            closeModal={() => {
-              setError('');
-              setVisible(false);
-            }}
-            onPressNegative={() => {
-              setVisible(false);
-            }}
-          />
-        </>
-      )}
+      <Header label={'My Post'} navigation={navigation} />
+      {loading && <LowOpacityLoader />}
+
+      <RenderRoom
+        onPress={onPressRoom}
+        myRoomList={myRoomList}
+        isFromMyPost={true}
+        refreshing={refreshing}
+        onPressActive={onPressActive}
+        onPressEdit={onPressEdit}
+        onPressDelete={onPressDelete}
+        onRefresh={() => {
+          onRefresh();
+        }}
+      />
+      <DeleteConformation
+        warningMessage={
+          'By deleting this post all data related to the post will also be deleted'
+        }
+        error={error}
+        isLoading={isLoading}
+        labelPositive={'Delete'}
+        labelNegative={'Cancel'}
+        visible={visible}
+        onPressPositive={deleteRoom}
+        closeModal={() => {
+          setError('');
+          setVisible(false);
+        }}
+        onPressNegative={() => {
+          setVisible(false);
+        }}
+      />
     </View>
   );
 

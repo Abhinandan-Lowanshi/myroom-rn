@@ -25,4 +25,9 @@ export default Screen = {
   UploadFormSTP2: 'UploadFormSTP2',
   UploadNavigator: 'UploadNavigator',
   DetailsScreen: 'DetailsScreen',
+  MapSearch: 'MapSearch',
+  Notification: 'Notification',
+  EditProfile: 'EditProfile',
+  EditRoom: 'EditRoom',
+  GetLocationByMap: 'GetLocationByMap',
 };

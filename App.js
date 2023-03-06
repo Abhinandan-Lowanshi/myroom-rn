@@ -13,20 +13,25 @@ import Splash from './src/screen/Splash';
 import EmailVerify from './src/screen/EmailVerify';
 import EditProfile from './src/screen/EditProfile';
 import DetailsScreen from './src/screen/DetailsScreen';
+import MyPost from './src/screen/MyPost';
 import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
 import UploadFormSTP2 from './src/screen/UploadFormSTP2';
 import localStorageOp from './src/localStorage/LocalData';
+import Notification from './src/screen/Notification';
+import EditRoom from './src/screen/EditRoom';
+import GetLocationByMap from './src/component/GetLocationByMap';
+// import {
+//   requestUserPermission,
+//   notificationListener,
+// } from './src/Utils/notificationServices';
 const Stack = createNativeStackNavigator();
 const App = () => {
-  const [token, setToken] = useState('');
-  useEffect(() => {
-    getToken();
-  }, []);
-  const getToken = async () => {
-    var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
-    setToken(userData?.token);
-  };
+  //   useEffect(() => {
+  //     requestUserPermission();
+  //     notificationListener();
+  //   }, []);
+
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -48,7 +53,17 @@ const App = () => {
             name={ScreenName.TabComponent}
             component={TabComponent}
           />
+          <Stack.Screen name={ScreenName.MyPost} component={MyPost} />
           <Stack.Screen name={ScreenName.EditProfile} component={EditProfile} />
+          <Stack.Screen name={ScreenName.EditRoom} component={EditRoom} />
+          <Stack.Screen
+            name={ScreenName.GetLocationByMap}
+            component={GetLocationByMap}
+          />
+          <Stack.Screen
+            name={ScreenName.Notification}
+            component={Notification}
+          />
           <Stack.Screen
             name={ScreenName.changePassword}
             component={ChangePassword}

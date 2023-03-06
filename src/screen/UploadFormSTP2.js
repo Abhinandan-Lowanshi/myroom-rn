@@ -8,13 +8,10 @@ import {
   FlatList,
   Image,
 } from 'react-native';
-import CustomPicker from '../component/CustomPicker';
-import CustomInputText from '../component/InputText';
 import {hp, RF} from '../common/CommonFunctions';
-import data from '../common/SpinnerData';
 import StyleGlobel from '../Style/StyleGlobel';
 import Colors from '../common/Colors';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import C_Button from '../component/C_Button';
 import Stapper from '../component/Stapper';
 import {uploadImage} from '../networking/ApiFunctions';
@@ -22,10 +19,10 @@ import EndPoints from '../networking/EndPoints';
 import {useSelector, useDispatch} from 'react-redux';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
-// var FormData = require('form-data');
+import LowOpacityLoader from '../component/LowOpacityLoader';
 const UploadFormSTP2 = ({navigation}) => {
   const [image, setImage] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [loading, setIsLoading] = React.useState(false);
   const uploadData = useSelector(state => state.AllData.uploadData);
 
   const openCamera = async () => {
@@ -59,7 +56,7 @@ const UploadFormSTP2 = ({navigation}) => {
     });
     setImage(temp);
   };
-  const renderImges = () => {
+  const renderImages = () => {
     return (
       <FlatList
         data={image}
@@ -82,20 +79,6 @@ const UploadFormSTP2 = ({navigation}) => {
         }}></FlatList>
     );
   };
-  // const prepareImage = () => {
-  //   let tempImage = [];
-  //   if (image.length > 0) {
-  //     image.forEach(item => {
-  //       tempImage.push({
-  //         name: item?.fileName,
-  //         type: item?.type,
-  //         uri: item?.uri,
-  //       });
-  //     });
-
-  //     return tempImage;
-  //   }
-  // };
 
   const uploadRoom = async () => {
     setIsLoading(true);
@@ -103,7 +86,7 @@ const UploadFormSTP2 = ({navigation}) => {
       var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
       const formdata = new FormData();
       image.forEach(item => {
-        formdata.append('Images[]', {
+        formdata.append('Images', {
           uri: item?.uri,
           name: item?.fileName,
           type: item?.type,
@@ -131,19 +114,21 @@ const UploadFormSTP2 = ({navigation}) => {
         .then(response => {
           setIsLoading(false);
           if (response.status === true) {
-            // navigation.navigate(ScreenName.Fav);
+            navigation.navigate(ScreenName.Upload);
             console.log(response, 'Response');
+          } else {
+            console.log(response, 'error');
           }
         })
         .catch(error => {
           setIsLoading(false);
-          console.log(error, 'error');
         });
     }
   };
 
   return (
     <View style={StyleGlobel.containerStyle}>
+      {loading && <LowOpacityLoader />}
       <Stapper fromSTP1={false} />
       <TouchableOpacity
         onPress={() => openCamera()}
@@ -153,11 +138,9 @@ const UploadFormSTP2 = ({navigation}) => {
           Note : Upload minimum 2 and maximum 9 photos.
         </Text>
       </TouchableOpacity>
-      {renderImges()}
+      {renderImages()}
       <C_Button
-        isLoading={isLoading}
         onPress={uploadRoom}
-        // outerContainer={style.outerContainer}
         isSubmitDisabled={false}
         label={'Proceed'}
       />
@@ -168,10 +151,6 @@ const UploadFormSTP2 = ({navigation}) => {
 export default UploadFormSTP2;
 
 const style = StyleSheet.create({
-  pickerstyle: {
-    elevation: 5,
-    // marginTop: hp(2.3),
-  },
   labelLimit: {
     color: Colors.BLACK,
     fontSize: RF(1.2),

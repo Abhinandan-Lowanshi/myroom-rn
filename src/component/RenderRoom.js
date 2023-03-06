@@ -9,11 +9,9 @@ import {
 } from 'react-native';
 import {hp, RF} from '../common/CommonFunctions';
 import Colors from '../common/Colors';
-import Custome_Image from './Custome_Image';
+import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
-import DeteleConformation from './DeleteConformation';
-import DeleteConformation from './DeleteConformation';
 const RenderRoom = ({
   myRoomList,
   isFromMyPost,
@@ -25,13 +23,13 @@ const RenderRoom = ({
   onPressDelete,
   onPressEdit,
   container,
+  flat,
 }) => {
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
         onPress={() => onPress(item)}
         activeOpacity={0.8}
-        //  activeOpacity={1}
         style={[style.container, container]}>
         {isFromMyPost && (
           <View style={style.innerContainer}>
@@ -60,9 +58,10 @@ const RenderRoom = ({
           </View>
         )}
         <View>
-          <Custome_Image
+          <Custom_Image
             uri={item?.images[0]?.img_name}
-            container={style.image}
+            container={style.imageContainer}
+            imageStyle={style.image}
           />
         </View>
         {!isFromMyPost && (
@@ -96,21 +95,15 @@ const RenderRoom = ({
             <TimeAgo style={style.timestamp} time={item?.created_at} />
           </View>
         </View>
-        {/* <View
-            style={{
-              width: '100%',
-              backgroundColor: Colors.GREY,
-              height: hp(1),
-            }}></View> */}
       </TouchableOpacity>
     );
   };
   return (
     <View>
       <FlatList
-        style={{height: '100%'}}
-        refreshing={refreshing}
-        onRefresh={() => onRefresh()}
+        style={flat || {width: '100%'}}
+        refreshing={refreshing || false}
+        onRefresh={onRefresh}
         data={myRoomList}
         renderItem={renderItem}
       />
@@ -122,8 +115,8 @@ export default RenderRoom;
 
 const style = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
-    marginTop: hp(2),
+    backgroundColor: Colors.WHITE,
+    marginTop: hp(0.5),
     flexDirection: 'column',
     borderRadius: hp(1),
     elevation: hp(1),
@@ -207,12 +200,13 @@ const style = StyleSheet.create({
     alignSelf: 'center',
     fontSize: RF(1.2),
   },
-  image: {
+  imageContainer: {
     height: hp(25),
+    borderRadius: 100,
   },
   bottomContainer: {
     marginHorizontal: hp(2),
-    marginTop: hp(1),
+    // marginTop: hp(1),
   },
   labelAddress: {
     fontSize: RF(1.6),
@@ -230,7 +224,14 @@ const style = StyleSheet.create({
     // backgroundColor: Colors.PRIMARY,
     padding: hp(0.5),
     borderRadius: hp(0.6),
-    marginTop: hp(1),
+    // marginTop: hp(1),
     marginLeft: hp(1),
+  },
+  image: {
+    flex: 1,
+    borderTopEndRadius: 7,
+    borderTopLeftRadius: 7,
+    borderBottomLeftRadius: hp(3),
+    borderBottomRightRadius: hp(3),
   },
 });

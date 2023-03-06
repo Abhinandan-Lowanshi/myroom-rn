@@ -1,15 +1,8 @@
 import React from 'react';
-import {
-  Dimensions,
-  Text,
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
+import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Colors from '../common/Colors';
-const Custome_Image = props => {
+const Custom_Image = props => {
   let [loadImage, setLoadImage] = React.useState(true);
   const [isBroken, setIsBroken] = React.useState(false);
 
@@ -17,7 +10,7 @@ const Custome_Image = props => {
     <View style={[style.container, props.container]}>
       <FastImage
         resizeMode={props?.resizeMode || FastImage.resizeMode.cover}
-        style={{flex: 1, borderRadius: 5}}
+        style={props?.imageStyle || {flex: 1, borderRadius: 5}}
         onLoadEnd={() => {
           setLoadImage(false);
         }}
@@ -41,7 +34,7 @@ const Custome_Image = props => {
     </View>
   );
 };
-export default Custome_Image;
+export default Custom_Image;
 const style = StyleSheet.create({
   container: {
     flex: 1,
