@@ -118,6 +118,13 @@ const Home = ({route, navigation}) => {
       return false;
     }
   };
+
+  const prepareData = data => {
+    let arr = data;
+    if (data.length > 0) {
+    }
+    return arr;
+  };
   const getData = () => {
     setIsFailed(false);
     if (data.longitude && data.latitude) {
@@ -139,7 +146,7 @@ const Home = ({route, navigation}) => {
           if (res.status === true) {
             console.log(res.data.length, 'res');
             if (res.data.length > 0) {
-              dispatch(setRoomDataHome(res?.data));
+              dispatch(setRoomDataHome(prepareData(res?.data)));
             } else {
               // setError({
               //   error: 'No rooms find at your location',

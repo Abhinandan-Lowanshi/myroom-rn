@@ -23,6 +23,8 @@ import Stapper from '../component/Stapper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {setUploadData} from '../redux/Slice';
 import GetLocationByMap from '../component/GetLocationByMap';
+import Icon from 'react-native-vector-icons/dist/AntDesign';
+
 const Stack = createNativeStackNavigator();
 
 const UploadNavigator = () => {
@@ -231,6 +233,11 @@ const Upload = ({navigation}) => {
       setMobileNumberError(false);
     }
   };
+
+  const handleMap = () => {
+    navigation.navigate(ScreenName.GetLocationByMap);
+  };
+
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
@@ -305,43 +312,28 @@ const Upload = ({navigation}) => {
 
         <TouchableOpacity
           style={{
-            // justifyContent: 'center',
-            alignSelf: 'center',
             width: '90%',
-            backgroundColor: Colors.GREY1,
-            paddingLeft: hp(2),
-            backgroundColor: 'white',
-            elevation: 3,
-            borderColor: false ? Colors.RED : Colors.GREY,
+            height: hp(6),
+            justifyContent: 'center',
+            alignSelf: 'center',
+            flexDirection: 'row',
+            backgroundColor: true ? Colors.PRIMARY : Colors.PRIMARYLITE1,
             borderRadius: hp(1),
-            borderWidth: hp(0.2),
             marginTop: hp(1),
-            paddingBottom: hp(1.7),
-          }}>
+          }}
+          onPress={handleMap}>
           <Text
             style={{
               fontSize: RF(1.6),
-              color: Colors.BLACK,
-              marginTop: hp(1),
+              color: Colors.WHITE,
               alignSelf: 'center',
             }}>
-            Tap to add room location for better room finding
+            {true
+              ? 'Location Added'
+              : 'Tap to add room location for better room finding'}
           </Text>
-          <CoordinateView label={'Latitude'} />
-          <CoordinateView label={'Longitude'} />
         </TouchableOpacity>
-        <Text style={style.labelHouseNoMessage}>
-          Don't worry if your house number shows wrong.
-        </Text>
-        {/* <CustomInputText
-          onChangeText={locationOnChange}
-          value={roomLocation}
-          maxLength={100}
-          outerContainer={style.outerContainer}
-          error={roomLocationError}
-          placeholder={'Room Location'}
-          errorMessage={'Enter Room Location'}
-        /> */}
+
         <CustomInputText
           onChangeText={rentOnChange}
           value={rent}

@@ -14,17 +14,27 @@ const GetLocationByMap = props => {
       {data.length === 0 ? (
         <LowOpacityLoader />
       ) : (
-        <View style={style.mapContainer}>
-          <MapView
-            apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
-            style={style.map}
-            initialRegion={{
-              latitude: 22.7196,
-              longitude: 75.8577,
-              latitudeDelta: 0.1,
-              longitudeDelta: 0.1,
-            }}></MapView>
-        </View>
+        <MapView
+          apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
+          style={style.map}
+          initialRegion={{
+            latitude: 22.7196,
+            longitude: 75.8577,
+            latitudeDelta: 0.1,
+            longitudeDelta: 0.1,
+          }}>
+          <Marker
+            // ref={(ref) => { this.marker = ref; }}
+            draggable
+            onDragEnd={(t, map, coords) => this.setDestination(coords)}
+            coordinate={destination}
+            position={destination}
+            centerOffset={{x: -18, y: -60}}
+            anchor={{x: 0.69, y: 1}}
+            pinColor={COLOR.marker}
+            onDragStart={() => this.setMarkerPosition()}
+          />
+        </MapView>
       )}
     </View>
   );
@@ -39,7 +49,7 @@ const style = StyleSheet.create({
     opacity: value ? 1.0 : 0.5,
     position: 'absolute',
   }),
-  parentContainer: {flex: 1, justifyContent: 'center', alignItems: 'center'},
+  parentContainer: {flex: 1},
   mapContainer: {
     flex: 1,
   },
