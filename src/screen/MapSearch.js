@@ -16,13 +16,14 @@ import {
   startL,
   UpdateFavData,
   updateHome,
+  updateFav,
+  setRoomDataHome,
 } from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
 import RenderRoom2 from '../component/RenderRoom2';
 import EndPoints from '../networking/EndPoints';
-import {setRoomDataHome, updateFav} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -38,20 +39,23 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Custom_Image from '../component/Custom_Image';
 import spinnerData from '../common/SpinnerData';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
+import MapViewDirections from 'react-native-maps-directions';
 
 const MapSearch = ({route, navigation}) => {
   const [isUpdate, setIsUpdate] = useState(false);
-  const [roomDataHome, setRoomDataHome] = useState({});
+  const [roomDataHomeTP, setRoomDataHomeTP] = useState({});
   const [selectedRoom, setSelectedRoom] = useState(null);
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
-  // const roomDataHome = useSelector(state => state.AllData.roomDataHome);
+  // const roomDataHomeTP = useSelector(state => state.AllData.roomDataHomeTP);
   const roomDataHomeTemp = useSelector(state => state.AllData.roomDataHome);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
+  const [locationData, setLocationData] = useState({});
 
   useEffect(() => {
-    setRoomDataHome(prepareData(roomDataHomeTemp));
+    setRoomDataHomeTP(prepareData(roomDataHomeTemp));
+    setSelectedRoom(roomDataHomeTemp[0]);
   }, []);
 
   const prepareData = data => {
@@ -63,13 +67,27 @@ const MapSearch = ({route, navigation}) => {
     return temp;
   };
   const performFavOp = data => {
-    let temp = JSON.parse(JSON.stringify(roomDataHome));
+    console.log('data', data);
+
+    let temp = JSON.parse(JSON.stringify(roomDataHomeTemp));
+    let temp1 = JSON.parse(JSON.stringify(roomDataHomeTP));
+    let selected = JSON.parse(JSON.stringify(selectedRoom));
+    selected.favorite_key = data?.like;
+
     temp.map(item => {
       if (item?.rm_pkey === data?.roomId) {
         return (item.favorite_key = data?.like);
       } else return item;
     });
+    temp1.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        console.log('temp1', item);
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
     dispatch(setRoomDataHome(temp));
+    setRoomDataHomeTP(temp1);
+    setSelectedRoom(selected);
   };
 
   const showToast = message => {
@@ -77,6 +95,7 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const onPressFav = async value1 => {
+    console.log(value1, 'line82');
     let value = {...value1};
     let data = {
       user_id: 2,
@@ -84,10 +103,15 @@ const MapSearch = ({route, navigation}) => {
       fav_type: value?.like === true ? 1 : 0,
     };
     performFavOp(value);
+    console.log(value1, 'line90');
 
     try {
       const response = await favFunction(data);
+      console.log(value1, 'line94');
+
       if (response.status === true) {
+        console.log(value1, 'line97');
+
         if (
           response?.message === 'Room removed to favorite list successfully.' ||
           response?.message === 'Room added to favorite list successfully.'
@@ -113,6 +137,8 @@ const MapSearch = ({route, navigation}) => {
       }
     } catch (error) {
       console.log(error, 'error|||||||||||||');
+      console.log(value1, 'line124');
+
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,
@@ -122,7 +148,6 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const renderSelectedRoom = item => {
-    console.log(item, 'renderSelectedRoom');
     return (
       <TouchableOpacity
         style={style.containerRoomView}
@@ -167,10 +192,17 @@ const MapSearch = ({route, navigation}) => {
           <Text style={style.labelAddress}>
             {`${item?.rm_house_no} ${item?.rm_colny} ${item?.rm_city}`}
           </Text>
-
-          {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
+          <Text style={style.labelRent}>₹{item?.rm_rent}</Text>
         </View>
-
+        <View style={style.containerLocation}>
+          <View style={style.lowOpacityLocation} />
+          <View style={style.contentLocation}>
+            <Text
+              style={
+                style.labelDistance
+              }>{`${locationData?.distance?.text} away`}</Text>
+          </View>
+        </View>
         <TouchableOpacity
           style={style.favImage}
           onPress={() =>
@@ -227,6 +259,14 @@ const MapSearch = ({route, navigation}) => {
     return message;
   };
 
+  const setDestination = data => {
+    let locationData = {
+      latitude: parseFloat(data ? data?.rm_latitude : 0.0),
+      longitude: parseFloat(data ? data?.rm_longitude : 0.0),
+    };
+    return locationData;
+  };
+
   const preDataOnMap = data => {
     let temp = JSON.parse(JSON.stringify(roomDataHomeTemp));
     temp.map((item, index) => {
@@ -234,7 +274,7 @@ const MapSearch = ({route, navigation}) => {
         return (item.isSelected = true);
       } else return (item.isSelected = false);
     });
-    setRoomDataHome(temp);
+    setRoomDataHomeTP(temp);
   };
   return (
     <ScrollView
@@ -244,30 +284,57 @@ const MapSearch = ({route, navigation}) => {
         <LowOpacityLoader />
       ) : (
         <View style={style.mapContainer}>
-          {/* {selectedRoom?.rm_latitude && selectedRoom?.rm_latitude && ( */}
           <MapView
             style={style.map}
             initialRegion={{
-              latitude: 22.7658,
-              longitude: 75.8705,
-              // latitude: data ? data?.latitude : 0.0,
-              // longitude: data ? data?.longitude : 0.0,
+              // latitude: 22.7658,
+              // longitude: 75.8705,
+              latitude: parseFloat(data ? data?.latitude : 0.0),
+              longitude: parseFloat(data ? data?.longitude : 0.0),
               latitudeDelta: 0.1,
               longitudeDelta: 0.1,
-            }}
-            // initialRegion={{
-            //   latitude: roomDataHome.length
-            //     ? parseFloat(selectedRoom?.rm_latitude)
-            //     : 0.0,
-            //   longitude: roomDataHome.length
-            //     ? parseFloat(selectedRoom?.rm_latitude)
-            //     : 0.0,
-            //   latitudeDelta: 0.015,
-            //   longitudeDelta: 0.015,
-            // }}
-          >
-            {roomDataHome?.length > 0
-              ? roomDataHome?.map((item, index) => (
+            }}>
+            <MapViewDirections
+              onReady={item => {
+                setLocationData(item?.legs[0]);
+              }}
+              optimizeWaypoints={true}
+              splitWaypoints={true}
+              // origin={{
+              //   latitude: 22.7658,
+              //   longitude: 75.8705,
+              // }}
+              origin={{
+                latitude: data?.latitude,
+                longitude: data?.longitude,
+              }}
+              destination={setDestination(
+                selectedRoom === null ? roomDataHomeTP[0] : selectedRoom,
+              )}
+              apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
+              strokeWidth={hp(0.5)}
+              strokeColor={Colors.PRIMARY}
+            />
+            <Marker
+              coordinate={{
+                latitude: parseFloat(data ? data?.latitude : 0.0),
+                longitude: parseFloat(data ? data?.longitude : 0.0),
+              }}
+              // coordinate={{
+              //   latitude: 22.7658,
+              //   longitude: 75.8705,
+              // }}
+            >
+              <View style={style.marker}>
+                <MaterialIcons
+                  name={'location-pin'}
+                  size={hp(6)}
+                  color={Colors.RED}
+                />
+              </View>
+            </Marker>
+            {roomDataHomeTP?.length > 0
+              ? roomDataHomeTP?.map((item, index) => (
                   <Marker
                     key={index}
                     coordinate={{
@@ -290,7 +357,7 @@ const MapSearch = ({route, navigation}) => {
               : null}
           </MapView>
           {renderSelectedRoom(
-            selectedRoom === null ? roomDataHome[0] : selectedRoom,
+            selectedRoom === null ? roomDataHomeTP[0] : selectedRoom,
           )}
         </View>
       )}
@@ -323,17 +390,13 @@ const style = StyleSheet.create({
     marginHorizontal: hp(2),
   },
   image: {
-    height: hp(5),
+    height: hp(8),
     width: hp(5),
     alignSelf: 'center',
     borderRadius: hp(1),
   },
   containerContent: {
     marginHorizontal: hp(2),
-  },
-  imageContainer: {
-    height: hp(5),
-    width: hp(5),
   },
   loader: {
     position: 'absolute',
@@ -362,7 +425,6 @@ const style = StyleSheet.create({
     elevation: hp(1),
     width: '90%',
     alignSelf: 'center',
-    // alignItems: 'center',
     paddingHorizontal: hp(2),
   },
   containerLabel: {
@@ -387,7 +449,7 @@ const style = StyleSheet.create({
   },
   imageContainer: {
     width: '100%',
-    height: hp(15),
+    height: hp(20),
     borderRadius: 100,
   },
   labelRent: {
@@ -403,10 +465,8 @@ const style = StyleSheet.create({
     color: Colors.BLACK,
   },
   containerTime: {
-    // backgroundColor: Colors.PRIMARY,
     padding: hp(0.5),
     borderRadius: hp(0.6),
-    // marginTop: hp(1),
     marginLeft: hp(1),
   },
   image: {
@@ -468,5 +528,26 @@ const style = StyleSheet.create({
   containerRoomView: {
     marginHorizontal: hp(1),
     marginVertical: hp(1),
+  },
+  containerLocation: {
+    position: 'absolute',
+    left: hp(1),
+    top: hp(1),
+    borderRadius: 7,
+  },
+  lowOpacityLocation: {
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    backgroundColor: Colors.PRIMARY,
+    opacity: 0.7,
+    borderRadius: 7,
+  },
+  labelDistance: {
+    color: Colors.BLACK,
+    fontSize: RF(1.2),
+  },
+  contentLocation: {
+    margin: hp(0.5),
   },
 });
