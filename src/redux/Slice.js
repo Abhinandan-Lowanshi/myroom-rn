@@ -17,6 +17,9 @@ export const slice = createSlice({
     isFavUpdate: false,
     searchRooms: {},
     roomDataHome: [],
+    roomLocation: {},
+    isMapVisited: false,
+    searchUpdate: false,
   },
   reducers: {
     startL: (state, actions) => {
@@ -58,6 +61,15 @@ export const slice = createSlice({
     searchRooms: (state, actions) => {
       state.searchRooms = actions.payload;
     },
+    roomLocationOP: (state, actions) => {
+      state.roomLocation = actions.payload;
+    },
+    isMapVisited: (state, actions) => {
+      state.isMapVisited = actions.payload;
+    },
+    searchUpdate: (state, actions) => {
+      state.searchUpdate = actions.payload;
+    },
   },
 });
 
@@ -75,6 +87,9 @@ export const {
   isHomeUpdate,
   isFavUpdate,
   searchRooms,
+  roomLocationOP,
+  isMapVisited,
+  searchUpdate,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -118,6 +133,15 @@ export const updateFav = data => dispatch => {
 };
 export const setSearchRoomData = data => dispatch => {
   dispatch(searchRooms(data));
+};
+export const setRoomLocation = data => dispatch => {
+  dispatch(roomLocationOP(data));
+};
+export const setIsMapVisited = data => dispatch => {
+  dispatch(isMapVisited(data));
+};
+export const setSearchUpdate = data => dispatch => {
+  dispatch(searchUpdate(data));
 };
 
 export default slice.reducer;

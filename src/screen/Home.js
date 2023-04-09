@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {
+  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  ToastAndroid,
   View,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
@@ -14,7 +14,7 @@ import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
 import RenderRoom from '../component/RenderRoom';
 import EndPoints from '../networking/EndPoints';
-import {setRoomDataHome, updateFav} from '../redux/Slice';
+import {setRoomDataHome, updateFav, setSearchUpdate} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -22,6 +22,10 @@ import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
 import {hp} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+import {LogBox} from 'react-native';
+import images from '../common/images';
+
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -30,11 +34,21 @@ const Home = ({route, navigation}) => {
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
+  const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
-  console.log(roomDataHome, 'home');
+  console.log(searchUpdate, 'searchUpdate');
   const dispatch = useDispatch();
   let counter = 10;
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    console.log('UseEffect');
+    if (searchUpdate) {
+      dispatch(startL(true));
+      getData();
+      dispatch(setSearchUpdate(false));
+    }
+  }, [searchUpdate]);
 
   useEffect(() => {
     if (favUpdate) {
@@ -54,6 +68,13 @@ const Home = ({route, navigation}) => {
     });
   };
 
+  useEffect(() => {
+    LogBox.ignoreLogs([
+      'VirtualizedLists should never be nested',
+      'Non-serializable values were found in the navigation state',
+    ]);
+  }, []);
+
   const onReload = () => {
     setLoading(true);
     getData();
@@ -71,9 +92,11 @@ const Home = ({route, navigation}) => {
     });
     dispatch(setRoomDataHome(temp));
   };
+
   const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
+    Toast.show(message, Toast.LONG);
   };
+
   const onPressFav = async value1 => {
     let value = {...value1};
     let data = {
@@ -132,8 +155,8 @@ const Home = ({route, navigation}) => {
       sendRequest(
         {
           user_id: 'Dummy',
-          latitude: 22.7658,
-          longitude: 75.8705,
+          latitude: data.latitude,
+          longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,

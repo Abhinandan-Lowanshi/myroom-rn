@@ -33,11 +33,17 @@ const RenderRoom = ({
     container,
     textLabel,
     lowOpacityContainer,
+    isTime,
   }) => {
+    console.log(label, 'LowOpacityText');
     return (
       <View style={container}>
         <View style={[[style.lowOpacityContainer, lowOpacityContainer]]}></View>
-        <Text style={[style.labelLow, textLabel]}>{label}</Text>
+        {isTime ? (
+          <TimeAgo style={style.labelLow} time={label} />
+        ) : (
+          <Text style={[style.labelLow, textLabel]}>{label}</Text>
+        )}
       </View>
     );
   };
@@ -93,10 +99,17 @@ const RenderRoom = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
-          <LowOpacityText
-            label={item?.rm_size}
-            container={style.containerRent}
-          />
+          <View style={style.containerDate}>
+            <LowOpacityText
+              label={item?.rm_size}
+              container={style.containerRent}
+            />
+            <LowOpacityText
+              label={item?.created_at}
+              container={style.containerRent}
+              isTime={true}
+            />
+          </View>
         </View>
         <View style={style.containerInfo}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
@@ -272,10 +285,8 @@ const style = StyleSheet.create({
     color: 'white',
   },
   containerRent: {
-    position: 'absolute',
-    bottom: hp(2),
-    right: hp(3),
     borderRadius: 25,
+    marginLeft: hp(1),
   },
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
@@ -313,5 +324,11 @@ const style = StyleSheet.create({
   containerOptional2: {
     borderRadius: 10,
     marginLeft: 20,
+  },
+  containerDate: {
+    position: 'absolute',
+    bottom: hp(2),
+    right: hp(2),
+    flexDirection: 'row',
   },
 });

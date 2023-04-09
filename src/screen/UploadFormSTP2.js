@@ -20,6 +20,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+
 const UploadFormSTP2 = ({navigation}) => {
   const [image, setImage] = React.useState([]);
   const [loading, setIsLoading] = React.useState(false);
@@ -56,6 +58,11 @@ const UploadFormSTP2 = ({navigation}) => {
     });
     setImage(temp);
   };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
   const renderImages = () => {
     return (
       <FlatList
@@ -113,8 +120,9 @@ const UploadFormSTP2 = ({navigation}) => {
       uploadImage(formdata, EndPoints.addRoom, 'POST')
         .then(response => {
           setIsLoading(false);
+          showToast(response?.message);
           if (response.status === true) {
-            navigation.navigate(ScreenName.Upload);
+            navigation.navigate(ScreenName.Home);
             console.log(response, 'Response');
           } else {
             console.log(response, 'error');

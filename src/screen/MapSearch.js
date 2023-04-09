@@ -30,7 +30,7 @@ import {useIsFocused} from '@react-navigation/native';
 import {hp, RF} from '../common/CommonFunctions';
 import MapView, {Marker} from 'react-native-maps';
 import Colors from '../common/Colors';
-import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
+import MaterialIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import PopupRoomView from '../component/PopupRoomView';
 import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/dist/Entypo';
@@ -40,6 +40,7 @@ import Custom_Image from '../component/Custom_Image';
 import spinnerData from '../common/SpinnerData';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import MapViewDirections from 'react-native-maps-directions';
+import Toast from 'react-native-simple-toast';
 
 const MapSearch = ({route, navigation}) => {
   const [isUpdate, setIsUpdate] = useState(false);
@@ -56,7 +57,7 @@ const MapSearch = ({route, navigation}) => {
   useEffect(() => {
     setRoomDataHomeTP(prepareData(roomDataHomeTemp));
     setSelectedRoom(roomDataHomeTemp[0]);
-  }, []);
+  }, [roomDataHomeTemp]);
 
   const prepareData = data => {
     let temp = [];
@@ -91,7 +92,7 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
+    Toast.show(message, Toast.LONG);
   };
 
   const onPressFav = async value1 => {
@@ -203,7 +204,7 @@ const MapSearch = ({route, navigation}) => {
               }>{`${locationData?.distance?.text} away`}</Text>
           </View>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={style.favImage}
           onPress={() =>
             onPressFav({roomId: item?.rm_pkey, like: !item?.favorite_key})
@@ -214,7 +215,7 @@ const MapSearch = ({route, navigation}) => {
             color={item?.favorite_key === true ? Colors.RED : Colors.WHITE}
             size={hp(3)}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </TouchableOpacity>
     );
   };
@@ -291,8 +292,8 @@ const MapSearch = ({route, navigation}) => {
               // longitude: 75.8705,
               latitude: parseFloat(data ? data?.latitude : 0.0),
               longitude: parseFloat(data ? data?.longitude : 0.0),
-              latitudeDelta: 0.1,
-              longitudeDelta: 0.1,
+              latitudeDelta: 0.06,
+              longitudeDelta: 0.06,
             }}>
             <MapViewDirections
               onReady={item => {
@@ -327,8 +328,8 @@ const MapSearch = ({route, navigation}) => {
             >
               <View style={style.marker}>
                 <MaterialIcons
-                  name={'location-pin'}
-                  size={hp(6)}
+                  name={'human-greeting'}
+                  size={hp(4)}
                   color={Colors.RED}
                 />
               </View>
@@ -347,8 +348,8 @@ const MapSearch = ({route, navigation}) => {
                     }}>
                     <View style={style.marker}>
                       <MaterialIcons
-                        name={'location-pin'}
-                        size={hp(6)}
+                        name={'home-map-marker'}
+                        size={hp(4)}
                         color={item?.isSelected ? Colors.GREEN : Colors.PRIMARY}
                       />
                     </View>
