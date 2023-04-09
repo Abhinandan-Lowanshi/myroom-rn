@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {
+  FlatList,
   Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
@@ -20,18 +23,22 @@ import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
-import {hp} from '../common/CommonFunctions';
+import {RF, hp} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import {LogBox} from 'react-native';
 import images from '../common/images';
 import SliderView from '../component/sliderView/SliderView';
+import {filterDataAll, filterRoom, getRoomCount} from '../common/FIlterData';
+import Colors from '../common/Colors';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filterList, setFilterList] = useState(filterDataAll);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
@@ -76,6 +83,18 @@ const Home = ({route, navigation}) => {
     ]);
   }, []);
 
+  const calculateRoomCount = (filter, rooms) => {
+    let temp = getRoomCount(filter, rooms);
+    if (temp) {
+      temp.map(item => {
+        if (item?.id === 7) {
+          return (item.availableRooms = rooms?.length);
+        } else return item;
+      });
+      console.log(temp, 'calculateRoomCount');
+      setFilterList(temp);
+    }
+  };
   const onReload = () => {
     setLoading(true);
     getData();
@@ -91,6 +110,14 @@ const Home = ({route, navigation}) => {
         return (item.favorite_key = data?.like);
       } else return item;
     });
+    let tempFil = JSON.parse(JSON.stringify(filteredData));
+    tempFil.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
+    setFilteredData(tempFil);
+    console.log(tempFil, 'tempFil');
     dispatch(setRoomDataHome(temp));
   };
 
@@ -157,7 +184,7 @@ const Home = ({route, navigation}) => {
         {
           user_id: 'Dummy',
           latitude: data.latitude,
-          longitude: data.longitude,
+          longitude: 27.6126,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -171,11 +198,15 @@ const Home = ({route, navigation}) => {
             console.log(res.data.length, 'res');
             if (res.data.length > 0) {
               dispatch(setRoomDataHome(prepareData(res?.data)));
+              calculateRoomCount(filterDataAll, res?.data);
+              setFilteredData(res?.data);
             } else {
-              // setError({
-              //   error: 'No rooms find at your location',
-              //   header: 'Sorry!',
-              // });
+              setError({
+                error:
+                  'No rooms find at your location \n You can also search nearby rooms by Area name ',
+                header: 'Sorry!',
+              });
+              setIsFailed(true);
             }
           } else {
             setIsFailed(true);
@@ -205,6 +236,80 @@ const Home = ({route, navigation}) => {
   const gotoSearch = () => {
     navigation.navigate(ScreenName.Search);
   };
+
+  const checkFilterApplied = () => {
+    return filterList?.some(item => {
+      return item?.isApplied === true;
+    });
+  };
+
+  const checkLastFilter = item => {
+    if (item?.isApplied === true) {
+      let count = 0;
+      filterList?.forEach(item => {
+        if (item?.isApplied === true) {
+          count = count + 1;
+        }
+      });
+      if (count > 1) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
+  const manageFilter = item => {
+    if (item?.id === 7 || checkLastFilter(item)) {
+      setFilteredData(roomDataHome);
+      let temp = JSON.parse(JSON.stringify(filterList));
+      temp?.map(item1 => {
+        if (item1?.id === item?.id) {
+          item1.isApplied = false;
+        }
+        return item1;
+      });
+      temp[0].isApplied = true;
+      setFilterList(temp);
+    } else {
+      let tempSearchRoom = [];
+      let temp = JSON.parse(JSON.stringify(filterList));
+      temp?.map(item1 => {
+        if (item1?.id === item?.id) {
+          item1.isApplied = !item1?.isApplied;
+        }
+        return item1;
+      });
+      temp[0].isApplied = false;
+      setFilterList(temp);
+      tempSearchRoom = filterRoom(temp, roomDataHome);
+      setFilteredData(tempSearchRoom);
+    }
+  };
+
+  const filterRender = ({item}) => {
+    return (
+      <>
+        <TouchableOpacity
+          style={style.containerFilter(item?.isApplied)}
+          onPress={() => {
+            if (item?.availableRooms > 0) {
+              manageFilter(item);
+            } else {
+              Toast.show(`No room Available for filter ${item?.value}`);
+            }
+          }}>
+          <Text style={style.labelFilter}>{item?.value}</Text>
+        </TouchableOpacity>
+        <View style={style.containerCount}>
+          <Text style={style.labelCount}>{item?.availableRooms}</Text>
+        </View>
+      </>
+    );
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -222,22 +327,28 @@ const Home = ({route, navigation}) => {
           gotoSearch();
         }}
       />
+      {filteredData?.length > 0 ? (
+        <FlatList
+          horizontal
+          data={filterList}
+          renderItem={filterRender}
+          style={{maxHeight: hp(9)}}
+        />
+      ) : null}
       {loading ? (
         <LowOpacityLoader />
       ) : isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
-        <View>
-          <View style={{marginHorizontal: hp(1)}}>
-            {roomDataHome?.length > 0 ? (
-              <RenderRoom
-                myRoomList={roomDataHome}
-                onPress={onPressRoom}
-                onPressFav={onPressFav}
-                refreshing={false}
-              />
-            ) : null}
-          </View>
+        <View style={{marginHorizontal: hp(1)}}>
+          {filteredData?.length > 0 ? (
+            <RenderRoom
+              myRoomList={filteredData}
+              onPress={onPressRoom}
+              onPressFav={onPressFav}
+              refreshing={false}
+            />
+          ) : null}
         </View>
       )}
     </ScrollView>
@@ -246,7 +357,35 @@ const Home = ({route, navigation}) => {
 
 export default Home;
 const style = StyleSheet.create({
-  previewImageContainerStyle: {
-    borderRadius: hp(2),
+  containerFilter: isApplied => ({
+    backgroundColor: isApplied ? Colors.PRIMARY : Colors.PRIMARYLITE,
+    height: hp(7),
+    width: hp(7),
+    borderRadius: hp(90),
+    marginHorizontal: hp(0.4),
+    justifyContent: 'center',
+    marginVertical: hp(1),
+  }),
+  labelFilter: {
+    color: Colors.WHITE,
+    alignSelf: 'center',
+    fontSize: RF(1.3),
+  },
+  labelCount: {
+    color: Colors.BLACK,
+    alignSelf: 'center',
+    marginHorizontal: hp(0.7),
+    marginVertical: hp(0.3),
+    fontSize: RF(1.3),
+  },
+  containerCount: {
+    borderRadius: hp(90),
+    backgroundColor: Colors.WHITE,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    position: 'absolute',
+    top: hp(1),
+    right: hp(2),
+    elevation: hp(2),
   },
 });

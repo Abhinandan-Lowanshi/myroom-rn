@@ -29,6 +29,7 @@ import GooglePlacesInput from '../component/GooglePlacesInput';
 import {updateHome, searchUpdate} from '../redux/Slice';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-simple-toast';
+import {filterData, filterRoom, getRoomCount} from '../common/FIlterData';
 
 const Search = ({navigation}) => {
   const [location, setLocation] = useState({});
@@ -42,14 +43,7 @@ const Search = ({navigation}) => {
   const [recent, setRecent] = useState([]);
   const dispatch = useDispatch();
 
-  const [data, setData] = React.useState([
-    {value: 'Single Room', id: 1, isApplied: false, availableRooms: 0},
-    {value: '1RK', id: 2, isApplied: false, availableRooms: 0},
-    {value: '1BHK', id: 3, isApplied: false, availableRooms: 0},
-    {value: '2BHK', id: 4, isApplied: false, availableRooms: 0},
-    {value: '3BHK', id: 5, isApplied: false, availableRooms: 0},
-    {value: 'More then 3BHK', id: 6, isApplied: false, availableRooms: 0},
-  ]);
+  const [data, setData] = React.useState(filterData);
 
   useEffect(() => {
     localStorageOp('', AsyncKeys.RECENT_SERCHES, '')
@@ -58,6 +52,7 @@ const Search = ({navigation}) => {
       })
       .catch(() => {});
   }, []);
+
   const getRooms = (location = null) => {
     setMessage('');
     setLoading(true);
@@ -99,16 +94,11 @@ const Search = ({navigation}) => {
   };
 
   const calculateRoomCount = rooms => {
-    let temp = [...data];
-    temp?.map(item => {
-      let count = 0;
-      rooms?.map(item1 => {
-        if (item?.value === item1?.rm_size) count = count + 1;
-      });
-      return (item.availableRooms = count);
-    });
-    setData(temp);
-    removeFilter();
+    let temp = getRoomCount(data, rooms);
+    if (temp) {
+      setData(temp);
+      removeFilter();
+    }
   };
 
   const Header = ({label, navigation}) => {
@@ -312,20 +302,13 @@ const Search = ({navigation}) => {
     });
     setData(temp);
   };
+
   const getFilteredData = (temp, filterA) => {
     if (filterA) {
       let tempRoomData = JSON.parse(JSON.stringify(actualData));
       let tempSearchRoom = [];
       if (tempRoomData.length > 0) {
-        temp?.forEach(filter => {
-          if (filter.isApplied === true) {
-            tempRoomData.map(item => {
-              if (filter.value === item?.rm_size) {
-                tempSearchRoom.push(item);
-              }
-            });
-          }
-        });
+        tempSearchRoom = filterRoom(temp, tempRoomData);
         setRoomData(tempSearchRoom);
       }
     } else {
