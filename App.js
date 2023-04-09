@@ -21,17 +21,12 @@ import localStorageOp from './src/localStorage/LocalData';
 import Notification from './src/screen/Notification';
 import EditRoom from './src/screen/EditRoom';
 import GetLocationByMap from './src/component/GetLocationByMap';
-// import {
-//   requestUserPermission,
-//   notificationListener,
-// } from './src/Utils/notificationServices';
+import AppSettings from './src/screen/AppSettings';
+import Fav from './src/screen/Fav';
+import Chat from './src/screen/Chat/Chat';
+
 const Stack = createNativeStackNavigator();
 const App = () => {
-  //   useEffect(() => {
-  //     requestUserPermission();
-  //     notificationListener();
-  //   }, []);
-
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -44,6 +39,9 @@ const App = () => {
           <Stack.Screen name={ScreenName.Home} component={HomeScreen} />
           <Stack.Screen name={ScreenName.SignUp} component={SignUp} />
           <Stack.Screen name={ScreenName.EmailVerify} component={EmailVerify} />
+          <Stack.Screen name={ScreenName.Fav} component={Fav} />
+          <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
+          <Stack.Screen name={ScreenName.Chat} component={Chat} />
           <Stack.Screen
             name={ScreenName.ForgotPassword}
             component={ForgotPassword}

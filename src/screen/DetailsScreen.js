@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -10,6 +10,8 @@ import {
   FlatList,
   Dimensions,
   Modal,
+  Linking,
+  Platform,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
@@ -31,6 +33,8 @@ import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
@@ -179,6 +183,53 @@ const DetailsScreen = props => {
     );
   };
 
+  const handleCall = (number = '') => {
+    if (number !== '') {
+      let phoneNumber;
+      if (Platform.OS === 'android') {
+        phoneNumber = `tel:${number}`;
+      } else {
+        phoneNumber = `telprompt:${number}`;
+      }
+      Linking.openURL(phoneNumber);
+    } else {
+      Toast.show('Something went wrong', Toast.LONG);
+    }
+  };
+
+  // const handleMessage = (phoneNumber = '') => {
+  //   if (phoneNumber !== '') {                                      code for send message on whatsapp
+  //     sendWhatsApp = () => {
+  //       let msg = "type something";
+  //       let phoneWithCountryCode = "xxxxxxxxxx";
+
+  //       let mobile =
+  //         Platform.OS == "ios" ? phoneWithCountryCode : "+" + phoneWithCountryCode;
+  //       if (mobile) {
+  //         if (msg) {
+  //           let url = "whatsapp://send?text=" + msg + "&phone=" + mobile;
+  //           Linking.openURL(url)
+  //             .then(data => {
+  //               console.log("WhatsApp Opened");
+  //             })
+  //             .catch(() => {
+  //               alert("Make sure WhatsApp installed on your device");
+  //             });
+  //         } else {
+  //           alert("Please insert message to send");
+  //         }
+  //       } else {
+  //         alert("Please insert mobile no");
+  //       }
+  //     };
+  //        let url = `sms:${phoneNumber}${
+  //       Platform.OS === 'ios' ? '&' : '?'
+  //     }body=${''}`;
+  //     Linking.openURL(url);
+  //   } else {
+  //     Toast.show('Something went wrong', Toast.LONG);
+  //   }
+  // };
   const ContentHeader = props => {
     return (
       <View style={[style.headerContainer, props.headerContainer]}>
@@ -292,16 +343,22 @@ const DetailsScreen = props => {
           }}></Image>
         <View style={style.ownerNameContainer}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
-          <Text style={style.labelmoble}>{item?.rm_own_Fullname}</Text>
+          <Text style={style.labelmoble}>{item?.rm_own_mble_num}</Text>
         </View>
         <View style={style.containerContact}>
           <IconButton_Entypo
             fValue={IconName?.message}
             iconColor={Colors.BLUE2}
+            onPress={() => {
+              handleMessage(item?.rm_own_mble_num);
+            }}
           />
           <IconButton_Entypo
             fValue={IconName?.phone}
             iconColor={Colors.GREEN1}
+            onPress={() => {
+              handleCall(item?.rm_own_mble_num);
+            }}
           />
         </View>
       </View>

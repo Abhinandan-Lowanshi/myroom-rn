@@ -25,6 +25,10 @@ import RenderRecentSearch from '../component/RenderRecentSearch';
 import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import GooglePlacesInput from '../component/GooglePlacesInput';
+import {updateHome, searchUpdate} from '../redux/Slice';
+import {useSelector, useDispatch} from 'react-redux';
+import Toast from 'react-native-simple-toast';
 
 const Search = ({navigation}) => {
   const [location, setLocation] = useState({});
@@ -36,6 +40,7 @@ const Search = ({navigation}) => {
   const [actualData, setActualData] = useState({});
   const [message, setMessage] = useState('Search rooms around you');
   const [recent, setRecent] = useState([]);
+  const dispatch = useDispatch();
 
   const [data, setData] = React.useState([
     {value: 'Single Room', id: 1, isApplied: false, availableRooms: 0},
@@ -136,51 +141,51 @@ const Search = ({navigation}) => {
     );
   };
 
-  const GooglePlacesInput = () => {
-    return (
-      <GooglePlacesAutocomplete
-        style={style.containerPlaceHolder}
-        onFail={error => {}}
-        onTimeout={error => {}}
-        textInputProps={{
-          placeholderTextColor: Colors.BLACK,
-          returnKeyType: 'search',
-        }}
-        keepResultsAfterBlur={true}
-        keyboardShouldPersistTaps={'always'}
-        styles={{
-          textInputContainer: {},
-          textInput: {
-            height: hp(6),
-            color: Colors.BLACK,
-            fontSize: 16,
-            elevation: hp(2),
-            borderColor: Colors.GREY,
-            borderWidth: hp(0.25),
-            borderRadius: hp(1),
-            marginHorizontal: hp(1),
-            marginTop: hp(1),
-          },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          },
-          description: {color: Colors.BLACK},
-        }}
-        placeholder="Search location"
-        fetchDetails={true}
-        onPress={(data, details = null) => {
-          setLocation(details?.geometry?.location);
-          getRooms(details?.geometry?.location);
-          handleRecent(details);
-        }}
-        getCurrentLocation={data => {}}
-        query={{
-          key: 'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
-          language: 'en',
-        }}
-      />
-    );
-  };
+  // const GooglePlacesInput = () => {
+  //   return (
+  //     <GooglePlacesAutocomplete
+  //       style={style.containerPlaceHolder}
+  //       onFail={error => {}}
+  //       onTimeout={error => {}}
+  //       textInputProps={{
+  //         placeholderTextColor: Colors.BLACK,
+  //         returnKeyType: 'search',
+  //       }}
+  //       keepResultsAfterBlur={true}
+  //       keyboardShouldPersistTaps={'always'}
+  //       styles={{
+  //         textInputContainer: {},
+  //         textInput: {
+  //           height: hp(6),
+  //           color: Colors.BLACK,
+  //           fontSize: 16,
+  //           elevation: hp(2),
+  //           borderColor: Colors.GREY,
+  //           borderWidth: hp(0.25),
+  //           borderRadius: hp(1),
+  //           marginHorizontal: hp(1),
+  //           marginTop: hp(1),
+  //         },
+  //         predefinedPlacesDescription: {
+  //           color: '#1faadb',
+  //         },
+  //         description: {color: Colors.BLACK},
+  //       }}
+  //       placeholder="Search location"
+  //       fetchDetails={true}
+  //       onPress={(data, details = null) => {
+  //         setLocation(details?.geometry?.location);
+  //         getRooms(details?.geometry?.location);
+  //         handleRecent(details);
+  //       }}
+  //       getCurrentLocation={data => {}}
+  //       query={{
+  //         key: 'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+  //         language: 'en',
+  //       }}
+  //     />
+  //   );
+  // };
 
   const handleRecent = data => {
     let ob = {
@@ -272,6 +277,8 @@ const Search = ({navigation}) => {
           response?.message === 'Room removed to favorite list successfully.' ||
           response?.message === 'Room added to favorite list successfully.'
         ) {
+          Toast.show(response?.message, Toast.LONG);
+          dispatch(searchUpdate(true));
           return true;
         } else {
           performFavOp({
@@ -534,11 +541,17 @@ const Search = ({navigation}) => {
     );
   };
 
+  const onSearch = details => {
+    setLocation(details?.geometry?.location);
+    getRooms(details?.geometry?.location);
+    handleRecent(details);
+  };
+
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Search} navigation={navigation} />
       {loading && <LowOpacityLoader />}
-      <GooglePlacesInput />
+      <GooglePlacesInput onSearch={onSearch} />
       {filter && RenderFilter()}
       <View style={style.containerList}>
         <RenderRecentSearch data={recent} onPress={handleRecentAPI} />
@@ -644,5 +657,6 @@ const style = StyleSheet.create({
   },
   flat: {
     height: '89%',
+    marginHorizontal: hp(1),
   },
 });

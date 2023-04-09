@@ -22,7 +22,8 @@ import UploadFormSTP2 from './UploadFormSTP2';
 import Stapper from '../component/Stapper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {setUploadData} from '../redux/Slice';
-import GetLocationByMap from '../component/GetLocationByMap';
+import {useIsFocused} from '@react-navigation/native';
+
 const Stack = createNativeStackNavigator();
 
 const UploadNavigator = () => {
@@ -58,7 +59,7 @@ const Upload = ({navigation}) => {
   const [dependencyStatusError, setDependencyStatusError] = useState(false);
   const [whichFloor, setWhichFloor] = useState('');
   const [whichFloorError, setWhichFloorError] = useState(false);
-  const [roomLocation, setRoomLocation] = useState('');
+  const [roomLocation, setRoomLocation] = useState({});
   const [roomLocationError, setRoomLocationError] = useState(false);
   const [houseNumber, setHouseNumber] = useState('');
   const [houseNumberError, setHouseNumberError] = useState(false);
@@ -70,6 +71,7 @@ const Upload = ({navigation}) => {
   const [cityError, setCityError] = useState(false);
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState(false);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     if (
@@ -81,7 +83,7 @@ const Upload = ({navigation}) => {
       parkingStatus.length === 0 ||
       dependencyStatus.length === 0 ||
       whichFloor.length < 2 ||
-      roomLocation.length < 2 ||
+      Object.keys(roomLocation).length === 0 ||
       rent.length < 3 ||
       houseNumber.length < 1 ||
       colony.length < 2 ||
@@ -109,6 +111,10 @@ const Upload = ({navigation}) => {
     description,
   ]);
 
+  useEffect(() => {
+    if (!isFocused) setRoomLocation({});
+  }, [isFocused]);
+
   const nameOnChange = name => {
     setName(name);
     if (name !== '' && name.length < 4) {
@@ -117,14 +123,16 @@ const Upload = ({navigation}) => {
       setErrorName(false);
     }
   };
-  const locationOnChange = location => {
-    setRoomLocation(location);
-    if (location !== '' && location.length < 2) {
-      setRoomLocationError(true);
-    } else {
-      setRoomLocationError(false);
-    }
-  };
+
+  // const locationOnChange = location => {
+  //   setRoomLocation(location);
+  //   if (location !== '' && location.length < 2) {
+  //     setRoomLocationError(true);
+  //   } else {
+  //     setRoomLocationError(false);
+  //   }
+  // };
+
   const houseNumberOnChange = houseNumber => {
     setHouseNumber(houseNumber);
     if (houseNumber !== '' && houseNumber.length < 1) {
@@ -133,6 +141,7 @@ const Upload = ({navigation}) => {
       setHouseNumberError(false);
     }
   };
+
   const cityOnChange = city => {
     setCity(city);
     if (city !== '' && city.length < 2) {
@@ -141,6 +150,7 @@ const Upload = ({navigation}) => {
       setCityError(false);
     }
   };
+
   const descriptionOnChange = description => {
     setDescription(description);
     if (description !== '' && description.length < 2) {
@@ -149,6 +159,7 @@ const Upload = ({navigation}) => {
       setDescriptionError(false);
     }
   };
+
   const colonyOnChange = colony => {
     setColony(colony);
     if (colony !== '' && colony.length < 2) {
@@ -157,6 +168,7 @@ const Upload = ({navigation}) => {
       setColonyError(false);
     }
   };
+
   const rentOnChange = rent => {
     setRent(rent);
     if (rent !== '' && rent.length < 3) {
@@ -165,6 +177,7 @@ const Upload = ({navigation}) => {
       setRentError(false);
     }
   };
+
   const onWhichFloorOnChange = whichFloor => {
     setWhichFloor(whichFloor);
     if (whichFloor !== '' && whichFloor.length < 2) {
@@ -181,21 +194,19 @@ const Upload = ({navigation}) => {
           style={{
             fontSize: RF(1.6),
             color: Colors.BLACK,
-            marginTop: hp(1),
           }}>
           {props?.label}
         </Text>
         <Text
           style={{
-            width: '40%',
+            width: '60%',
             fontSize: RF(1.6),
             color: Colors.WHITE,
-            marginTop: hp(0.3),
             backgroundColor: Colors.PRIMARYLITE,
             borderRadius: 3,
             padding: hp(1),
           }}>
-          0.0510502
+          {props.coordinate}
         </Text>
       </View>
     );
@@ -216,8 +227,8 @@ const Upload = ({navigation}) => {
       rm_colny: colony,
       rm_city: city,
       rm_state: '',
-      rm_latitude: '22.7149',
-      rm_longitude: '75.8899',
+      rm_latitude: roomLocation?.latitude,
+      rm_longitude: roomLocation?.longitude,
       rm_description: description,
     };
     dispatch(setUploadData(data));
@@ -231,6 +242,13 @@ const Upload = ({navigation}) => {
       setMobileNumberError(false);
     }
   };
+  const onMapData = value => {
+    setRoomLocation(value);
+  };
+  const handleMap = () => {
+    navigation.navigate(ScreenName.GetLocationByMap, {onMapData, roomLocation});
+  };
+
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
@@ -303,45 +321,6 @@ const Upload = ({navigation}) => {
           errorMessage={'Enter floor'}
         />
 
-        <TouchableOpacity
-          style={{
-            // justifyContent: 'center',
-            alignSelf: 'center',
-            width: '90%',
-            backgroundColor: Colors.GREY1,
-            paddingLeft: hp(2),
-            backgroundColor: 'white',
-            elevation: 3,
-            borderColor: false ? Colors.RED : Colors.GREY,
-            borderRadius: hp(1),
-            borderWidth: hp(0.2),
-            marginTop: hp(1),
-            paddingBottom: hp(1.7),
-          }}>
-          <Text
-            style={{
-              fontSize: RF(1.6),
-              color: Colors.BLACK,
-              marginTop: hp(1),
-              alignSelf: 'center',
-            }}>
-            Tap to add room location for better room finding
-          </Text>
-          <CoordinateView label={'Latitude'} />
-          <CoordinateView label={'Longitude'} />
-        </TouchableOpacity>
-        <Text style={style.labelHouseNoMessage}>
-          Don't worry if your house number shows wrong.
-        </Text>
-        {/* <CustomInputText
-          onChangeText={locationOnChange}
-          value={roomLocation}
-          maxLength={100}
-          outerContainer={style.outerContainer}
-          error={roomLocationError}
-          placeholder={'Room Location'}
-          errorMessage={'Enter Room Location'}
-        /> */}
         <CustomInputText
           onChangeText={rentOnChange}
           value={rent}
@@ -390,7 +369,46 @@ const Upload = ({navigation}) => {
           placeholder={'Enter Description'}
           errorMessage={'Enter Description'}
         />
+        <TouchableOpacity
+          style={{
+            width: '90%',
+            justifyContent: 'center',
+            alignSelf: 'center',
+            flexDirection: 'column',
+            backgroundColor:
+              Object.keys(roomLocation).length !== 0
+                ? Colors.PRIMARY
+                : Colors.PRIMARYLITE1,
+            borderRadius: hp(1),
+            paddingVertical: hp(1),
+            paddingHorizontal: hp(2),
+            marginTop: hp(1),
+          }}
+          onPress={handleMap}>
+          <Text
+            style={{
+              fontSize: RF(1.6),
+              color: Colors.WHITE,
+              alignSelf: 'center',
+            }}>
+            {Object.keys(roomLocation).length !== 0
+              ? 'Location Added'
+              : 'Tap to add room location for better room finding'}
+          </Text>
 
+          {Object.keys(roomLocation).length !== 0 && (
+            <CoordinateView
+              coordinate={roomLocation?.latitude}
+              label={'Latitude'}
+            />
+          )}
+          {Object.keys(roomLocation).length !== 0 && (
+            <CoordinateView
+              coordinate={roomLocation?.longitude}
+              label={'Longitude'}
+            />
+          )}
+        </TouchableOpacity>
         <C_Button
           isLoading={false}
           onPress={() => onNextPress()}

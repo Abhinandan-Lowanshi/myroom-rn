@@ -29,5 +29,8 @@ export default Screen = {
   Notification: 'Notification',
   EditProfile: 'EditProfile',
   EditRoom: 'EditRoom',
-  GetLocationByMap: 'GetLocationByMap',
+  GetLocationByMap: 'RoomLocation',
+  AppSettings: 'AppSettings',
+  Chat: 'chat',
+  ChatList: 'ChatList',
 };

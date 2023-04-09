@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback, useRef} from 'react';
 import {
   FlatList,
   Text,
@@ -13,6 +13,7 @@ import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
 import data from '../common/SpinnerData';
+import {Dimensions} from 'react-native';
 
 const RenderRoom = ({
   myRoomList,
@@ -28,22 +29,24 @@ const RenderRoom = ({
   flat,
   horizontal,
 }) => {
+  const windowWidth = Dimensions.get('window').width;
+  const _onViewableItemsChanged = ({viewableItems, changed}) => {
+    console.log('Visible items are', viewableItems);
+    console.log('Changed in this iteration', changed);
+  };
+  const _viewabilityConfig = {
+    itemVisiblePercentThreshold: 50,
+  };
   const LowOpacityText = ({
     label,
     container,
     textLabel,
     lowOpacityContainer,
-    isTime,
   }) => {
-    console.log(label, 'LowOpacityText');
     return (
       <View style={container}>
         <View style={[[style.lowOpacityContainer, lowOpacityContainer]]}></View>
-        {isTime ? (
-          <TimeAgo style={style.labelLow} time={label} />
-        ) : (
-          <Text style={[style.labelLow, textLabel]}>{label}</Text>
-        )}
+        <Text style={[style.labelLow, textLabel]}>{label}</Text>
       </View>
     );
   };
@@ -66,7 +69,7 @@ const RenderRoom = ({
       <TouchableOpacity
         onPress={() => onPress(item)}
         activeOpacity={0.8}
-        style={[style.container, container]}>
+        style={[style.container(windowWidth), container]}>
         {isFromMyPost && (
           <View style={style.innerContainer}>
             <TouchableOpacity
@@ -99,23 +102,6 @@ const RenderRoom = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
-          <View style={style.containerDate}>
-            <LowOpacityText
-              label={item?.rm_size}
-              container={style.containerRent}
-            />
-            <LowOpacityText
-              label={item?.created_at}
-              container={style.containerRent}
-              isTime={true}
-            />
-          </View>
-        </View>
-        <View style={style.containerInfo}>
-          <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
-          <Text style={style.labelAddress}>
-            {`${item?.rm_house_no} ${item?.rm_colny} ${item?.rm_city}`}
-          </Text>
           <View style={style.containerBottom}>
             <LowOpacityText
               label={item?.rm_availble}
@@ -126,13 +112,26 @@ const RenderRoom = ({
             {getText(item) === '' ? null : (
               <LowOpacityText
                 label={getText(item)}
-                lowOpacityContainer={style.containerOptional}
+                lowOpacityContainer={style.containerAvailable}
                 container={style.containerOptional2}
                 textLabel={style.labelAvailable}
               />
             )}
-            {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
+            <LowOpacityText
+              label={item?.rm_size}
+              lowOpacityContainer={style.containerAvailable}
+              container={style.containerAvailable2}
+              textLabel={style.labelAvailable}
+            />
           </View>
+        </View>
+        <View style={style.containerInfo}>
+          <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
+          <Text style={style.labelAddress}>
+            {`${item?.rm_house_no} ${item?.rm_colny} ${item?.rm_city}`}
+          </Text>
+
+          {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
         </View>
         {!isFromMyPost && (
           <TouchableOpacity
@@ -151,6 +150,18 @@ const RenderRoom = ({
       </TouchableOpacity>
     );
   };
+
+  // const onViewableItemsChanged = ({viewableItems, changed}) => {
+  //   console.log('Visible items are', viewableItems);
+  //   console.log('Changed in this iteration', changed);
+  // };
+  const viewabilityConfig = {
+    waitForInteraction: true,
+    viewAreaCoveragePercentThreshold: windowWidth + 20,
+  };
+  const handleViewableItemsChanged = useCallback(info => {
+    console.log('info', info);
+  }, []);
   return (
     <View>
       <FlatList
@@ -160,6 +171,9 @@ const RenderRoom = ({
         data={myRoomList}
         renderItem={renderItem}
         horizontal={horizontal}
+        scrollToEnd={value => {
+          console.log(value, 'onScroll');
+        }}
       />
     </View>
   );
@@ -168,7 +182,8 @@ const RenderRoom = ({
 export default RenderRoom;
 
 const style = StyleSheet.create({
-  container: {
+  container: width => ({
+    width: width - hp(2),
     backgroundColor: Colors.WHITE,
     marginTop: hp(0.5),
     flexDirection: 'column',
@@ -177,7 +192,8 @@ const style = StyleSheet.create({
     marginHorizontal: hp(0.2),
     paddingBottom: hp(2),
     marginBottom: hp(1),
-  },
+    marginLeft: hp(1),
+  }),
   favImage: {
     right: hp(2),
     top: hp(2),
@@ -242,16 +258,17 @@ const style = StyleSheet.create({
     fontSize: RF(1.2),
   },
   imageContainer: {
-    height: hp(25),
+    width: '100%',
+    height: hp(15),
     borderRadius: 100,
   },
   labelRent: {
     color: 'green',
-    fontSize: 20,
+    fontSize: RF(2),
     fontWeight: '700',
     marginLeft: 5,
     position: 'absolute',
-    right: 10,
+    right: hp(0.5),
     alignSelf: 'center',
   },
   timestamp: {
@@ -285,30 +302,35 @@ const style = StyleSheet.create({
     color: 'white',
   },
   containerRent: {
+    position: 'absolute',
+    bottom: hp(2),
+    right: hp(3),
     borderRadius: 25,
-    marginLeft: hp(1),
   },
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: 18,
+    fontSize: RF(2),
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
     color: 'black',
-    fontSize: 13,
+    fontSize: RF(1.3),
     fontWeight: '400',
     marginLeft: 5,
   },
   containerBottom: {
+    position: 'absolute',
     width: '100%',
     flexDirection: 'row',
     marginTop: 10,
+    bottom: hp(1),
+    justifyContent: 'space-around',
   },
   containerAvailable: {
     backgroundColor: Colors.PRIMARY,
-    opacity: 0.2,
+    opacity: 0.7,
   },
   containerAvailable2: {
     borderRadius: 10,
@@ -323,12 +345,5 @@ const style = StyleSheet.create({
   },
   containerOptional2: {
     borderRadius: 10,
-    marginLeft: 20,
-  },
-  containerDate: {
-    position: 'absolute',
-    bottom: hp(2),
-    right: hp(2),
-    flexDirection: 'row',
   },
 });

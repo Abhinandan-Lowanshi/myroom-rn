@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, useWindowDimensions, View} from 'react-native';
+import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import {SceneMap, TabView} from 'react-native-tab-view';
 import RenderRoom from '../component/RenderRoom';
 import StyleGlobel from '../Style/StyleGlobel';
@@ -13,7 +13,8 @@ import ScreenName from '../common/ScreenName';
 import FullScreenLoader from '../component/FullScreenLoader';
 import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
-
+import Toast from 'react-native-simple-toast';
+import {hp} from '../common/CommonFunctions';
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState('');
@@ -46,6 +47,10 @@ const MyPost = ({navigation}) => {
         setLoading(false);
         setRefreshing(false);
       });
+  };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
   };
 
   const updateRoomStatus = data => {
@@ -103,6 +108,7 @@ const MyPost = ({navigation}) => {
       .then(response => {
         setIsLoading(false);
         if (response.status === true) {
+          showToast('Room deleted successfully');
           setVisible(false);
           removeRoom(roomId);
         } else {
@@ -129,6 +135,7 @@ const MyPost = ({navigation}) => {
       {loading && <LowOpacityLoader />}
 
       <RenderRoom
+        flat={style.container}
         onPress={onPressRoom}
         myRoomList={myRoomList}
         isFromMyPost={true}
@@ -165,3 +172,8 @@ const MyPost = ({navigation}) => {
 };
 
 export default MyPost;
+const style = StyleSheet.create({
+  container: {
+    marginHorizontal: hp(1),
+  },
+});

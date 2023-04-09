@@ -19,7 +19,8 @@ import {useDispatch} from 'react-redux';
 import {setLocation} from '../redux/Slice';
 const getLocation = () => {
   console.log('getLocation');
-  const [update, setUpdate] = useState(true);
+  const [coords, setCoords] = useState('');
+  const [update, setUpdate] = useState('');
   const dispatch = useDispatch();
   useEffect(() => {
     requestLocationPermission();
@@ -42,6 +43,7 @@ const getLocation = () => {
 
           getOneTimeLocation();
           subscribeLocationLocation();
+          dispatch(setLocation(coords));
         } else {
         }
       } catch (err) {}
@@ -54,17 +56,18 @@ const getLocation = () => {
       position => {
         const currentLongitude = JSON.stringify(position.coords.longitude);
         const currentLatitude = JSON.stringify(position.coords.latitude);
-        if (update) {
-          setUpdate(false);
-          dispatch(setLocation(position.coords));
-          console.log(position, 'subscribeLocationLocation55');
-        }
+        // setCoords(position.coords);
+        // if (update) {
+        setUpdate(false);
+        dispatch(setLocation(position.coords));
+        console.log(position, 'subscribeLocationLocation55');
+        // }
       },
       error => {
         //   setLocationStatus(error.message);
       },
       {
-        enableHighAccuracy: true,
+        enableHighAccuracy: false,
         timeout: 30000,
         maximumAge: 1000,
       },
@@ -77,6 +80,8 @@ const getLocation = () => {
         //Will give you the location on location change
 
         //   setLocationStatus('You are Here');
+        // setCoords(position.coords);
+
         if (update) {
           setUpdate(false);
           dispatch(setLocation(position.coords));

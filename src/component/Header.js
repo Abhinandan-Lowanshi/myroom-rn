@@ -4,21 +4,23 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import Colors from '../common/Colors';
 import {hp} from '../common/CommonFunctions';
 
-const Header = ({label, navigation}) => {
+const Header = ({label, navigation, container, hideBack}) => {
   return (
-    <View style={style.container}>
-      <TouchableOpacity
-        style={style.containerInner}
-        onPress={() => {
-          navigation.goBack();
-        }}>
-        <Icon
-          style={style.iconStyle}
-          name="left"
-          size={hp(3.6)}
-          color={Colors.PRIMARY}
-        />
-      </TouchableOpacity>
+    <View style={[style.container, container]}>
+      {!hideBack && (
+        <TouchableOpacity
+          style={style.containerInner}
+          onPress={() => {
+            navigation?.goBack();
+          }}>
+          <Icon
+            style={style.iconStyle}
+            name="left"
+            size={hp(3.6)}
+            color={Colors.PRIMARY}
+          />
+        </TouchableOpacity>
+      )}
       <Text style={style.labelSignUp}>{label}</Text>
       <Text style={{color: Colors.WHITE}}>kkkk</Text>
     </View>

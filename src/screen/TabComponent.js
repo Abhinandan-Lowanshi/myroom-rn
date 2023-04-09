@@ -5,6 +5,7 @@ import UploadNavigator from './Upload';
 import Fav from './Fav';
 import MyAccount from './MyAccount';
 import MapSearch from './MapSearch';
+import ChatList from './Chat/ChatList';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,6 +23,7 @@ import AppLogo from '../component/applogo/AppLogo';
 import {useDispatch, useSelector} from 'react-redux';
 const Tab = createBottomTabNavigator();
 import {setHomeNavigation} from '../redux/Slice';
+import Labels from '../common/labels';
 const TabComponent = ({navigation}) => {
   const loading = useSelector(state => state.AllData.loading);
 
@@ -70,7 +72,7 @@ const TabComponent = ({navigation}) => {
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Home',
+            tabBarLabel: Labels.Home,
             tabBarIcon: ({color, size, focused}) => (
               <Icon
                 name="home"
@@ -85,7 +87,7 @@ const TabComponent = ({navigation}) => {
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Map',
+            tabBarLabel: Labels.Map,
             tabBarIcon: ({color, size, focused}) => (
               <Icon2
                 name="map-legend"
@@ -100,7 +102,7 @@ const TabComponent = ({navigation}) => {
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Upload',
+            tabBarLabel: Labels.Upload,
             tabBarIcon: ({color, size, focused}) => (
               <Icon1
                 name="cloud-upload"
@@ -127,7 +129,7 @@ const TabComponent = ({navigation}) => {
           name={ScreenName.MyPost}
           component={MyPost}
         /> */}
-        <Tab.Screen
+        {/* <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: 'Favorite',
@@ -141,11 +143,26 @@ const TabComponent = ({navigation}) => {
           }}
           name={ScreenName.Fav}
           component={Fav}
+        /> */}
+        <Tab.Screen
+          options={{
+            tabBarLabelStyle: {paddingBottom: hp(0.5)},
+            tabBarLabel: Labels.Chat,
+            tabBarIcon: ({color, size, focused}) => (
+              <Icon
+                name="message1"
+                color={focused ? Colors.PRIMARYDARK : Colors.PRIMARYLITE1}
+                size={size}
+              />
+            ),
+          }}
+          name={ScreenName.ChatList}
+          component={ChatList}
         />
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'My Account',
+            tabBarLabel: Labels.MyAccount,
             tabBarIcon: ({color, size, focused}) => (
               <Icon2
                 name="account-circle-outline"

@@ -5,6 +5,7 @@ import Colors from '../common/Colors';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon1 from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon3 from 'react-native-vector-icons/MaterialIcons';
 import ScreenName from '../common/ScreenName';
 const AccountTouchableCom = ({
   outerContainer,
@@ -70,6 +71,16 @@ const AccountTouchableCom = ({
           <Icon2
             style={style.iconStyle}
             name={'post-outline'}
+            size={hp(4)}
+            color={Colors.PRIMARY}
+          />
+        );
+      }
+      case ScreenName.Fav: {
+        return (
+          <Icon3
+            style={style.iconStyle}
+            name={'favorite-border'}
             size={hp(4)}
             color={Colors.PRIMARY}
           />

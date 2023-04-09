@@ -1,5 +1,5 @@
 import react, {useEffect, useState} from 'react';
-import {Text, ToastAndroid, View} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import RenderRoom from '../component/RenderRoom';
 import sendRequest from '../networking/ApiFunctions';
@@ -11,8 +11,12 @@ import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import Colors from '../common/Colors';
-import {RF} from '../common/CommonFunctions';
+import {RF, hp} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+import Header from '../component/Header';
+import Labels from '../common/labels';
+
 const Fav = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const favList = useSelector(state => state.AllData.favData);
@@ -119,14 +123,16 @@ const Fav = ({navigation, route}) => {
     }
   };
   const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
+    Toast.show(message, Toast.LONG);
   };
   return (
     <View style={StyleGlobel.containerStyle}>
+      <Header label={Labels.Favourite} navigation={navigation} />
       {loading ? (
         <LowOpacityLoader />
       ) : favList?.length > 0 ? (
         <RenderRoom
+          flat={style.container}
           myRoomList={favList}
           onPress={onPressRoom}
           onPressFav={onPressFav}
@@ -134,16 +140,8 @@ const Fav = ({navigation, route}) => {
           onRefresh={onRefresh}
         />
       ) : (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Text
-            style={{
-              color: Colors.BLACK,
-              fontSize: RF(2.8),
-              fontWeight: '600',
-              fontFamily: 'AlNile-Bold',
-            }}>
-            No Data Found
-          </Text>
+        <View style={style.containerNoData}>
+          <Text style={style.labelNoData}>No Data Found</Text>
         </View>
       )}
     </View>
@@ -151,3 +149,20 @@ const Fav = ({navigation, route}) => {
 };
 
 export default Fav;
+
+const style = StyleSheet.create({
+  container: {
+    marginHorizontal: hp(1),
+  },
+  containerNoData: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  labelNoData: {
+    color: Colors.BLACK,
+    fontSize: RF(2.8),
+    fontWeight: '600',
+    fontFamily: 'AlNile-Bold',
+  },
+});

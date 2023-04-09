@@ -13,6 +13,7 @@ import DeleteConformation from '../component/DeleteConformation';
 import {clearAllData} from '../localStorage/LocalData';
 import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Labels from '../common/labels';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -98,13 +99,19 @@ const MyAccount = ({navigation}) => {
         </View>
         <AccountTouchableCom
           onPress={() => {
-            navigation.navigate(ScreenName.MyPost);
+            navigation.navigate(ScreenName.Fav);
           }}
-          label={'My Post'}
-          type={ScreenName.MyPost}
+          label={Labels.Favourite}
+          type={ScreenName.Fav}
           outerContainer={styles.outerContainer}
         />
-        <AccountTouchableCom label={'Settings'} type={ScreenName.Settings} />
+        <AccountTouchableCom
+          onPress={() => {
+            navigation.navigate(ScreenName.MyPost);
+          }}
+          label={Labels.MyPost}
+          type={ScreenName.MyPost}
+        />
         <AccountTouchableCom
           onPress={() => {
             navigation.navigate(ScreenName.EditProfile);
@@ -118,6 +125,13 @@ const MyAccount = ({navigation}) => {
           }}
           label={'Change Password'}
           type={ScreenName.changePassword}
+        />
+        <AccountTouchableCom
+          label={'App Settings'}
+          type={ScreenName.Settings}
+          onPress={() => {
+            navigation.navigate(ScreenName.AppSettings);
+          }}
         />
         <AccountTouchableCom label={'Contact Us'} type={ScreenName.ContactUs} />
         <AccountTouchableCom
