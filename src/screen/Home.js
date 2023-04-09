@@ -25,6 +25,7 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import {LogBox} from 'react-native';
 import images from '../common/images';
+import SliderView from '../component/sliderView/SliderView';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -36,10 +37,10 @@ const Home = ({route, navigation}) => {
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
   const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
-  console.log(searchUpdate, 'searchUpdate');
   const dispatch = useDispatch();
   let counter = 10;
   const isFocused = useIsFocused();
+  console.log(isFocused, 'isFocused');
 
   useEffect(() => {
     console.log('UseEffect');
@@ -197,6 +198,13 @@ const Home = ({route, navigation}) => {
     }
   };
 
+  const gotoUpload = () => {
+    navigation.navigate(ScreenName.UploadNavigator);
+  };
+
+  const gotoSearch = () => {
+    navigation.navigate(ScreenName.Search);
+  };
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -205,28 +213,21 @@ const Home = ({route, navigation}) => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
       {getLocation()}
+      <SliderView
+        isFocused={isFocused}
+        onPresUpload={() => {
+          gotoUpload();
+        }}
+        onPresSearch={() => {
+          gotoSearch();
+        }}
+      />
       {loading ? (
         <LowOpacityLoader />
       ) : isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
         <View>
-          <ImageSlider
-            previewImageContainerStyle={style.previewImageContainerStyle}
-            data={[
-              {
-                img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5a5uCP-n4teeW2SApcIqUrcQApev8ZVCJkA&usqp=CAU',
-              },
-              {
-                img: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg',
-              },
-              {
-                img: 'https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510__340.jpg',
-              },
-            ]}
-            autoPlay={true}
-            closeIconColor="#fff"
-          />
           <View style={{marginHorizontal: hp(1)}}>
             {roomDataHome?.length > 0 ? (
               <RenderRoom
