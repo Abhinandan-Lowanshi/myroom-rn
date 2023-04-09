@@ -102,16 +102,16 @@ const GetLocationByMap = props => {
         outerContainer={style.outerContainer}
         isLoading={false}
         onPress={() => saveLocation()}
-        // outerContainer={style.outerContainer}
         isSubmitDisabled={false}
         label={'Save Location & Exit'}
       />
-      {/* <InfoModal
+      <InfoModal
         label={
           'Drag the map to above your room if the marker not point to your room.'
         }
+        visible={visiblef}
         buttonLabel={'Dismiss'}
-        onPress={handleModal}></InfoModal> */}
+        onPress={handleModal}></InfoModal>
     </View>
   );
 };

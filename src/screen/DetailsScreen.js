@@ -197,39 +197,16 @@ const DetailsScreen = props => {
     }
   };
 
-  // const handleMessage = (phoneNumber = '') => {
-  //   if (phoneNumber !== '') {                                      code for send message on whatsapp
-  //     sendWhatsApp = () => {
-  //       let msg = "type something";
-  //       let phoneWithCountryCode = "xxxxxxxxxx";
-
-  //       let mobile =
-  //         Platform.OS == "ios" ? phoneWithCountryCode : "+" + phoneWithCountryCode;
-  //       if (mobile) {
-  //         if (msg) {
-  //           let url = "whatsapp://send?text=" + msg + "&phone=" + mobile;
-  //           Linking.openURL(url)
-  //             .then(data => {
-  //               console.log("WhatsApp Opened");
-  //             })
-  //             .catch(() => {
-  //               alert("Make sure WhatsApp installed on your device");
-  //             });
-  //         } else {
-  //           alert("Please insert message to send");
-  //         }
-  //       } else {
-  //         alert("Please insert mobile no");
-  //       }
-  //     };
-  //        let url = `sms:${phoneNumber}${
-  //       Platform.OS === 'ios' ? '&' : '?'
-  //     }body=${''}`;
-  //     Linking.openURL(url);
-  //   } else {
-  //     Toast.show('Something went wrong', Toast.LONG);
-  //   }
-  // };
+  const handleMessage = (phoneNumber = '') => {
+    if (phoneNumber !== '') {
+      let url = `sms:${phoneNumber}${
+        Platform.OS === 'ios' ? '&' : '?'
+      }body=${''}`;
+      Linking.openURL(url);
+    } else {
+      Toast.show('Something went wrong', Toast.LONG);
+    }
+  };
   const ContentHeader = props => {
     return (
       <View style={[style.headerContainer, props.headerContainer]}>
