@@ -20,6 +20,7 @@ export const slice = createSlice({
     roomLocation: {},
     isMapVisited: false,
     searchUpdate: false,
+    currentLocationName: '',
   },
   reducers: {
     startL: (state, actions) => {
@@ -70,6 +71,9 @@ export const slice = createSlice({
     searchUpdate: (state, actions) => {
       state.searchUpdate = actions.payload;
     },
+    currentLocationName: (state, actions) => {
+      state.currentLocationName = actions.payload;
+    },
   },
 });
 
@@ -90,6 +94,7 @@ export const {
   roomLocationOP,
   isMapVisited,
   searchUpdate,
+  currentLocationName,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -142,6 +147,9 @@ export const setIsMapVisited = data => dispatch => {
 };
 export const setSearchUpdate = data => dispatch => {
   dispatch(searchUpdate(data));
+};
+export const setCurrentLocationName = data => dispatch => {
+  dispatch(currentLocationName(data));
 };
 
 export default slice.reducer;

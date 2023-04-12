@@ -31,11 +31,15 @@ import images from '../common/images';
 import SliderView from '../component/sliderView/SliderView';
 import {filterDataAll, filterRoom, getRoomCount} from '../common/FIlterData';
 import Colors from '../common/Colors';
+import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
+import AsyncKeys from '../localStorage/AsyncKeys';
+import localStorageOp from '../localStorage/LocalData';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
+  const [userInfo, setUserInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [filteredData, setFilteredData] = useState([]);
   const [filterList, setFilterList] = useState(filterDataAll);
@@ -44,10 +48,14 @@ const Home = ({route, navigation}) => {
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
   const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
+  const currentLocationName = useSelector(
+    state => state.AllData.currentLocationName,
+  );
+  const accountData = useSelector(state => state.AllData.accountData);
+  console.log(currentLocationName, 'currentLocationName');
   const dispatch = useDispatch();
   let counter = 10;
   const isFocused = useIsFocused();
-  console.log(isFocused, 'isFocused');
 
   useEffect(() => {
     console.log('UseEffect');
@@ -66,6 +74,7 @@ const Home = ({route, navigation}) => {
     }
   }, [isFocused]);
   useEffect(() => {
+    console.log(data, 'isFocuseduseEffect');
     setLoading(true);
     getData();
   }, [data]);
@@ -184,7 +193,7 @@ const Home = ({route, navigation}) => {
         {
           user_id: 'Dummy',
           latitude: data.latitude,
-          longitude: 27.6126,
+          longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -266,10 +275,7 @@ const Home = ({route, navigation}) => {
       setFilteredData(roomDataHome);
       let temp = JSON.parse(JSON.stringify(filterList));
       temp?.map(item1 => {
-        if (item1?.id === item?.id) {
-          item1.isApplied = false;
-        }
-        return item1;
+        return (item1.isApplied = false);
       });
       temp[0].isApplied = true;
       setFilterList(temp);
@@ -318,6 +324,23 @@ const Home = ({route, navigation}) => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
       {getLocation()}
+      <View style={style.locationNameContainer}>
+        <View style={style.innerContainerName}>
+          <MaterialIcons
+            size={hp(2.5)}
+            color={Colors.PRIMARY}
+            name={'my-location'}
+            style={style.iconLOcation}
+          />
+          <Text style={style.labelOwnerName}>
+            {`Welcome ${accountData?.data?.usr_firstName}`}
+          </Text>
+        </View>
+        <Text style={style.labelLocation}>
+          1017, Sukhlia, Pandit Dindayal Upadhyay Nagar, Ward 11, Indore, Madhya
+          Pradesh 452015, India
+        </Text>
+      </View>
       <SliderView
         isFocused={isFocused}
         onPresUpload={() => {
@@ -332,7 +355,7 @@ const Home = ({route, navigation}) => {
           horizontal
           data={filterList}
           renderItem={filterRender}
-          style={{maxHeight: hp(9)}}
+          style={style.filterFlatlist}
         />
       ) : null}
       {loading ? (
@@ -387,5 +410,30 @@ const style = StyleSheet.create({
     top: hp(1),
     right: hp(2),
     elevation: hp(2),
+  },
+  filterFlatlist: {
+    maxHeight: hp(9),
+    marginHorizontal: hp(1),
+  },
+  locationNameContainer: {
+    marginHorizontal: hp(1.2),
+    marginBottom: hp(2),
+  },
+  labelOwnerName: {
+    color: Colors.BLACK,
+    fontSize: RF(2.2),
+    marginLeft: hp(0.4),
+    fontWeight: '600',
+  },
+  labelLocation: {
+    color: Colors.BLACK,
+    fontSize: RF(1.4),
+    fontWeight: '600',
+  },
+  iconLOcation: {},
+  iconArrow: {},
+  innerContainerName: {
+    flexDirection: 'row',
+    marginTop: hp(1),
   },
 });

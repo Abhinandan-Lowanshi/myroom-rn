@@ -292,8 +292,8 @@ const MapSearch = ({route, navigation}) => {
               // longitude: 75.8705,
               latitude: parseFloat(data ? data?.latitude : 0.0),
               longitude: parseFloat(data ? data?.longitude : 0.0),
-              latitudeDelta: 0.06,
-              longitudeDelta: 0.06,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
             }}>
             <MapViewDirections
               onReady={item => {

@@ -129,7 +129,7 @@ const TabComponent = ({navigation}) => {
           name={ScreenName.MyPost}
           component={MyPost}
         /> */}
-        {/* <Tab.Screen
+        <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: 'Favorite',
@@ -143,8 +143,8 @@ const TabComponent = ({navigation}) => {
           }}
           name={ScreenName.Fav}
           component={Fav}
-        /> */}
-        <Tab.Screen
+        />
+        {/* <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: Labels.Chat,
@@ -158,7 +158,7 @@ const TabComponent = ({navigation}) => {
           }}
           name={ScreenName.ChatList}
           component={ChatList}
-        />
+        /> */}
         <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},

@@ -127,7 +127,7 @@ const Fav = ({navigation, route}) => {
   };
   return (
     <View style={StyleGlobel.containerStyle}>
-      <Header label={Labels.Favourite} navigation={navigation} />
+      {/* <Header label={Labels.Favourite} navigation={navigation} />x */}
       {loading ? (
         <LowOpacityLoader />
       ) : favList?.length > 0 ? (
