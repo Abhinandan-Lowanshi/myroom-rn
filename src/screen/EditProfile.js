@@ -14,12 +14,16 @@ import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import localStorageOp from '../localStorage/LocalData';
+import AsyncKeys from '../localStorage/AsyncKeys';
 
 const EditProfile = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
-  const [name, setName] = useState(accountData?.usr_firstName);
+  const [name, setName] = useState(accountData?.data?.usr_firstName);
   const [nameError, setErrorName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState(accountData?.usr_phone);
+  const [mobileNumber, setMobileNumber] = useState(
+    accountData?.data?.usr_phone,
+  );
   const [mobileNumberError, setMobileNumberError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -58,7 +62,7 @@ const EditProfile = ({navigation}) => {
   };
 
   const updateProfile = () => {
-    if (accountData?.usr_email && name && mobileNumber) {
+    if (accountData?.data?.usr_email && name && mobileNumber) {
       setLoading(true);
       sendRequest(
         {
@@ -75,16 +79,14 @@ const EditProfile = ({navigation}) => {
         .then(response => {
           setLoading(false);
           if (response.status === true) {
-            dispatch(
-              getAccountImfo({
-                ...accountData,
-                usr_firstName: name,
-                usr_phone: mobileNumber,
-              }),
-              navigation.goBack(),
-            );
+            let accountDataTemp = JSON.parse(JSON.stringify(accountData));
+            accountDataTemp.data.usr_firstName = name;
+            accountDataTemp.data.usr_phone = mobileNumber;
+            localStorageOp(true, AsyncKeys.USERDATA, accountDataTemp);
+            dispatch(getAccountImfo(accountDataTemp), navigation.goBack());
           } else {
             setEmailApiError(response.message);
+
             //go back
           }
         })

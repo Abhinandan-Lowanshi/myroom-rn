@@ -14,38 +14,55 @@ import {clearAllData} from '../localStorage/LocalData';
 import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Labels from '../common/labels';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
   const dispatch = useDispatch();
-  useEffect(() => {
-    setLoading(true);
-    sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
-      .then(res => {
-        setLoading(false);
-        if (res.status === true) {
-          dispatch(getAccountImfo(res.data));
-        }
-      })
-      .catch(e => {
-        setLoading(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   setLoading(true);
+  //   sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
+  //     .then(res => {
+  //       setLoading(false);
+  //       if (res.status === true) {
+  //         dispatch(getAccountImfo(res.data));
+  //       }
+  //     })
+  //     .catch(e => {
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
   const logout = () => {
     setVisible(false);
-    if (clearAllData()) {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: ScreenName.Login}],
-        }),
-      );
-    } else {
-      Alert('Something went wrong');
-    }
+    AsyncStorage.getAllKeys()
+      .then(keys => AsyncStorage.multiRemove(keys))
+      .then(() => {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: ScreenName.Login}],
+          }),
+        );
+        // return true;
+      })
+      .catch(() => {
+        return false;
+      });
+
+    // if (clearAllData()) {
+    // navigation.dispatch(
+    //   CommonActions.reset({
+    //     index: 0,
+    //     routes: [{name: ScreenName.Login}],
+    //   }),
+    // );
+    // } else {
+    //   Alert('Something went wrong');
+    // }
   };
 
   return (
@@ -77,18 +94,20 @@ const MyAccount = ({navigation}) => {
           />
           <View style={styles.personalInfoCTNR}>
             <Text style={styles.labelPersonal}>
-              {accountData?.usr_firstName}
+              {accountData?.data?.usr_firstName}
             </Text>
-            <Text style={styles.labelPersonal}>{accountData?.usr_email}</Text>
+            <Text style={styles.labelPersonal}>
+              {accountData?.data?.usr_email}
+            </Text>
           </View>
         </View>
 
         <View style={styles.staticsContainer}>
-          {accountData?.usr_phone && (
+          {accountData?.data?.usr_phone && (
             <View style={styles.staticsInnerContainer}>
               <Text style={styles.labelPersonalText(true)}>Phone number</Text>
               <Text style={styles.labelInnerContainer}>
-                {accountData?.usr_phone}
+                {accountData?.data?.usr_phone}
               </Text>
             </View>
           )}

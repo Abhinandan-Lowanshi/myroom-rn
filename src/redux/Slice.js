@@ -21,6 +21,7 @@ export const slice = createSlice({
     isMapVisited: false,
     searchUpdate: false,
     currentLocationName: '',
+    filteredData: '',
   },
   reducers: {
     startL: (state, actions) => {
@@ -74,6 +75,9 @@ export const slice = createSlice({
     currentLocationName: (state, actions) => {
       state.currentLocationName = actions.payload;
     },
+    filteredData: (state, actions) => {
+      state.filteredData = actions.payload;
+    },
   },
 });
 
@@ -95,6 +99,7 @@ export const {
   isMapVisited,
   searchUpdate,
   currentLocationName,
+  filteredData,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {

@@ -113,8 +113,8 @@ const UploadFormSTP2 = ({navigation}) => {
       formdata.append('rm_size', uploadData?.rm_size);
       formdata.append('rm_rent', uploadData?.rm_rent);
       formdata.append('rm_flor', uploadData?.rm_flor);
-      formdata.append('rm_latitude', '22.7149');
-      formdata.append('rm_longitude', '75.8899');
+      formdata.append('rm_latitude', uploadData?.rm_latitude);
+      formdata.append('rm_longitude', uploadData?.rm_longitude);
       formdata.append('rm_description', uploadData?.rm_description);
 
       uploadImage(formdata, EndPoints.addRoom, 'POST')
@@ -122,7 +122,12 @@ const UploadFormSTP2 = ({navigation}) => {
           setIsLoading(false);
           showToast(response?.message);
           if (response.status === true) {
-            navigation.navigate(ScreenName.Home);
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: ScreenName.TabComponent}],
+              }),
+            );
             console.log(response, 'Response');
           } else {
             console.log(response, 'error');

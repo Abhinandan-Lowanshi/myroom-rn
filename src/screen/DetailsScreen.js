@@ -125,6 +125,7 @@ const DetailsScreen = props => {
         if (res.status === true) {
           if (res.message === 'Room details get successfully.') {
             setItem(res?.data);
+            setLike(res?.data?.favorite_key);
             setCheck(true);
           } else {
             setApiError(

@@ -64,12 +64,9 @@ const MapSearch = ({route, navigation}) => {
     data?.forEach((item, index) => {
       temp.push({...item, isSelected: index === 0 ? true : false});
     });
-    console.log(temp, 'prepareData');
     return temp;
   };
   const performFavOp = data => {
-    console.log('data', data);
-
     let temp = JSON.parse(JSON.stringify(roomDataHomeTemp));
     let temp1 = JSON.parse(JSON.stringify(roomDataHomeTP));
     let selected = JSON.parse(JSON.stringify(selectedRoom));
@@ -82,7 +79,6 @@ const MapSearch = ({route, navigation}) => {
     });
     temp1.map(item => {
       if (item?.rm_pkey === data?.roomId) {
-        console.log('temp1', item);
         return (item.favorite_key = data?.like);
       } else return item;
     });
@@ -96,7 +92,6 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const onPressFav = async value1 => {
-    console.log(value1, 'line82');
     let value = {...value1};
     let data = {
       user_id: 2,
@@ -104,15 +99,11 @@ const MapSearch = ({route, navigation}) => {
       fav_type: value?.like === true ? 1 : 0,
     };
     performFavOp(value);
-    console.log(value1, 'line90');
 
     try {
       const response = await favFunction(data);
-      console.log(value1, 'line94');
 
       if (response.status === true) {
-        console.log(value1, 'line97');
-
         if (
           response?.message === 'Room removed to favorite list successfully.' ||
           response?.message === 'Room added to favorite list successfully.'
@@ -138,7 +129,6 @@ const MapSearch = ({route, navigation}) => {
       }
     } catch (error) {
       console.log(error, 'error|||||||||||||');
-      console.log(value1, 'line124');
 
       performFavOp({
         ...value,
@@ -235,12 +225,6 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const getText = item => {
-    console.log(
-      item?.rm_prking_avblity,
-      item?.rm_depndecy,
-      item?.rm_prking_avblity,
-      'getText',
-    );
     let message = '';
     if (
       item?.rm_prking_avblity ===

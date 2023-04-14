@@ -17,10 +17,17 @@ import EndPoints from '../networking/EndPoints';
 import StyleGlobel from '../Style/StyleGlobel';
 import ScreenName from '../common/ScreenName';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import {favFunction} from '../common/APIFunctions';
+import {useDispatch, useSelector} from 'react-redux';
+import Toast from 'react-native-simple-toast';
+import {setRoomDataHome} from '../redux/Slice';
 
 const Notification = ({route, navigation}) => {
   const [notification, setNotification] = useState([]);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const roomDataHome = useSelector(state => state.AllData.roomDataHome);
+
   useEffect(() => {
     getNotification();
   }, []);
@@ -39,7 +46,6 @@ const Notification = ({route, navigation}) => {
         if (res.status === true) {
           if (res.data.length) {
             setNotification(res.data);
-            console.log(res.data);
           }
         }
       })
@@ -68,8 +74,67 @@ const Notification = ({route, navigation}) => {
       </TouchableOpacity>
     );
   };
-  const onPressFav = () => {};
 
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
+  const performFavOp = data => {
+    let temp = JSON.parse(JSON.stringify(roomDataHome));
+    temp.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
+
+    dispatch(setRoomDataHome(temp));
+  };
+
+  const onPressFav = async value1 => {
+    let value = {...value1};
+    let data = {
+      user_id: 2,
+      room_id: value?.roomId,
+      fav_type: value?.like === true ? 1 : 0,
+    };
+    performFavOp(value);
+
+    try {
+      const response = await favFunction(data);
+      if (response.status === true) {
+        if (
+          response?.message === 'Room removed to favorite list successfully.' ||
+          response?.message === 'Room added to favorite list successfully.'
+        ) {
+          showToast(response?.message);
+          return true;
+        } else {
+          console.log('Fav else');
+          performFavOp({
+            ...value,
+            like: value?.like === true ? false : true,
+          });
+          return false;
+        }
+      } else {
+        console.log('Fav else2');
+
+        performFavOp({
+          ...value,
+          like: value?.like === true ? false : true,
+        });
+        showToast(response?.message);
+        return false;
+      }
+    } catch (error) {
+      console.log(error, 'error|||||||||||||');
+      performFavOp({
+        ...value,
+        like: value?.like === true ? false : true,
+      });
+      return false;
+    }
+  };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Notification} navigation={navigation} />

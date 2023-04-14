@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {openSettings} from 'react-native-permissions';
-// import all the components we are going to use
 import {
   SafeAreaView,
   View,
@@ -16,9 +15,8 @@ import {
 } from 'react-native';
 import Geolocation from '@react-native-community/geolocation';
 import {useDispatch} from 'react-redux';
-import {setLocation} from '../redux/Slice';
+import {setLocation, setCurrentLocationName} from '../redux/Slice';
 const getLocation = () => {
-  console.log('getLocation');
   const [coords, setCoords] = useState('');
   const [update, setUpdate] = useState('');
   const dispatch = useDispatch();
@@ -28,7 +26,8 @@ const getLocation = () => {
   const requestLocationPermission = async () => {
     if (Platform.OS === 'ios') {
       getOneTimeLocation();
-      subscribeLocationLocation();
+      // subscribeLocationLocation();
+      // dispatch(setLocation(coords));
     } else {
       try {
         const granted = await PermissionsAndroid.request(
@@ -42,12 +41,41 @@ const getLocation = () => {
           //To Check, If Permission is granted
 
           getOneTimeLocation();
-          subscribeLocationLocation();
-          dispatch(setLocation(coords));
+          // subscribeLocationLocation();
+          // dispatch(setLocation(coords));
         } else {
         }
       } catch (err) {}
     }
+  };
+
+  const getAddressFromCoordinates = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+          latitude +
+          ',' +
+          longitude +
+          '&key=' +
+          'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+      )
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.status === 'OK') {
+            dispatch(
+              setCurrentLocationName({
+                locationName: responseJson?.results?.[0]?.formatted_address,
+              }),
+            );
+            resolve(responseJson?.results?.[0]?.formatted_address);
+          } else {
+            reject('not found');
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
   };
   const getOneTimeLocation = () => {
     // setLocationStatus('Getting Location ...');
@@ -58,9 +86,13 @@ const getLocation = () => {
         const currentLatitude = JSON.stringify(position.coords.latitude);
         // setCoords(position.coords);
         // if (update) {
-        setUpdate(false);
+        // setUpdate(false);
         dispatch(setLocation(position.coords));
-        console.log(position, 'subscribeLocationLocation55');
+        getAddressFromCoordinates(
+          position.coords.latitude,
+          position.coords.longitude,
+        );
+
         // }
       },
       error => {
@@ -80,13 +112,11 @@ const getLocation = () => {
         //Will give you the location on location change
 
         //   setLocationStatus('You are Here');
-        // setCoords(position.coords);
-
-        if (update) {
-          setUpdate(false);
-          dispatch(setLocation(position.coords));
-          console.log(position, 'subscribeLocationLocation55');
-        }
+        setCoords(position.coords);
+        // if (update) {
+        //   setUpdate(false);
+        //   dispatch(setLocation(position.coords));
+        // }
         // setTimeout(() => {
         //   dispatch(setLocation(position.coords));
         // }, 5000);

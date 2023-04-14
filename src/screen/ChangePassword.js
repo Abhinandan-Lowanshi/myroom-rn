@@ -96,7 +96,6 @@ const ChangePassword = ({navigation}) => {
   };
 
   const onPressDismiss = () => {
-    console.log('  setEmailApiError(response.message);');
     setEmailApiError('');
   };
   return (

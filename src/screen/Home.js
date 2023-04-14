@@ -52,13 +52,11 @@ const Home = ({route, navigation}) => {
     state => state.AllData.currentLocationName,
   );
   const accountData = useSelector(state => state.AllData.accountData);
-  console.log(currentLocationName, 'currentLocationName');
   const dispatch = useDispatch();
   let counter = 10;
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log('UseEffect');
     if (searchUpdate) {
       dispatch(startL(true));
       getData();
@@ -74,7 +72,6 @@ const Home = ({route, navigation}) => {
     }
   }, [isFocused]);
   useEffect(() => {
-    console.log(data, 'isFocuseduseEffect');
     setLoading(true);
     getData();
   }, [data]);
@@ -100,7 +97,6 @@ const Home = ({route, navigation}) => {
           return (item.availableRooms = rooms?.length);
         } else return item;
       });
-      console.log(temp, 'calculateRoomCount');
       setFilterList(temp);
     }
   };
@@ -126,7 +122,6 @@ const Home = ({route, navigation}) => {
       } else return item;
     });
     setFilteredData(tempFil);
-    console.log(tempFil, 'tempFil');
     dispatch(setRoomDataHome(temp));
   };
 
@@ -187,8 +182,7 @@ const Home = ({route, navigation}) => {
   };
   const getData = () => {
     setIsFailed(false);
-    if (data.longitude && data.latitude) {
-      console.log(data.longitude, data.latitude, 'data.longitude');
+    if (data?.longitude && data?.latitude) {
       sendRequest(
         {
           user_id: 'Dummy',
@@ -204,7 +198,6 @@ const Home = ({route, navigation}) => {
           setRefreshing(false);
           dispatch(startL(false));
           if (res.status === true) {
-            console.log(res.data.length, 'res');
             if (res.data.length > 0) {
               dispatch(setRoomDataHome(prepareData(res?.data)));
               calculateRoomCount(filterDataAll, res?.data);
@@ -337,8 +330,7 @@ const Home = ({route, navigation}) => {
           </Text>
         </View>
         <Text style={style.labelLocation}>
-          1017, Sukhlia, Pandit Dindayal Upadhyay Nagar, Ward 11, Indore, Madhya
-          Pradesh 452015, India
+          {currentLocationName?.locationName}
         </Text>
       </View>
       <SliderView
