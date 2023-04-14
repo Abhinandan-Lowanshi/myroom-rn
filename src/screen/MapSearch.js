@@ -56,7 +56,7 @@ const MapSearch = ({route, navigation}) => {
 
   useEffect(() => {
     setRoomDataHomeTP(prepareData(roomDataHomeTemp));
-    setSelectedRoom(roomDataHomeTemp[0]);
+    setSelectedRoom(roomDataHomeTP[0]);
   }, [roomDataHomeTemp]);
 
   const prepareData = data => {

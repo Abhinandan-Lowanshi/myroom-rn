@@ -157,4 +157,8 @@ export const setCurrentLocationName = data => dispatch => {
   dispatch(currentLocationName(data));
 };
 
+export const setFilteredData = data => dispatch => {
+  dispatch(filteredData(data));
+};
+
 export default slice.reducer;

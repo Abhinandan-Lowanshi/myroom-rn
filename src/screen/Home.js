@@ -17,7 +17,12 @@ import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
 import RenderRoom from '../component/RenderRoom';
 import EndPoints from '../networking/EndPoints';
-import {setRoomDataHome, updateFav, setSearchUpdate} from '../redux/Slice';
+import {
+  setRoomDataHome,
+  updateFav,
+  setSearchUpdate,
+  setFilteredData,
+} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -41,13 +46,14 @@ const Home = ({route, navigation}) => {
   const [isFailed, setIsFailed] = useState(false);
   const [userInfo, setUserInfo] = useState('');
   const [loading, setLoading] = useState(false);
-  const [filteredData, setFilteredData] = useState([]);
+  // const [filteredData, setFilteredData] = useState([]);
   const [filterList, setFilterList] = useState(filterDataAll);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
   const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
+  const filteredData = useSelector(state => state.AllData.filteredData);
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
   );
@@ -121,7 +127,7 @@ const Home = ({route, navigation}) => {
         return (item.favorite_key = data?.like);
       } else return item;
     });
-    setFilteredData(tempFil);
+    dispatch(setFilteredData(tempFil));
     dispatch(setRoomDataHome(temp));
   };
 
@@ -201,7 +207,7 @@ const Home = ({route, navigation}) => {
             if (res.data.length > 0) {
               dispatch(setRoomDataHome(prepareData(res?.data)));
               calculateRoomCount(filterDataAll, res?.data);
-              setFilteredData(res?.data);
+              dispatch(setFilteredData(res?.data));
             } else {
               setError({
                 error:
@@ -265,7 +271,7 @@ const Home = ({route, navigation}) => {
 
   const manageFilter = item => {
     if (item?.id === 7 || checkLastFilter(item)) {
-      setFilteredData(roomDataHome);
+      dispatch(setFilteredData(roomDataHome));
       let temp = JSON.parse(JSON.stringify(filterList));
       temp?.map(item1 => {
         return (item1.isApplied = false);
@@ -284,7 +290,7 @@ const Home = ({route, navigation}) => {
       temp[0].isApplied = false;
       setFilterList(temp);
       tempSearchRoom = filterRoom(temp, roomDataHome);
-      setFilteredData(tempSearchRoom);
+      dispatch(setFilteredData(tempSearchRoom));
     }
   };
 

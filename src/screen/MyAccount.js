@@ -15,6 +15,7 @@ import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Labels from '../common/labels';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import images from '../common/images';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -86,12 +87,7 @@ const MyAccount = ({navigation}) => {
           }}
         />
         <View style={styles.profileContainer}>
-          <Image
-            style={styles.profileImage}
-            source={{
-              uri: 'https://source.unsplash.com/user/c_v_r/1900x800',
-            }}
-          />
+          <Image style={styles.profileImage} source={images.profileIcon} />
           <View style={styles.personalInfoCTNR}>
             <Text style={styles.labelPersonal}>
               {accountData?.data?.usr_firstName}
