@@ -30,10 +30,7 @@ const RenderRoom = ({
   horizontal,
 }) => {
   const windowWidth = Dimensions.get('window').width;
-  const _onViewableItemsChanged = ({viewableItems, changed}) => {
-    console.log('Visible items are', viewableItems);
-    console.log('Changed in this iteration', changed);
-  };
+  const _onViewableItemsChanged = ({viewableItems, changed}) => {};
   const _viewabilityConfig = {
     itemVisiblePercentThreshold: 50,
   };
@@ -159,9 +156,7 @@ const RenderRoom = ({
     waitForInteraction: true,
     viewAreaCoveragePercentThreshold: windowWidth + 20,
   };
-  const handleViewableItemsChanged = useCallback(info => {
-    console.log('info', info);
-  }, []);
+  const handleViewableItemsChanged = useCallback(info => {}, []);
   return (
     <View>
       <FlatList
@@ -171,9 +166,7 @@ const RenderRoom = ({
         data={myRoomList}
         renderItem={renderItem}
         horizontal={horizontal}
-        scrollToEnd={value => {
-          console.log(value, 'onScroll');
-        }}
+        scrollToEnd={value => {}}
       />
     </View>
   );

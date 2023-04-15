@@ -33,7 +33,6 @@ const AppSettings = props => {
   }, []);
 
   const onSearch = value => {
-    console.log(value);
     setAddress(value?.formatted_address);
     setRowData(value);
     setSave(false);
@@ -50,7 +49,6 @@ const AppSettings = props => {
 
   const handleSwitch = value => {
     setSwitchFocus(value);
-    console.log(value);
   };
 
   const goToHome = () => {

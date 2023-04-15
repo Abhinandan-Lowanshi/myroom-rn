@@ -8,14 +8,14 @@ const setData = async (key, value) => {
   }
 };
 export const clearAllData = () => {
-  AsyncStorage.getAllKeys()
-    .then(keys => AsyncStorage.multiRemove(keys))
-    .then(() => {
-      return true;
-    })
-    .catch(() => {
-      return false;
-    });
+  // AsyncStorage.getAllKeys()
+  //   .then(keys => AsyncStorage.multiRemove(keys))
+  //   .then(() => {
+  //     return true;
+  //   })
+  //   .catch(() => {
+  //     return false;
+  //   });
 };
 const getData = async key => {
   try {

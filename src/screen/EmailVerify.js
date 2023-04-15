@@ -11,7 +11,8 @@ import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
 import LowOpacityLoader from '../component/LowOpacityLoader';
-
+import {getAccountImfo} from '../redux/Slice';
+import {useDispatch} from 'react-redux';
 const EmailVerify = ({navigation}) => {
   const signInData = useSelector(state => state.AllData.signInData);
   const [otp, setOtp] = useState('');
@@ -20,30 +21,21 @@ const EmailVerify = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [apiError, setApiError] = useState(false);
-
+  const dispatch = useDispatch();
   const SignUp = () => {
     setLoading(true);
-    sendRequest(
-      {email: signInData?.email, otp: otp},
-      EndPoints.verifyEmailOtp,
-      'POST',
-    )
+    sendRequest(signInData, EndPoints.register, 'POST')
       .then(response => {
+        setLoading(false);
         if (response.status === true) {
-          sendRequest(signInData, EndPoints.register, 'POST')
-            .then(response => {
-              setLoading(false);
-              if (response.status === true) {
-                localStorageOp(true, AsyncKeys.USERDATA, response.data);
-                navigation.navigate(ScreenName.TabComponent);
-              } else {
-                setApiError('Something went wrong');
-                setLoading(false);
-              }
-            })
-            .catch(e => {
-              setLoading(false);
-            });
+          localStorageOp(true, AsyncKeys.USERDATA, response);
+          dispatch(getAccountImfo(response));
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.TabComponent}],
+            }),
+          );
         } else {
           setApiError('Something went wrong');
           setLoading(false);
@@ -52,6 +44,42 @@ const EmailVerify = ({navigation}) => {
       .catch(e => {
         setLoading(false);
       });
+    // sendRequest(
+    //   {email: signInData?.email, otp: otp},
+    //   EndPoints.verifyEmailOtp,
+    //   'POST',
+    // )
+    //   .then(response => {
+    //     if (response.status === true) {
+    //       sendRequest(signInData, EndPoints.register, 'POST')
+    //         .then(response => {
+    //           setLoading(false);
+    //           if (response.status === true) {
+    //             localStorageOp(true, AsyncKeys.USERDATA, response);
+    //             dispatch(getAccountImfo(response));
+    //             console.log(response, 'navigation.navigate Signup');
+    //             navigation.dispatch(
+    //               CommonActions.reset({
+    //                 index: 0,
+    //                 routes: [{name: ScreenName.TabComponent}],
+    //               }),
+    //             );
+    //           } else {
+    //             setApiError('Something went wrong');
+    //             setLoading(false);
+    //           }
+    //         })
+    //         .catch(e => {
+    //           setLoading(false);
+    //         });
+    //     } else {
+    //       setApiError('Something went wrong');
+    //       setLoading(false);
+    //     }
+    //   })
+    //   .catch(e => {
+    //     setLoading(false);
+    //   });
   };
 
   const otpOnChange = otp => {

@@ -19,7 +19,6 @@ import FastImage from 'react-native-fast-image';
 // import Modal from "react-native-modal";
 
 const PopupRoomView = props => {
-  console.log(props?.data);
   const [loading, setLoading] = useState(true);
   return (
     <Modal

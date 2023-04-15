@@ -21,7 +21,6 @@ const GetLocationByMap = props => {
   const data = useSelector(state => state.AllData.locationInfo);
   const [roomLocationMain, setRoomLocationMain] = useState(data);
   const dispatch = useDispatch();
-  console.log(roomLocation, onMapData, 'roomLocation');
   // const renderInfoModal = () => {
   //   return (
   //     <Modal visible={visible} transparent={true}>
@@ -109,7 +108,7 @@ const GetLocationByMap = props => {
         label={
           'Drag the map to above your room if the marker not point to your room.'
         }
-        visible={visiblef}
+        visible={visible}
         buttonLabel={'Dismiss'}
         onPress={handleModal}></InfoModal>
     </View>

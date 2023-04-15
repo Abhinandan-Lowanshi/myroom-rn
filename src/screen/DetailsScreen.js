@@ -34,6 +34,7 @@ import EndPoints from '../networking/EndPoints';
 import ErrorModal from '../component/ErrorModal';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
+import images from '../common/images';
 
 const DetailsScreen = props => {
   const {navigation} = props;
@@ -125,6 +126,7 @@ const DetailsScreen = props => {
         if (res.status === true) {
           if (res.message === 'Room details get successfully.') {
             setItem(res?.data);
+            setLike(res?.data?.favorite_key);
             setCheck(true);
           } else {
             setApiError(
@@ -313,11 +315,7 @@ const DetailsScreen = props => {
   const ownerDetails = () => {
     return (
       <View style={style.ownerView}>
-        <Image
-          style={style.ownerImage}
-          source={{
-            uri: 'https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510__340.jpg',
-          }}></Image>
+        <Image style={style.ownerImage} source={images.profileIcon}></Image>
         <View style={style.ownerNameContainer}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
           <Text style={style.labelmoble}>{item?.rm_own_mble_num}</Text>

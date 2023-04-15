@@ -23,17 +23,20 @@ import localStorageOp from '../localStorage/LocalData';
 import ErrorModal from '../component/ErrorModal';
 import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
-
+import {getAccountImfo} from '../redux/Slice';
+import {useDispatch} from 'react-redux';
 const Login = ({navigation}) => {
+  // const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
   const [email, setEmail] = useState('');
   const [loading, SetIsLoading] = useState(false);
+  // const [password, setPassword] = useState('Abhi@7049');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [authError, setAuthError] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [apiError, setApiError] = useState(false);
-
+  const dispatch = useDispatch(dispatch);
   React.useEffect(() => {
     setAuthError('');
     if (validateEmail(email) && password.length >= 6)
@@ -65,9 +68,10 @@ const Login = ({navigation}) => {
     )
       .then(response => {
         SetIsLoading(false);
-        if (response.status === true) {
-          setApiError(response.message);
+        if (response?.status === true) {
+          setApiError(response?.message);
           localStorageOp(true, AsyncKeys.USERDATA, response);
+          dispatch(getAccountImfo(response));
           // navigation.navigate(ScreenName.TabComponent);
           navigation.dispatch(
             CommonActions.reset({
@@ -76,7 +80,7 @@ const Login = ({navigation}) => {
             }),
           );
         } else {
-          setAuthError(response.message);
+          setAuthError(response?.message);
         }
       })
       .catch(e => {

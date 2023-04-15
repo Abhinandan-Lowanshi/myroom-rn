@@ -6,4 +6,5 @@ export default images = {
   intro: require('../image/intro.png'),
   search: require('../image/search.png'),
   upload: require('../image/upload.png'),
+  profileIcon: require('../image/profileIcon.png'),
 };

@@ -126,7 +126,6 @@ const EditRoom = props => {
       room_id: roomInfo?.rm_pkey.toString(),
       data: data,
     };
-    console.log(rowData);
     updateRoom({
       room_id: '52',
       data: {
@@ -139,7 +138,6 @@ const EditRoom = props => {
     setLoading(true);
     sendRequest(data, EndPoints.editRoom, 'POST')
       .then(response => {
-        console.log(response, 'Response');
         setLoading(false);
         if (response.status === true) {
           // navigation.navigate(ScreenName.Upload);
@@ -147,7 +145,6 @@ const EditRoom = props => {
       })
       .catch(error => {
         setLoading(false);
-        console.log(error, 'error');
       });
   };
 

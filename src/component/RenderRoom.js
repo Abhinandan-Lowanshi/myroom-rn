@@ -35,7 +35,6 @@ const RenderRoom = ({
     lowOpacityContainer,
     isTime,
   }) => {
-    console.log(label, 'LowOpacityText');
     return (
       <View style={container}>
         <View style={[[style.lowOpacityContainer, lowOpacityContainer]]}></View>

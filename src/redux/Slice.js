@@ -20,6 +20,8 @@ export const slice = createSlice({
     roomLocation: {},
     isMapVisited: false,
     searchUpdate: false,
+    currentLocationName: '',
+    filteredData: '',
   },
   reducers: {
     startL: (state, actions) => {
@@ -70,6 +72,12 @@ export const slice = createSlice({
     searchUpdate: (state, actions) => {
       state.searchUpdate = actions.payload;
     },
+    currentLocationName: (state, actions) => {
+      state.currentLocationName = actions.payload;
+    },
+    filteredData: (state, actions) => {
+      state.filteredData = actions.payload;
+    },
   },
 });
 
@@ -90,6 +98,8 @@ export const {
   roomLocationOP,
   isMapVisited,
   searchUpdate,
+  currentLocationName,
+  filteredData,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -142,6 +152,13 @@ export const setIsMapVisited = data => dispatch => {
 };
 export const setSearchUpdate = data => dispatch => {
   dispatch(searchUpdate(data));
+};
+export const setCurrentLocationName = data => dispatch => {
+  dispatch(currentLocationName(data));
+};
+
+export const setFilteredData = data => dispatch => {
+  dispatch(filteredData(data));
 };
 
 export default slice.reducer;
