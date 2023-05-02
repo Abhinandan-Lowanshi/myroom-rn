@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useRef} from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   Text,
@@ -13,9 +13,8 @@ import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
 import data from '../common/SpinnerData';
-import {Dimensions} from 'react-native';
 
-const RenderRoom = ({
+const RenderRoom2Column = ({
   myRoomList,
   isFromMyPost,
   onPress,
@@ -28,22 +27,23 @@ const RenderRoom = ({
   container,
   flat,
   horizontal,
+  moreVisible,
 }) => {
-  const windowWidth = Dimensions.get('window').width;
-  const _onViewableItemsChanged = ({viewableItems, changed}) => {};
-  const _viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
   const LowOpacityText = ({
     label,
     container,
     textLabel,
     lowOpacityContainer,
+    isTime,
   }) => {
     return (
       <View style={container}>
         <View style={[[style.lowOpacityContainer, lowOpacityContainer]]}></View>
-        <Text style={[style.labelLow, textLabel]}>{label}</Text>
+        {isTime ? (
+          <TimeAgo style={style.labelLow} time={label} />
+        ) : (
+          <Text style={[style.labelLow, textLabel]}>{label}</Text>
+        )}
       </View>
     );
   };
@@ -66,7 +66,7 @@ const RenderRoom = ({
       <TouchableOpacity
         onPress={() => onPress(item)}
         activeOpacity={0.8}
-        style={[style.container(windowWidth), container]}>
+        style={[style.container, container]}>
         {isFromMyPost && (
           <View style={style.innerContainer}>
             <TouchableOpacity
@@ -99,36 +99,40 @@ const RenderRoom = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
-          <View style={style.containerBottom}>
-            <LowOpacityText
-              label={item?.rm_availble}
-              lowOpacityContainer={style.containerAvailable}
-              container={style.containerAvailable2}
-              textLabel={style.labelAvailable}
-            />
-            {getText(item) === '' ? null : (
-              <LowOpacityText
-                label={getText(item)}
-                lowOpacityContainer={style.containerAvailable}
-                container={style.containerOptional2}
-                textLabel={style.labelAvailable}
-              />
-            )}
+          {/* <View style={style.containerDate}>
             <LowOpacityText
               label={item?.rm_size}
-              lowOpacityContainer={style.containerAvailable}
-              container={style.containerAvailable2}
-              textLabel={style.labelAvailable}
+              container={style.containerRent}
             />
-          </View>
+            <LowOpacityText
+              label={item?.created_at}
+              container={style.containerRent}
+              isTime={true}
+            />
+          </View> */}
         </View>
         <View style={style.containerInfo}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
           <Text style={style.labelAddress}>
             {`${item?.rm_house_no} ${item?.rm_colny} ${item?.rm_city}`}
           </Text>
-
-          {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
+          <View style={style.containerBottom}>
+            <LowOpacityText
+              label={item?.rm_size}
+              lowOpacityContainer={style.containerAvailable}
+              container={style.containerAvailable2}
+              textLabel={style.labelAvailable}
+            />
+            {/* {getText(item) === '' ? null : (
+              <LowOpacityText
+                label={getText(item)}
+                lowOpacityContainer={style.containerOptional}
+                container={style.containerOptional2}
+                textLabel={style.labelAvailable}
+              />
+            )} */}
+            {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
+          </View>
         </View>
         {!isFromMyPost && (
           <TouchableOpacity
@@ -147,50 +151,64 @@ const RenderRoom = ({
       </TouchableOpacity>
     );
   };
-
-  // const onViewableItemsChanged = ({viewableItems, changed}) => {
-  //   console.log('Visible items are', viewableItems);
-  //   console.log('Changed in this iteration', changed);
-  // };
-  const viewabilityConfig = {
-    waitForInteraction: true,
-    viewAreaCoveragePercentThreshold: windowWidth + 20,
-  };
-  const handleViewableItemsChanged = useCallback(info => {}, []);
   return (
     <View>
       <FlatList
-        style={flat || {width: '100%'}}
+        numColumns={2}
+        style={flat || {marginHorizontal: hp(1)}}
         refreshing={refreshing || false}
         onRefresh={onRefresh}
         data={myRoomList}
         renderItem={renderItem}
         horizontal={horizontal}
-        scrollToEnd={value => {}}
+        maxToRenderPerBatch={5}
+        ListFooterComponent={() => {
+          if (moreVisible) {
+            return (
+              <TouchableOpacity>
+                <Text
+                  style={{
+                    height: hp(5),
+                    width: '70%',
+                    color: Colors.WHITE,
+                    fontWeight: '600',
+                    backgroundColor: Colors.PRIMARY,
+                    textAlign: 'center',
+                    textAlignVertical: 'center',
+                    alignSelf: 'center',
+                    marginVertical: hp(2),
+                    borderRadius: hp(1),
+                  }}>
+                  More
+                </Text>
+              </TouchableOpacity>
+            );
+          }
+        }}
       />
     </View>
   );
 };
 
-export default RenderRoom;
+export default RenderRoom2Column;
 
 const style = StyleSheet.create({
-  container: width => ({
-    width: width - hp(2),
+  container: {
+    width: '49%',
     backgroundColor: Colors.WHITE,
     marginTop: hp(0.5),
     flexDirection: 'column',
     borderRadius: hp(1),
     elevation: hp(0.5),
-    marginHorizontal: hp(0.2),
+    marginHorizontal: hp(0.3),
     paddingBottom: hp(2),
     marginBottom: hp(1),
-    marginLeft: hp(1),
-  }),
+  },
   favImage: {
     right: hp(2),
     top: hp(2),
     position: 'absolute',
+    elevation: hp(10),
   },
   innerContainer: {
     position: 'absolute',
@@ -237,7 +255,6 @@ const style = StyleSheet.create({
     fontSize: RF(1.2),
   },
   containerDelete: {
-    backgroundColor: 'red',
     alignItems: 'center',
     justifyContent: 'center',
     width: hp(8),
@@ -251,18 +268,14 @@ const style = StyleSheet.create({
     fontSize: RF(1.2),
   },
   imageContainer: {
-    width: '100%',
-    height: hp(15),
+    height: hp(30),
     borderRadius: 100,
   },
   labelRent: {
     color: 'green',
     fontSize: RF(2),
     fontWeight: '700',
-    marginLeft: 5,
-    position: 'absolute',
-    right: hp(0.5),
-    alignSelf: 'center',
+    alignSelf: 'flex-end',
   },
   timestamp: {
     color: Colors.BLACK,
@@ -295,35 +308,29 @@ const style = StyleSheet.create({
     color: 'white',
   },
   containerRent: {
-    position: 'absolute',
-    bottom: hp(2),
-    right: hp(3),
     borderRadius: 25,
+    marginLeft: hp(1),
   },
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: RF(2),
+    fontSize: 18,
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
     color: 'black',
-    fontSize: RF(1.3),
+    fontSize: 13,
     fontWeight: '400',
-    marginLeft: 5,
   },
   containerBottom: {
-    position: 'absolute',
-    width: '100%',
     flexDirection: 'row',
-    marginTop: 10,
-    bottom: hp(1),
-    justifyContent: 'space-around',
+    marginTop: hp(1),
+    justifyContent: 'space-between',
   },
   containerAvailable: {
     backgroundColor: Colors.PRIMARY,
-    opacity: 0.7,
+    opacity: 0.2,
   },
   containerAvailable2: {
     borderRadius: 10,
@@ -338,5 +345,11 @@ const style = StyleSheet.create({
   },
   containerOptional2: {
     borderRadius: 10,
+    marginLeft: 20,
+  },
+  containerDate: {
+    position: 'absolute',
+    bottom: hp(2),
+    flexDirection: 'row',
   },
 });

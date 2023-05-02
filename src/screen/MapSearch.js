@@ -20,10 +20,6 @@ import {
   setRoomDataHome,
 } from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
-import getLocation from '../geoLocation/GetLocation';
-import sendRequest from '../networking/ApiFunctions';
-import RenderRoom2 from '../component/RenderRoom2';
-import EndPoints from '../networking/EndPoints';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -32,13 +28,9 @@ import MapView, {Marker} from 'react-native-maps';
 import Colors from '../common/Colors';
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import PopupRoomView from '../component/PopupRoomView';
-import FastImage from 'react-native-fast-image';
-import Icon from 'react-native-vector-icons/dist/Entypo';
-import IconName from '../common/IconName';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Custom_Image from '../component/Custom_Image';
 import spinnerData from '../common/SpinnerData';
-import Icon1 from 'react-native-vector-icons/FontAwesome';
 import MapViewDirections from 'react-native-maps-directions';
 import Toast from 'react-native-simple-toast';
 

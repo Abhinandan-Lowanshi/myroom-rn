@@ -16,239 +16,188 @@ import StyleGlobel from '../../Style/StyleGlobel';
 import LowOpacityLoader from '../../component/LowOpacityLoader';
 import Colors from '../../common/Colors';
 import Header from '../../component/Header';
-import {RF} from '../../common/CommonFunctions';
+import {RF, hp} from '../../common/CommonFunctions';
+import io from 'socket.io-client';
+import localStorageOp from '../../localStorage/LocalData';
+import sendRequest from '../../networking/ApiFunctions';
+import EndPoints from '../../networking/EndPoints';
+import ProfileIcon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
+import ScreenName from '../../common/ScreenName';
 
 const Chat = props => {
   const {navigation} = props;
+  const {item} = props?.route?.params;
   const [passwordSend, setpasswordSend] = useState(false);
   const [user, setUser] = useState('');
-  const [height, setHeight] = useState(40);
+  const [height, setHeight] = useState(hp(5.5));
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [uid, setUID] = useState('');
+  const [pageCount, setPageCount] = useState(1);
+  const [stop, setStop] = useState(false);
   const flatListRef = useRef();
-  //   const [messages, setMessages] = useState([]);
-  const [reciverInfo, setRecieverInfo] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      messagesId: 1,
-      content: 'Hello',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 2,
-      content: 'Hello',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 2,
-      recieverID: 1,
-    },
-    {
-      messagesId: 3,
-      content: 'Kese ho',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 4,
-      content: 'Me theek hu. or Ap kese ho',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 2,
-      recieverID: 1,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 6,
-      content:
-        'Sometimes, you would want to get the auto-generated document ID immediately right after data has been added to the Firestore Database.Luckily, you can do that using the addDoc() method.In order to get the auto-generated ID from the response, all we have to do is access the id property on the docRef object.',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 745,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-    },
-    {
-      messagesId: 6,
-      content:
-        'Sometimes, you would want to get the auto-generated document ID immediately right after data has been added to the Firestore Database.Luckily, you can do that using the addDoc() method.In order to get the auto-generated ID from the response, all we have to do is access the id property on the docRef object.',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 2,
-      recieverID: 1,
-    },
-  ]);
+  const [user_id, setUser_id] = useState('');
+  const [messages, setMessages] = useState([]);
+  const socket = io.connect('http://3.220.96.137:3000', {reconnect: true});
+  console.log(item, 'Chat');
 
+  useEffect(() => {
+    socket.on('receive_message', chatMessage => {
+      console.log(chatMessage, 'ChatMessage');
+      if (chatMessage?.user_id !== user_id) {
+        setMessages(prevMessages => [...prevMessages, chatMessage]);
+        toBottom();
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    getMessageList();
+  }, []);
+
+  const getMessageList = async () => {
+    setLoading(true);
+    localStorageOp(false, AsyncKeys.USERDATA, '')
+      .then(userData => {
+        setUser_id(userData?.data?.usr_id);
+        socket.emit('join_room', {
+          user_id: userData?.data?.usr_id,
+          buddy_id: item?.user_id,
+        });
+
+        let tempOb = {
+          user_id: userData?.data?.usr_id,
+          buddy_id: item?.user_id,
+          page: 1,
+        };
+
+        sendRequest(tempOb, EndPoints?.chatList, 'POST').then(response => {
+          setLoading(false);
+          if (response.status === true) {
+            if (response?.data?.length > 0) {
+              setMessages(response.data?.reverse());
+              setTimeout(() => {
+                toBottom();
+              }, 500);
+            }
+          }
+        });
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  };
   const onPress = () => {};
   const renderItem = ({item}) => {
     return (
-      <View style={style.messagesContainer(item.senderID === 1)}>
-        <View style={style.innerContainer}>
-          <Text style={style.message}>{item?.content}</Text>
-        </View>
-        <Text style={style.time(item.senderID === 1)}>{item?.timeStamp}</Text>
+      <View style={style.messagesContainer(item?.message_type === 'sent')}>
+        {/* <View style={style.innerContainer(item?.message_type === 'sent')}> */}
+        <Text style={style.message(item?.message_type === 'sent')}>
+          {item?.message}
+        </Text>
+        {/* </View> */}
+        <Text style={style.time(item?.message_type === 'sent')}>
+          {getTime(item?.created_date)}
+        </Text>
       </View>
     );
   };
 
-  const getHeigth = length => {
-    if (length > 120) {
-      setHeight(100);
-    } else if (length > 80) {
-      setHeight(80);
-    } else if (length > 50) {
-      setHeight(60);
-    } else if (length < 40) {
-      setHeight(40);
+  const getHeight = length => {
+    if (length > 270) {
+      setHeight(hp(10.5));
+    } else if (length > 180) {
+      setHeight(hp(9.5));
+    } else if (length > 60) {
+      setHeight(hp(7.5));
+    } else if (length < 60) {
+      setHeight(hp(5.5));
     }
   };
 
   const sendMessage = () => {
-    // if (user?.uid) {
-    //   if (message !== '') {
-    //     let tempMessage = {
-    //       messagesId: Math.random().toString(33).substring(2, 12),
-    //       timeStamp: new Date().toLocaleString(),
-    //       type: 'TEXT',
-    //       senderID: user?.uid,
-    //       recieverID: null,
-    //       content: message,
-    //     };
-    //     let tempAr = [];
-    //     if (messages?.length > 0) {
-    //       tempAr = JSON.parse(JSON.stringify(messages));
-    //       tempAr.push(tempMessage);
-    //     } else {
-    //       tempAr.push(tempMessage);
-    //     }
-    //     setMessage('');
-    //     setMessages(tempAr);
-    //     consversation
-    //       .doc(user?.uid + reciverInfo?.uid)
-    //       .collection('mess')
-    //       .add(tempMessage)
-    //       .then(value => {
-    //         console.log(value, 'consversation');
-    //         setLoading(false);
-    //       })
-    //       .catch(() => {
-    //         setLoading(false);
-    //       });
-    //     if (tempAr?.length > 3) toBottom();
-    //   } else {
-    //     Toast.show('Please enter message', Toast.LONG);
-    //   }
-    // } else {
-    //   Toast.show('Something went wrong', Toast.LONG);
-    // }
+    const created_date = new Date().toISOString();
+    // console.log(messages);
+    if (message !== '') {
+      let data = {
+        user_id,
+        buddy_id: item?.user_id,
+        message,
+        created_date,
+        message_type: 'sent',
+      };
+      setMessages(prevMessages => [...prevMessages, data]);
+      socket.emit('send_message', {
+        user_id,
+        buddy_id: item?.user_id,
+        message,
+      });
+      setMessage('');
+      toBottom();
+    }
   };
 
   const toBottom = () => {
     flatListRef.current.scrollToEnd({animated: true});
   };
 
+  const getTime = value => {
+    let myDate = new Date(value).toLocaleDateString('en-US');
+    let myTime = new Date(value).toLocaleTimeString('en-US');
+    return `${myTime}  ${myDate}`;
+  };
+
+  const onReactTop = index => {
+    if (index === 0 && stop === false) {
+      // setPageCount(previousValue => previousValue + 1)
+      setLoading(true);
+      let pageNumber = pageCount;
+
+      console.log(pageNumber + 1, 'pageNumber');
+      let tempOb = {
+        user_id: user_id,
+        buddy_id: item?.user_id,
+        page: pageNumber + 1,
+      };
+      sendRequest(tempOb, EndPoints?.chatList, 'POST')
+        .then(response => {
+          setLoading(false);
+          if (response.status === true) {
+            if (response.message === 'Chat list not found.') {
+              setStop(true);
+            }
+            if (response?.data?.length > 0) {
+              setPageCount(previousValue => previousValue + 1);
+              console.log(response.data.reverse());
+              setMessages(previousValue => [
+                ...response.data.reverse(),
+                ...previousValue,
+              ]);
+            }
+          }
+        })
+        .catch(() => {
+          setLoading(false);
+        });
+    }
+  };
+
+  const onPressProfile = () => {
+    navigation.navigate(ScreenName.UserProfile);
+  };
+  const rightIcon = () => {
+    return (
+      <TouchableOpacity style={style.iconProContainer} onPress={onPressProfile}>
+        <ProfileIcon
+          name={'account-circle-outline'}
+          size={hp(4)}
+          color={Colors.PRIMARY}
+        />
+      </TouchableOpacity>
+    );
+  };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
-      <Header label={'Raju'} navigation={navigation} />
+      <Header label={item?.usr_first_name} navigation={navigation} />
       <View style={style.container}>
         {true && (
           <>
@@ -257,22 +206,26 @@ const Chat = props => {
               data={messages}
               style={style.flatList}
               renderItem={renderItem}
+              onScroll={e => onReactTop(e.nativeEvent.contentOffset.y)}
             />
-            <View style={style.sendMessageContainer}>
+            <View style={style.sendMessageContainer(height)}>
               <TextInput
-                style={style.textinput(height)}
+                style={style.textinput}
                 multiline={true}
                 onChangeText={value => {
-                  getHeigth(value.length);
+                  getHeight(value.length);
                   setMessage(value);
+                }}
+                onFocus={value => {
+                  toBottom();
                 }}
                 placeholder={'Type a message'}
                 value={message}
-                placeholderTextColor={Colors.white}></TextInput>
+                placeholderTextColor={Colors.BLACK}></TextInput>
               <TouchableOpacity
                 style={style.buttonStyle}
                 onPress={() => sendMessage()}>
-                <Icon name={'send'} size={30} color={Colors.primary}></Icon>
+                <Icon name={'send'} size={hp(3)} color={Colors.PRIMARY}></Icon>
               </TouchableOpacity>
             </View>
           </>
@@ -298,7 +251,7 @@ const style = StyleSheet.create({
     width: '40%',
   },
   appLabel: {
-    color: Colors.white,
+    color: Colors.BLACK,
     alignSelf: 'center',
     marginTop: 60,
     fontSize: 30,
@@ -309,58 +262,65 @@ const style = StyleSheet.create({
     flex: 1,
     marginTop: 5,
   },
-  message: {
-    color: Colors.white,
-    marginHorizontal: 5,
+  message: isSend => ({
+    color: isSend ? Colors.WHITE : Colors.BLACK,
+    backgroundColor: isSend ? Colors.PRIMARYLITE : Colors.GREY1,
     marginVertical: 2,
-  },
+    maxWidth: '90%',
+    paddingHorizontal: hp(1),
+    borderRadius: hp(1),
+    paddingVertical: hp(0.4),
+    alignSelf: isSend ? 'flex-end' : 'flex-start',
+    fontSize: RF(1.6),
+  }),
   messagesContainer: isSend => ({
     alignSelf: isSend ? 'flex-end' : 'flex-start',
     maxWidth: '90%',
-    marginTop: 5,
+    marginHorizontal: hp(1),
+    marginTop: hp(1),
   }),
   time: isSend => ({
-    color: Colors.white,
-    fontSize: 10,
+    color: Colors.BLACK,
+    fontSize: RF(1),
     textAlign: isSend ? 'right' : 'left',
     marginHorizontal: 5,
   }),
-  innerContainer: {
-    backgroundColor: Colors.PRIMARY,
+  innerContainer: isSend => ({
+    backgroundColor: isSend ? Colors.PRIMARYLITE : Colors.GREY1,
     marginTop: 2,
-    marginHorizontal: 3,
+    marginHorizontal: hp(0.2),
     borderRadius: 5,
-  },
-  sendMessageContainer: {
-    width: '100%',
-    // borderTopColor: Colors.white,
-    // borderWidth: 1,
-    flexDirection: 'row',
-    paddingVertical: 5,
-  },
-  textinput: height => ({
-    width: '85%',
-    borderColor: 'green',
-    borderWidth: 1,
-    marginTop: 6,
-    borderRadius: 5,
-    height: height,
-    marginLeft: 5,
-    color: Colors.white,
-    overflow: 'visible',
-    textAlignVertical: 'top',
   }),
+  sendMessageContainer: height => ({
+    borderWidth: 1,
+    flexDirection: 'row',
+    margin: hp(1),
+    borderColor: Colors.PRIMARY,
+    borderWidth: 1,
+    height,
+    borderRadius: hp(1),
+    marginHorizontal: hp(1.2),
+  }),
+  textinput: {
+    flex: 1,
+    color: Colors.BLACK,
+    marginLeft: hp(1),
+  },
   buttonStyle: {
     width: '15%',
-    height: 30,
-    marginTop: 5,
+    height: hp(3),
     alignSelf: 'center',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
   labelOwnerName: {
     color: Colors.BLACK,
     alignSelf: 'center',
     fontSize: RF(2.3),
+  },
+  iconProContainer: {
+    alignSelf: 'center',
+    position: 'absolute',
+    right: hp(2.5),
   },
 });

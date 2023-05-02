@@ -24,6 +24,6 @@ const Labels = {
   Chat: 'Chat',
   Upload: 'Upload',
   Map: 'Map',
-  Map: 'Map',
+  Profile: 'Profile',
 };
 export default Labels;

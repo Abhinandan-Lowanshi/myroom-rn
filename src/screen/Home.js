@@ -39,6 +39,7 @@ import Colors from '../common/Colors';
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import localStorageOp from '../localStorage/LocalData';
+import RenderRoom2Column from '../component/RenderRoom2Column';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -192,8 +193,10 @@ const Home = ({route, navigation}) => {
       sendRequest(
         {
           user_id: 'Dummy',
-          latitude: data.latitude,
-          longitude: data.longitude,
+          latitude: 22.7196,
+          longitude: 75.8577,
+          // latitude: data.latitude,
+          // longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -356,15 +359,20 @@ const Home = ({route, navigation}) => {
           style={style.filterFlatlist}
         />
       ) : null}
-      {loading ? (
+      {false ? (
         <LowOpacityLoader />
       ) : isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
-        <View style={{marginHorizontal: hp(1)}}>
+        <View>
           {filteredData?.length > 0 ? (
-            <RenderRoom
-              myRoomList={filteredData}
+            <RenderRoom2Column
+              myRoomList={
+                filteredData?.length > 5
+                  ? filteredData?.slice(0, 5)
+                  : filteredData
+              }
+              moreVisible={filteredData?.length > 5 ? true : false}
               onPress={onPressRoom}
               onPressFav={onPressFav}
               refreshing={false}

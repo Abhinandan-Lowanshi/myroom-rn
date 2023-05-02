@@ -23,6 +23,7 @@ import Stapper from '../component/Stapper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {setUploadData} from '../redux/Slice';
 import {useIsFocused} from '@react-navigation/native';
+import localStorageOp from '../localStorage/LocalData';
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +72,7 @@ const Upload = ({navigation}) => {
   const [cityError, setCityError] = useState(false);
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState(false);
+  const [userData, setUserData] = useState('');
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -115,6 +117,16 @@ const Upload = ({navigation}) => {
     if (!isFocused) setRoomLocation({});
   }, [isFocused]);
 
+  useEffect(() => {
+    localStorageOp('', AsyncKeys.USERDATA, '')
+      .then(data => {
+        if (data?.data) {
+          setName(data?.data?.usr_firstName);
+          setMobileNumber(data?.data?.usr_phone);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const nameOnChange = name => {
     setName(name);
     if (name !== '' && name.length < 4) {
@@ -254,6 +266,7 @@ const Upload = ({navigation}) => {
       <View style={{marginBottom: hp(2)}}>
         <Stapper fromSTP1={true} />
         <CustomInputText
+          disabled
           onChangeText={nameOnChange}
           value={name}
           maxLength={30}
@@ -263,6 +276,7 @@ const Upload = ({navigation}) => {
           errorMessage={'Enter valid Name'}
         />
         <CustomInputText
+          disabled
           maxLength={10}
           isNumeric={true}
           onChangeText={mobileNumberOnChange}
