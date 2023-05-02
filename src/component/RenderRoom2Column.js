@@ -28,6 +28,7 @@ const RenderRoom2Column = ({
   flat,
   horizontal,
   moreVisible,
+  onPressMore,
 }) => {
   const LowOpacityText = ({
     label,
@@ -165,7 +166,7 @@ const RenderRoom2Column = ({
         ListFooterComponent={() => {
           if (moreVisible) {
             return (
-              <TouchableOpacity>
+              <TouchableOpacity onPress={onPressMore}>
                 <Text
                   style={{
                     height: hp(5),

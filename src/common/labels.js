@@ -25,5 +25,6 @@ const Labels = {
   Upload: 'Upload',
   Map: 'Map',
   Profile: 'Profile',
+  AllRooms: 'All Rooms  ',
 };
 export default Labels;

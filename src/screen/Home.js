@@ -318,6 +318,10 @@ const Home = ({route, navigation}) => {
     );
   };
 
+  const onPressMore = () => {
+    navigation.navigate(ScreenName.MoreRooms);
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -367,15 +371,17 @@ const Home = ({route, navigation}) => {
         <View>
           {filteredData?.length > 0 ? (
             <RenderRoom2Column
-              myRoomList={
-                filteredData?.length > 5
-                  ? filteredData?.slice(0, 5)
-                  : filteredData
-              }
-              moreVisible={filteredData?.length > 5 ? true : false}
+              myRoomList={filteredData}
+              // myRoomList={
+              //   filteredData?.length > 5
+              //     ? filteredData?.slice(0, 5)
+              //     : filteredData
+              // }
+              // moreVisible={filteredData?.length > 5 ? true : false}
               onPress={onPressRoom}
               onPressFav={onPressFav}
               refreshing={false}
+              onPressMore={onPressMore}
             />
           ) : null}
         </View>
