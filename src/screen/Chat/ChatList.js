@@ -20,93 +20,49 @@ import Header from '../../component/Header';
 import {RF, hp} from '../../common/CommonFunctions';
 import Custom_Image from '../../component/Custom_Image';
 import ScreenName from '../../common/ScreenName';
-
+import sendRequest from '../../networking/ApiFunctions';
+import EndPoints from '../../networking/EndPoints';
+import images from '../../common/images';
 const ChatList = props => {
   const {navigation} = props;
-  const [passwordSend, setpasswordSend] = useState(false);
-  const [user, setUser] = useState('');
-  const [height, setHeight] = useState(40);
+  const [refreshing, setRefreshing] = useState(false);
+  const [userList, setUserList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [uid, setUID] = useState('');
-  const flatListRef = useRef();
-  //   const [messages, setMessages] = useState([]);
-  const [reciverInfo, setRecieverInfo] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      messagesId: 1,
-      content: 'Hello',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-      name: 'Rajveer',
-    },
-    {
-      messagesId: 2,
-      content: 'Hello',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 2,
-      recieverID: 1,
-      name: 'Rajveer',
-    },
-    {
-      messagesId: 3,
-      content: 'Kese ho',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-      name: 'Rajveer',
-    },
-    {
-      messagesId: 4,
-      content: 'Me theek hu. or Ap kese ho',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 2,
-      recieverID: 1,
-      name: 'Rajveer',
-    },
-    {
-      messagesId: 5,
-      content: 'Me bhi theek hu',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-      name: 'Rajveer',
-    },
-    {
-      messagesId: 6,
-      content:
-        'Sometimes, you would want to get the auto-generated document ID immediately right after data has been added to the Firestore Database.Luckily, you can do that using the addDoc() method.In order to get the auto-generated ID from the response, all we have to do is access the id property on the docRef object.',
-      timeStamp: '10:20 AM',
-      type: 'TEXT',
-      senderID: 1,
-      recieverID: 2,
-      name: 'Rajveer',
-    },
-  ]);
+  useEffect(() => {
+    getUserList();
+  }, []);
 
-  const onPress = () => {};
+  const onRefresh = () => [getUserList()];
+  const getUserList = () => {
+    setLoading(true);
+    sendRequest({user_id: 'non'}, EndPoints?.chatUserList, 'POST')
+      .then(response => {
+        setLoading(false);
+        setRefreshing(false);
+
+        if (response.status === true) {
+          if (response?.data?.length > 0) {
+            setUserList(response.data);
+          }
+        }
+      })
+      .catch(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
+  };
+
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
         style={style.containerFlatList}
         onPress={() => {
-          navigation.navigate(ScreenName.Chat);
+          navigation.navigate(ScreenName.Chat, {item});
         }}>
-        <Image
-          style={style.profileImage}
-          source={{
-            uri: 'https://source.unsplash.com/user/c_v_r/1900x800',
-          }}
-        />
+        <Image style={style.profileImage} source={images.profileIcon} />
         <View style={style.contentContainer}>
           <View style={style.nameContainer}>
-            <Text style={style.name}>{item?.name}</Text>
+            <Text style={style.name}>{item?.usr_first_name}</Text>
             <Text style={style.date}>{item?.timeStamp}</Text>
           </View>
           <Text style={style.lastMessage} numberOfLines={1}>
@@ -117,19 +73,16 @@ const ChatList = props => {
     );
   };
 
-  const toBottom = () => {
-    flatListRef.current.scrollToEnd({animated: true});
-  };
-
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <View style={style.container}>
         {true && (
           <FlatList
-            ref={flatListRef}
-            data={messages}
+            data={userList}
             style={style.flatList}
             renderItem={renderItem}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
           />
         )}
       </View>

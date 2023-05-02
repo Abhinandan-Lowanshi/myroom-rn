@@ -33,4 +33,6 @@ export default Screen = {
   AppSettings: 'AppSettings',
   Chat: 'chat',
   ChatList: 'ChatList',
+  UserProfile: 'UserProfile',
+  RoomDetailsOwner: 'RoomDetailsOwner',
 };

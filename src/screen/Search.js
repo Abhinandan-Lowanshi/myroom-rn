@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -533,6 +534,7 @@ const Search = ({navigation}) => {
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Search} navigation={navigation} />
+      {/* <ScrollView> */}
       {loading && <LowOpacityLoader />}
       <GooglePlacesInput onSearch={onSearch} />
       {filter && RenderFilter()}
@@ -556,6 +558,7 @@ const Search = ({navigation}) => {
           onPressFav={onPressFav}
         />
       </View>
+      {/* </ScrollView> */}
     </View>
   );
 };

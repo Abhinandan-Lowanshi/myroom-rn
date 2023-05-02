@@ -28,7 +28,7 @@ const CustomInputText = ({
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
   return (
     <View style={[style.outerContainer, outerContainer]}>
-      <View style={[style.containerStyle(error), containerStyleP]}>
+      <View style={[style.containerStyle(error, disabled), containerStyleP]}>
         <TextInput
           maxLength={maxLength || 50}
           editable={!disabled}
@@ -75,14 +75,14 @@ const style = StyleSheet.create({
     flex: 1,
     borderRadius: hp(1),
   }),
-  containerStyle: error => ({
+  containerStyle: (error, disabled) => ({
     flexDirection: 'row',
     width: '90%',
     backgroundColor: Colors.GREY1,
     paddingLeft: hp(2),
     backgroundColor: 'white',
     elevation: 3,
-    borderColor: error ? Colors.RED : Colors.GREY,
+    borderColor: disabled ? Colors.PRIMARY : error ? Colors.RED : Colors.GREY,
     borderRadius: hp(1),
     borderWidth: hp(0.2),
   }),

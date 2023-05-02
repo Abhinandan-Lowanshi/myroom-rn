@@ -22,5 +22,7 @@ const EndPoints = {
   toFavorite: 'toFavorite',
   favoriteList: 'favoriteList',
   addRoom: 'addRoom',
+  chatUserList: 'chatUserList',
+  chatList: 'chatList',
 };
 export default EndPoints;

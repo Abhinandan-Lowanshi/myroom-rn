@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import Colors from '../common/Colors';
 import {hp} from '../common/CommonFunctions';
 
-const Header = ({label, navigation, container, hideBack}) => {
+const Header = ({label, navigation, container, hideBack, RightIcon}) => {
   return (
     <View style={[style.container, container]}>
       {!hideBack && (
@@ -23,6 +23,7 @@ const Header = ({label, navigation, container, hideBack}) => {
       )}
       <Text style={style.labelSignUp}>{label}</Text>
       <Text style={{color: Colors.WHITE}}>kkkk</Text>
+      {RightIcon && <RightIcon />}
     </View>
   );
 };

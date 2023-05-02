@@ -37,7 +37,7 @@ import Toast from 'react-native-simple-toast';
 import images from '../common/images';
 import ScreenName from '../common/ScreenName';
 
-const DetailsScreen = props => {
+const RoomDetailsOwner = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -334,7 +334,7 @@ const DetailsScreen = props => {
       <TouchableOpacity
         style={style.ownerView}
         onPress={viewProfile}
-        disabled={disabled || props?.route?.params?.isFrom === 'MyPost'}>
+        disabled={true}>
         <Image style={style.ownerImage} source={images.profileIcon}></Image>
         <View style={style.ownerNameContainer}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
@@ -411,16 +411,16 @@ const DetailsScreen = props => {
               style={{
                 marginTop: 20,
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-end',
               }}>
-              <ContentHeader
+              {/* <ContentHeader
                 label={labels.ListingAgent}
                 headerContainer={{marginTop: 0}}
-              />
+              /> */}
               <Text style={style.labelRent}>{`\u20B9${item?.rm_rent}`}</Text>
             </View>
 
-            {ownerDetails()}
+            {/* {ownerDetails()} */}
             {/* {viewProfile()} */}
             <ContentHeader label={labels.Specification} />
             <View style={style.contantConatainer2}>
@@ -521,7 +521,7 @@ const DetailsScreen = props => {
   );
 };
 
-export default DetailsScreen;
+export default RoomDetailsOwner;
 const style = StyleSheet.create({
   headerContainer: {
     alignSelf: 'flex-start',

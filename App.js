@@ -24,6 +24,8 @@ import GetLocationByMap from './src/component/GetLocationByMap';
 import AppSettings from './src/screen/AppSettings';
 import Fav from './src/screen/Fav';
 import Chat from './src/screen/Chat/Chat';
+import UserProfile from './src/screen/Chat/UserProfile';
+import RoomDetailsOwner from './src/screen/RoomDetailsOwner';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -42,6 +44,11 @@ const App = () => {
           <Stack.Screen name={ScreenName.Fav} component={Fav} />
           <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
           <Stack.Screen name={ScreenName.Chat} component={Chat} />
+          <Stack.Screen name={ScreenName.UserProfile} component={UserProfile} />
+          <Stack.Screen
+            name={ScreenName.RoomDetailsOwner}
+            component={RoomDetailsOwner}
+          />
           <Stack.Screen
             name={ScreenName.ForgotPassword}
             component={ForgotPassword}
