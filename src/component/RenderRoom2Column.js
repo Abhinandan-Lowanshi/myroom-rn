@@ -195,7 +195,7 @@ export default RenderRoom2Column;
 
 const style = StyleSheet.create({
   container: {
-    width: '49%',
+    flex: 1,
     backgroundColor: Colors.WHITE,
     marginTop: hp(0.5),
     flexDirection: 'column',
