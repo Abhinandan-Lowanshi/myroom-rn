@@ -26,7 +26,7 @@ import ScreenName from '../../common/ScreenName';
 
 const Chat = props => {
   const {navigation} = props;
-  const {item} = props?.route?.params;
+  const {item, fromProfile} = props?.route?.params;
   const [passwordSend, setpasswordSend] = useState(false);
   const [user, setUser] = useState('');
   const [height, setHeight] = useState(hp(5.5));
@@ -197,7 +197,11 @@ const Chat = props => {
   };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
-      <Header label={item?.usr_first_name} navigation={navigation} />
+      <Header
+        label={item?.usr_first_name}
+        navigation={navigation}
+        RightIcon={!fromProfile ? rightIcon : null}
+      />
       <View style={style.container}>
         {true && (
           <>

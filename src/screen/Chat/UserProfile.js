@@ -86,7 +86,7 @@ const UserProfile = props => {
         user_id: item?.rm_usr_fkey,
         usr_first_name: item?.rm_own_Fullname,
       };
-      navigation.navigate(ScreenName.Chat, {item: ob});
+      navigation.navigate(ScreenName.Chat, {item: ob, fromProfile: true});
     }
   };
 
@@ -247,5 +247,5 @@ const style = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
   },
-  ownerContainer: {},
+  ownerContainer: {marginBottom: hp(3)},
 });
