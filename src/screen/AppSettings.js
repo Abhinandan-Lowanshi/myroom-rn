@@ -11,8 +11,8 @@ import Colors from '../common/Colors';
 import {RF, hp} from '../common/CommonFunctions';
 import C_Button from '../component/C_Button';
 import Toast from 'react-native-simple-toast';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-
+import {setCurrentLocationName, setLocation} from '../redux/Slice';
+import {useSelector, useDispatch} from 'react-redux';
 import {useState} from 'react';
 import Labels from '../common/labels';
 const AppSettings = props => {
@@ -22,6 +22,7 @@ const AppSettings = props => {
   const [address, setAddress] = useState('');
   const [rowData, setRowData] = useState('');
   const isHideBack = props?.route?.params?.isHideBack;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
@@ -33,17 +34,57 @@ const AppSettings = props => {
   }, []);
 
   const onSearch = value => {
+    console.log(value, 'value');
     setAddress(value?.formatted_address);
+
     setRowData(value);
     setSave(false);
   };
 
   const saveLocation = () => {
-    if (rowData !== '') {
-      localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
-      setSave(true);
+    if (isHideBack) {
+      if (rowData !== '') {
+        localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
+        setSave(true);
+        dispatch(
+          setCurrentLocationName({
+            locationName: rowData?.formatted_address,
+          }),
+        );
+        let Ob = {
+          latitude: rowData?.geometry?.location?.lat,
+          longitude: rowData?.geometry?.location?.lng,
+        };
+        dispatch(setLocation(Ob));
+      } else {
+        Toast.show('Please select location', Toast.LONG);
+      }
     } else {
-      Toast.show('Please select location', Toast.LONG);
+      if (save) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: ScreenName.Splash}],
+          }),
+        );
+      } else {
+        if (rowData !== '') {
+          localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
+          setSave(true);
+          dispatch(
+            setCurrentLocationName({
+              locationName: rowData?.formatted_address,
+            }),
+          );
+          let Ob = {
+            latitude: rowData?.geometry?.location?.lat,
+            longitude: rowData?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+        } else {
+          Toast.show('Please select location', Toast.LONG);
+        }
+      }
     }
   };
 
@@ -58,52 +99,10 @@ const AppSettings = props => {
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header
-        label={Labels?.AppSettings}
-        hideBack={isHideBack}
+        label={Labels?.defaultLocation}
+        hideBack={!isHideBack}
         navigation={navigation}></Header>
 
-      {/* <GooglePlacesAutocomplete
-        // style={[style.containerPlaceHolder]}
-        onFail={error => {}}
-        onTimeout={error => {}}
-        textInputProps={{
-          placeholderTextColor: Colors.BLACK,
-          returnKeyType: 'search',
-        }}
-        keepResultsAfterBlur={true}
-        keyboardShouldPersistTaps={'always'}
-        styles={{
-          textInputContainer: {},
-          textInput: {
-            height: hp(6),
-            color: Colors.BLACK,
-            fontSize: 16,
-            elevation: hp(2),
-            borderColor: Colors.GREY,
-            borderWidth: hp(0.25),
-            borderRadius: hp(1),
-            marginHorizontal: hp(1),
-            marginTop: hp(1),
-          },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          },
-          description: {color: Colors.BLACK},
-        }}
-        placeholder="Search location"
-        fetchDetails={true}
-        onPress={(data, details = null) => {
-          // props?.onSearch(details);
-          // setLocation(details?.geometry?.location);
-          // getRooms(details?.geometry?.location);
-          // handleRecent(details);
-        }}
-        getCurrentLocation={data => {}}
-        query={{
-          key: 'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
-          language: 'en',
-        }}
-      /> */}
       <GooglePlacesInput
         containerPlaceHolder={style.containerPlaceHolder}
         onSearch={onSearch}
@@ -122,37 +121,15 @@ const AppSettings = props => {
         <Text style={style.labelLocation}>
           {address || '- - - - - - - - - - - - - - - - -'}
         </Text>
-        {/* <View style={style.containerSwitch}>
-          <Text style={style.labelNotification}>
-            Move notification to default location
-          </Text>
-          <Switch
-            trackColor={{false: '#767577', true: Colors.PRIMARYLITE1}}
-            thumbColor={switchFocus ? Colors.PRIMARYLITE : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={handleSwitch}
-            value={switchFocus}
-          />
-        </View> */}
 
         <C_Button
           onPress={saveLocation}
           outerContainer={style.outerContainer}
           isSubmitDisabled={rowData == '' ? true : false}
-          label={'Save Address'}
+          label={
+            isHideBack ? 'Save Location' : save ? 'Continue' : 'Save Location'
+          }
         />
-        {isHideBack && (
-          <View style={style.containerHome}>
-            <TouchableOpacity onPress={goToHome}>
-              <MaterialCommunityIcons
-                name={'home-circle-outline'}
-                size={hp(5)}
-                color={Colors.PRIMARY}
-              />
-            </TouchableOpacity>
-            <Text style={style.labelHome}>Back to home</Text>
-          </View>
-        )}
       </View>
     </View>
   );

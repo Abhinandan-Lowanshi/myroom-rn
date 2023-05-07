@@ -145,7 +145,7 @@ const MyAccount = ({navigation}) => {
           label={'App Settings'}
           type={ScreenName.Settings}
           onPress={() => {
-            navigation.navigate(ScreenName.AppSettings);
+            navigation.navigate(ScreenName.AppSettings, {isHideBack: true});
           }}
         />
         <AccountTouchableCom label={'Contact Us'} type={ScreenName.ContactUs} />

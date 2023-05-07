@@ -3,35 +3,18 @@ import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Colors from '../common/Colors';
 import {hp, RF} from '../common/CommonFunctions';
 import C_Button from './C_Button';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import {useEffect} from 'react';
 
-const DeleteConformation = ({
-  labelTop,
+const GPSDialogue = ({
   visible,
-  onPressNegative,
-  onPressPositive,
-  warningMessage,
-  confirmationMessage,
-  confirmationMessageHigh,
-  undoMessage,
-  labelPositive,
-  labelNegative,
+  useDefaultLocation,
+  handleOpenSettings,
   closeModal,
-  isLoading,
-  error,
 }) => {
-  const [close, setClose] = useState(true);
-  // // setClose(visible);
-  // const closeModal1 = () => {
-  //   setClose(false);
-  // };
   return (
     <Modal
       backdropOpacity={0.3}
       activeOpacity={0.9}
-      // backdropOpacity={1}
       transparent={true}
       style={{
         flex: 1,
@@ -39,66 +22,43 @@ const DeleteConformation = ({
         alignItems: 'center',
         activeOpacity: 0.3,
         backdropOpacity: 0.2,
-        // backgroundColor: 'red',
         backgroundColor: 'rgba(0,0,0,0.5)',
       }}
       visible={visible}>
       <View style={style.lowOpacity}></View>
       <View style={style.container}>
-        <TouchableOpacity disabled={isLoading} onPress={closeModal}>
-          <MaterialCommunityIcons
-            style={style.closeIcon}
-            name={'close'}
-            size={hp(3)}
-            color={Colors.GREY}
-          />
-        </TouchableOpacity>
-        <Text style={style.deleteLabel}>{labelTop || 'Delete Post?'}</Text>
+        <Text style={style.deleteLabel}>
+          {'GPS service is not available or Permission denied'}
+        </Text>
         <View style={style.container2}>
-          {confirmationMessage && (
-            <Text style={style.label2}>{confirmationMessage}</Text>
-          )}
-          {confirmationMessageHigh && (
-            <Text style={style.label3}>{confirmationMessageHigh}</Text>
-          )}
+          <Text style={style.label2}>
+            {
+              'Use default location when GPS service is not available or turn on GPS'
+            }
+          </Text>
         </View>
-        <Text style={style.label2}>{undoMessage}</Text>
-        {warningMessage && (
-          <View style={style.containerWarning}>
-            <View style={style.line}></View>
-            <Ionicons
-              style={style.warningIcon}
-              name={'warning'}
-              size={hp(3)}
-              color={'#eb1e29'}
-            />
-            <View style={style.warningMessageContainer}>
-              <Text style={style.warningLabel}>Warning</Text>
-              <Text style={style.warningMessage}>{warningMessage}</Text>
-            </View>
-          </View>
-        )}
-        <Text style={style.errorlabel}>{error}</Text>
         <View style={style.containerButtonLayout}>
           <C_Button
-            isSubmitDisabled={isLoading}
-            outerContainer={style.cancelButton(isLoading)}
-            onPress={onPressNegative}
-            label={labelNegative || 'No'}
+            outerContainer={style.cancelButton(false)}
+            onPress={handleOpenSettings}
+            label={'Go to settings'}
           />
           <C_Button
-            isSubmitDisabled={isLoading}
-            isLoading={isLoading}
             outerContainer={style.deleteButton}
-            onPress={onPressPositive}
-            label={error ? 'Retry' : labelPositive || 'Yes'}
+            onPress={useDefaultLocation}
+            label={'Default location'}
           />
         </View>
+        <C_Button
+          outerContainer={style.exitButton}
+          onPress={handleOpenSettings}
+          label={'Close App'}
+        />
       </View>
     </Modal>
   );
 };
-export default DeleteConformation;
+export default GPSDialogue;
 
 const style = StyleSheet.create({
   outerContainer: {
@@ -125,6 +85,9 @@ const style = StyleSheet.create({
     fontSize: RF(2.2),
     fontWeight: '600',
     color: Colors.BLACK1,
+    marginTop: hp(2),
+    marginHorizontal: hp(2),
+    textAlign: 'center',
   },
   containerWarning: {
     flexDirection: 'row',
@@ -143,6 +106,8 @@ const style = StyleSheet.create({
     alignSelf: 'center',
     fontSize: RF(1.8),
     fontWeight: '600',
+    marginHorizontal: hp(3),
+    textAlign: 'center',
   },
   label3: {
     alignSelf: 'center',
@@ -180,9 +145,9 @@ const style = StyleSheet.create({
   containerButtonLayout: {
     justifyContent: 'space-around',
     flexDirection: 'row',
-    marginHorizontal: hp(6),
-    marginTop: hp(2),
-    marginBottom: hp(3),
+    marginHorizontal: hp(2),
+    marginTop: hp(1),
+    marginBottom: hp(1),
   },
   cancelButton: isLoading => ({
     flex: 1,
@@ -194,7 +159,7 @@ const style = StyleSheet.create({
     flex: 1,
     borderRadius: hp(1),
     marginLeft: hp(1),
-    backgroundColor: Colors.RED,
+    backgroundColor: Colors.BLUE,
   },
   errorlabel: {
     alignSelf: 'center',
@@ -208,5 +173,11 @@ const style = StyleSheet.create({
     backgroundColor: 'grey',
     opacity: 0.5,
     position: 'absolute',
+  },
+  exitButton: {
+    borderRadius: hp(1),
+    marginLeft: hp(1),
+    backgroundColor: Colors.RED,
+    marginBottom: hp(3),
   },
 });

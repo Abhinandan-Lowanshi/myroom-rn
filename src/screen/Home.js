@@ -8,10 +8,18 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
+  PermissionsAndroid,
+  Linking,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
-import {startL, updateHome} from '../redux/Slice';
+import {
+  startL,
+  updateHome,
+  setLocation,
+  setCurrentLocationName,
+} from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
@@ -40,14 +48,15 @@ import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import localStorageOp from '../localStorage/LocalData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
+import Geolocation from '@react-native-community/geolocation';
+import GPSDialogue from '../component/GPSDialogue';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [userInfo, setUserInfo] = useState('');
   const [loading, setLoading] = useState(false);
-  // const [filteredData, setFilteredData] = useState([]);
+  const [visible, setVisible] = useState(false);
   const [filterList, setFilterList] = useState(filterDataAll);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
@@ -60,8 +69,12 @@ const Home = ({route, navigation}) => {
   );
   const accountData = useSelector(state => state.AllData.accountData);
   const dispatch = useDispatch();
-  let counter = 10;
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    console.log('requestLocationPermission');
+    requestLocationPermission();
+  }, []);
 
   useEffect(() => {
     if (searchUpdate) {
@@ -95,6 +108,84 @@ const Home = ({route, navigation}) => {
       'Non-serializable values were found in the navigation state',
     ]);
   }, []);
+
+  const getAddressFromCoordinates = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+          latitude +
+          ',' +
+          longitude +
+          '&key=' +
+          'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+      )
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.status === 'OK') {
+            dispatch(
+              setCurrentLocationName({
+                locationName: responseJson?.results?.[0]?.formatted_address,
+              }),
+            );
+            resolve(responseJson?.results?.[0]?.formatted_address);
+          } else {
+            reject('not found');
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  };
+
+  const getOneTimeLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        dispatch(setLocation(position.coords));
+        getAddressFromCoordinates(
+          position.coords?.latitude,
+          position.coords?.longitude,
+        );
+      },
+      error => {
+        setVisible(true);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000,
+      },
+    );
+  };
+
+  const handleOpenSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'ios') {
+      getOneTimeLocation();
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message: 'This App needs to Access your location',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getOneTimeLocation();
+        } else {
+          setVisible(true);
+        }
+      } catch (err) {}
+    }
+  };
 
   const calculateRoomCount = (filter, rooms) => {
     let temp = getRoomCount(filter, rooms);
@@ -193,10 +284,10 @@ const Home = ({route, navigation}) => {
       sendRequest(
         {
           user_id: 'Dummy',
-          latitude: 22.7196,
-          longitude: 75.8577,
-          // latitude: data.latitude,
-          // longitude: data.longitude,
+          // latitude: 22.7196,
+          // longitude: 75.8577,
+          latitude: data.latitude,
+          longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -208,10 +299,12 @@ const Home = ({route, navigation}) => {
           dispatch(startL(false));
           if (res.status === true) {
             if (res.data.length > 0) {
-              dispatch(setRoomDataHome(prepareData(res?.data)));
               calculateRoomCount(filterDataAll, res?.data);
+              dispatch(setRoomDataHome(prepareData(res?.data)));
               dispatch(setFilteredData(res?.data));
             } else {
+              dispatch(setRoomDataHome([]));
+              dispatch(setFilteredData([]));
               setError({
                 error:
                   'No rooms find at your location \n You can also search nearby rooms by Area name ',
@@ -220,6 +313,8 @@ const Home = ({route, navigation}) => {
               setIsFailed(true);
             }
           } else {
+            dispatch(setRoomDataHome([]));
+            dispatch(setFilteredData([]));
             setIsFailed(true);
             setError({
               error: res.message,
@@ -232,6 +327,8 @@ const Home = ({route, navigation}) => {
           setIsFailed(true);
           setRefreshing(false);
           dispatch(startL(false));
+          dispatch(setRoomDataHome([]));
+          dispatch(setFilteredData([]));
           setError({
             error: '',
             header: '',
@@ -322,6 +419,24 @@ const Home = ({route, navigation}) => {
     navigation.navigate(ScreenName.MoreRooms);
   };
 
+  const handleDefault = () => {
+    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+      .then(value => {
+        console.log(value);
+        let Ob = {
+          latitude: value?.geometry?.location?.lat,
+          longitude: value?.geometry?.location?.lng,
+        };
+        dispatch(setLocation(Ob));
+        dispatch(
+          setCurrentLocationName({
+            locationName: value?.formatted_address,
+          }),
+        );
+        setVisible(false);
+      })
+      .catch(() => {});
+  };
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -329,7 +444,19 @@ const Home = ({route, navigation}) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      {getLocation()}
+      <GPSDialogue
+        labelTop={'Your GPS seems to disabled?'}
+        labelPositive={'Turn on GPS'}
+        labelNegative={'default location'}
+        visible={visible}
+        confirmationMessage={'Are you want to use default location Now'}
+        // confirmationMessageHigh={'logout?'}
+        handleOpenSettings={handleOpenSettings}
+        closeModal={() => {
+          // setError('');
+        }}
+        useDefaultLocation={handleDefault}
+      />
       <View style={style.locationNameContainer}>
         <View style={style.innerContainerName}>
           <MaterialIcons
@@ -355,7 +482,7 @@ const Home = ({route, navigation}) => {
           gotoSearch();
         }}
       />
-      {filteredData?.length > 0 ? (
+      {filteredData?.length > 0 && !isFailed ? (
         <FlatList
           horizontal
           data={filterList}
