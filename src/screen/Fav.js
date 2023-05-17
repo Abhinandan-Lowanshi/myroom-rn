@@ -132,7 +132,7 @@ const Fav = ({navigation, route}) => {
         <LowOpacityLoader />
       ) : favList?.length > 0 ? (
         <RenderRoom
-          flat={style.container}
+          container={style.container}
           myRoomList={favList}
           onPress={onPressRoom}
           onPressFav={onPressFav}
@@ -152,7 +152,8 @@ export default Fav;
 
 const style = StyleSheet.create({
   container: {
-    marginHorizontal: hp(1),
+    flex: 1,
+    marginHorizontal: hp(0.5),
   },
   containerNoData: {
     flex: 1,

@@ -77,7 +77,7 @@ const Search = ({navigation}) => {
             setRoomData(res?.data);
             if (res.data?.length > 0) {
             } else {
-              setMessage('No room at your searched location');
+              setMessage('No room found');
               setActualData({});
             }
           } else {
@@ -642,7 +642,8 @@ const style = StyleSheet.create({
     height: hp(5),
   },
   flat: {
-    height: '89%',
+    height: '85%',
     marginHorizontal: hp(1),
+    marginTop: hp(1),
   },
 });
