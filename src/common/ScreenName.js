@@ -35,4 +35,5 @@ export default Screen = {
   ChatList: 'ChatList',
   UserProfile: 'UserProfile',
   RoomDetailsOwner: 'RoomDetailsOwner',
+  MoreRooms: 'MoreRooms',
 };

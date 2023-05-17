@@ -1,5 +1,16 @@
 import React, {useEffect} from 'react';
-import {Text, View, StyleSheet, Switch, TouchableOpacity} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  BackHandler,
+  TouchableOpacity,
+  FlatList,
+  Linking,
+  Platform,
+  ActivityIndicator,
+  PermissionsAndroid,
+} from 'react-native';
 import ScreenName from '../common/ScreenName';
 import StyleGlobel from '../Style/StyleGlobel';
 import localStorageOp from '../localStorage/LocalData';
@@ -11,44 +22,329 @@ import Colors from '../common/Colors';
 import {RF, hp} from '../common/CommonFunctions';
 import C_Button from '../component/C_Button';
 import Toast from 'react-native-simple-toast';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
-
+import {
+  setCurrentLocationName,
+  setLocation,
+  setLocationMode,
+} from '../redux/Slice';
+import {useSelector, useDispatch} from 'react-redux';
 import {useState} from 'react';
 import Labels from '../common/labels';
+import Geolocation from '@react-native-community/geolocation';
+import GPSDialogue from '../component/GPSDialogue';
+import Icon from 'react-native-vector-icons/dist/Entypo';
+
 const AppSettings = props => {
   const {navigation} = props;
   const [save, setSave] = useState(false);
   const [switchFocus, setSwitchFocus] = useState(false);
   const [address, setAddress] = useState('');
+  const currentLocationName = useSelector(
+    state => state.AllData.currentLocationName,
+  );
   const [rowData, setRowData] = useState('');
   const isHideBack = props?.route?.params?.isHideBack;
-
+  const dispatch = useDispatch();
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [buttonData, setButtonData] = useState([
+    {
+      id: '1',
+      label: 'Current Location',
+      isChecked: true,
+    },
+    {
+      id: '2',
+      label: 'Default Location',
+      isChecked: false,
+    },
+  ]);
   useEffect(() => {
     localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
       .then(value => {
-        setAddress(value?.formatted_address);
-        setSave(true);
+        if (value) {
+          setAddress(value?.formatted_address);
+          setSave(true);
+        }
+      })
+      .catch(() => {});
+
+    localStorageOp('', AsyncKeys.LOCATION_MODE, '')
+      .then(value => {
+        if (value) {
+          if (value.mode === AsyncKeys.DEFAULT) {
+            changLocationList(buttonData[1]);
+          } else {
+            changLocationList(buttonData[0]);
+          }
+        } else {
+          changLocationList(buttonData[0]);
+        }
       })
       .catch(() => {});
   }, []);
 
   const onSearch = value => {
+    console.log(value, 'value');
     setAddress(value?.formatted_address);
+
     setRowData(value);
     setSave(false);
   };
 
   const saveLocation = () => {
-    if (rowData !== '') {
-      localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
-      setSave(true);
+    if (isHideBack) {
+      if (rowData !== '') {
+        localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
+        setSave(true);
+        dispatch(
+          setCurrentLocationName({
+            locationName: rowData?.formatted_address,
+          }),
+        );
+        let Ob = {
+          latitude: rowData?.geometry?.location?.lat,
+          longitude: rowData?.geometry?.location?.lng,
+        };
+        dispatch(setLocation(Ob));
+      } else {
+        showToast('Please select location');
+      }
     } else {
-      Toast.show('Please select location', Toast.LONG);
+      if (save) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: ScreenName.Splash}],
+          }),
+        );
+      } else {
+        if (rowData !== '') {
+          localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, rowData);
+          setSave(true);
+          dispatch(
+            setCurrentLocationName({
+              locationName: rowData?.formatted_address,
+            }),
+          );
+          let Ob = {
+            latitude: rowData?.geometry?.location?.lat,
+            longitude: rowData?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+        } else {
+          showToast('Please select location');
+        }
+      }
     }
   };
 
   const handleSwitch = value => {
     setSwitchFocus(value);
+  };
+
+  const onPressItem = item => {
+    if (item?.id === '1') {
+      setLoading(true);
+      requestLocationPermission(item);
+    } else {
+      if (save) {
+        localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+          .then(value => {
+            if (value) {
+              let Ob = {
+                latitude: value?.geometry?.location?.lat,
+                longitude: value?.geometry?.location?.lng,
+              };
+              dispatch(setLocation(Ob));
+              dispatch(
+                setCurrentLocationName({
+                  locationName: value?.formatted_address,
+                }),
+              );
+            }
+            changeLocationMode(item, AsyncKeys.DEFAULT);
+          })
+          .catch(() => {
+            return false;
+          });
+      } else {
+        showToast('Please save default location first');
+      }
+    }
+  };
+
+  const changeLocationMode = (item, mode) => {
+    let data = {
+      mode: mode,
+    };
+    localStorageOp(true, AsyncKeys.LOCATION_MODE, data);
+    changLocationList(item);
+  };
+
+  const requestLocationPermission = async item => {
+    console.log('requestLocationPermission 140');
+    if (Platform.OS === 'ios') {
+      getOneTimeLocation(item);
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message: 'This App needs to Access your location',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getOneTimeLocation(item);
+        } else {
+          setVisible(true);
+          setLoading(false);
+        }
+      } catch (err) {
+        setVisible(true);
+        setLoading(false);
+      }
+    }
+  };
+
+  const getOneTimeLocation = item => {
+    console.log('getOneTimeLocation');
+    Geolocation.getCurrentPosition(
+      position => {
+        setLoading(false);
+        changeLocationMode(item, AsyncKeys.CUSTOM);
+        dispatch(setLocation(position.coords));
+        getAddressFromCoordinates(
+          position.coords?.latitude,
+          position.coords?.longitude,
+        );
+      },
+      error => {
+        setVisible(true);
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000,
+      },
+    );
+  };
+
+  const getAddressFromCoordinates = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+          latitude +
+          ',' +
+          longitude +
+          '&key=' +
+          'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+      )
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.status === 'OK') {
+            dispatch(
+              setCurrentLocationName({
+                locationName: responseJson?.results?.[0]?.formatted_address,
+              }),
+            );
+            resolve(responseJson?.results?.[0]?.formatted_address);
+          } else {
+            reject('not found');
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
+  const changLocationList = item => {
+    let temp = JSON.parse(JSON.stringify(buttonData));
+    temp.map(value => {
+      return (value.isChecked = value?.id === item?.id ? true : false);
+    });
+    console.log('temp', temp);
+    dispatch(
+      setLocationMode({locationMode: item?.id === '1' ? 'Live' : 'Default'}),
+    );
+
+    setButtonData(temp);
+  };
+
+  const handleOpenSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
+  const renderHomeIcon = () => {
+    return (
+      <TouchableOpacity style={style.buttonHome}>
+        <Icon name={'home'} size={hp(5)} color={Colors.PRIMARY} />
+        <Text style={style.labelHome}>Home</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderItem = ({item}) => {
+    return (
+      <TouchableOpacity
+        style={style.buttonContainer}
+        onPress={() => onPressItem(item)}>
+        <View
+          style={{
+            backgroundColor: item.isChecked ? Colors.PRIMARYLITE1 : 'white',
+            height: hp(2.5),
+            width: hp(2.5),
+            borderRadius: hp(90),
+            borderWidth: hp(0.3),
+            borderColor: Colors.PRIMARY,
+            alignSelf: 'center',
+          }}
+        />
+        <Text
+          style={{
+            color: item.isChecked ? Colors.PRIMARYDARK : 'black',
+            marginLeft: hp(1),
+            alignSelf: 'center',
+            fontSize: RF(1.8),
+          }}>
+          {item?.label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const handleDefault = () => {
+    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+      .then(value => {
+        if (value) {
+          let Ob = {
+            latitude: value?.geometry?.location?.lat,
+            longitude: value?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+          dispatch(
+            setCurrentLocationName({
+              locationName: value?.formatted_address,
+            }),
+          );
+          setVisible(false);
+        } else {
+          showToast('Please Select default location first');
+          setVisible(false);
+        }
+      })
+      .catch(() => {});
   };
 
   const goToHome = () => {
@@ -58,55 +354,35 @@ const AppSettings = props => {
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header
-        label={Labels?.AppSettings}
-        hideBack={isHideBack}
+        label={Labels?.defaultLocation}
+        hideBack={!isHideBack}
         navigation={navigation}></Header>
 
-      {/* <GooglePlacesAutocomplete
-        // style={[style.containerPlaceHolder]}
-        onFail={error => {}}
-        onTimeout={error => {}}
-        textInputProps={{
-          placeholderTextColor: Colors.BLACK,
-          returnKeyType: 'search',
-        }}
-        keepResultsAfterBlur={true}
-        keyboardShouldPersistTaps={'always'}
-        styles={{
-          textInputContainer: {},
-          textInput: {
-            height: hp(6),
-            color: Colors.BLACK,
-            fontSize: 16,
-            elevation: hp(2),
-            borderColor: Colors.GREY,
-            borderWidth: hp(0.25),
-            borderRadius: hp(1),
-            marginHorizontal: hp(1),
-            marginTop: hp(1),
-          },
-          predefinedPlacesDescription: {
-            color: '#1faadb',
-          },
-          description: {color: Colors.BLACK},
-        }}
-        placeholder="Search location"
-        fetchDetails={true}
-        onPress={(data, details = null) => {
-          // props?.onSearch(details);
-          // setLocation(details?.geometry?.location);
-          // getRooms(details?.geometry?.location);
-          // handleRecent(details);
-        }}
-        getCurrentLocation={data => {}}
-        query={{
-          key: 'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
-          language: 'en',
-        }}
-      /> */}
       <GooglePlacesInput
         containerPlaceHolder={style.containerPlaceHolder}
         onSearch={onSearch}
+      />
+      {loading && (
+        <View style={style.loader}>
+          <Text style={style.labelLocationText}>Getting Current Location</Text>
+          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+        </View>
+      )}
+      <GPSDialogue
+        labelTop={'Your GPS seems to disabled?'}
+        labelPositive={'Turn on GPS'}
+        labelNegative={'default location'}
+        visible={visible}
+        confirmationMessage={'Are you want to use default location Now'}
+        // confirmationMessageHigh={'logout?'}
+        handleOpenSettings={handleOpenSettings}
+        closeModal={() => {
+          setVisible(false);
+        }}
+        useDefaultLocation={handleDefault}
+        closeApp={() => {
+          BackHandler.exitApp();
+        }}
       />
 
       <View style={style.container}>
@@ -122,37 +398,29 @@ const AppSettings = props => {
         <Text style={style.labelLocation}>
           {address || '- - - - - - - - - - - - - - - - -'}
         </Text>
-        {/* <View style={style.containerSwitch}>
-          <Text style={style.labelNotification}>
-            Move notification to default location
-          </Text>
-          <Switch
-            trackColor={{false: '#767577', true: Colors.PRIMARYLITE1}}
-            thumbColor={switchFocus ? Colors.PRIMARYLITE : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={handleSwitch}
-            value={switchFocus}
-          />
-        </View> */}
 
         <C_Button
           onPress={saveLocation}
           outerContainer={style.outerContainer}
-          isSubmitDisabled={rowData == '' ? true : false}
-          label={'Save Address'}
+          // isSubmitDisabled={rowData == '' ? true : false}
+          label={
+            isHideBack ? 'Save Location' : save ? 'Go to home' : 'Save Location'
+          }
         />
-        {isHideBack && (
-          <View style={style.containerHome}>
-            <TouchableOpacity onPress={goToHome}>
-              <MaterialCommunityIcons
-                name={'home-circle-outline'}
-                size={hp(5)}
-                color={Colors.PRIMARY}
-              />
-            </TouchableOpacity>
-            <Text style={style.labelHome}>Back to home</Text>
-          </View>
-        )}
+        <Text style={style.labelDefaultLocation}>Active Location</Text>
+        <Text style={style.labelLocation}>
+          {currentLocationName?.locationName ||
+            '- - - - - - - - - - - - - - - - -'}
+        </Text>
+        <Text style={[style.labelDefaultLocation, {marginTop: hp(3)}]}>
+          Location Mode
+        </Text>
+        <FlatList
+          style={style.flatList}
+          data={buttonData}
+          renderItem={renderItem}
+        />
+        {/* {renderHomeIcon()} */}
       </View>
     </View>
   );
@@ -186,6 +454,7 @@ const style = StyleSheet.create({
   },
   outerContainer: {
     height: hp(5),
+    marginBottom: hp(3),
   },
   containerSave: {
     flexDirection: 'row',
@@ -224,5 +493,24 @@ const style = StyleSheet.create({
     color: Colors.BLACK,
     fontSize: RF(1.8),
     fontWeight: '600',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: hp(1.5),
+  },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  labelLocationText: {
+    color: Colors.BLACK,
+    fontSize: hp(2),
+    marginBottom: hp(2),
+  },
+  buttonHome: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: hp(5),
   },
 });

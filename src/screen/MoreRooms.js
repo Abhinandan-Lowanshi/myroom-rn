@@ -1,12 +1,10 @@
-import react, {useEffect, useState} from 'react';
+import react, {useState} from 'react';
 import {Text, View, StyleSheet} from 'react-native';
-import FullScreenLoader from '../component/FullScreenLoader';
 import RenderRoom from '../component/RenderRoom';
 import sendRequest from '../networking/ApiFunctions';
-import EndPoints from '../networking/EndPoints';
 import StyleGlobel from '../Style/StyleGlobel';
 import {useSelector, useDispatch} from 'react-redux';
-import {setFavData, updateHome, updateFav, startL} from '../redux/Slice';
+import {setFavData, setRoomDataHome, updateFav, startL} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
@@ -17,66 +15,29 @@ import Toast from 'react-native-simple-toast';
 import Header from '../component/Header';
 import Labels from '../common/labels';
 
-const Fav = ({navigation, route}) => {
+const MoreRooms = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
-  const favList = useSelector(state => state.AllData.favData);
-  const isHomeUpdate = useSelector(state => state.AllData.isHomeUpdate);
+  const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const dispatch = useDispatch();
-  const isFocused = useIsFocused();
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (isHomeUpdate) {
-      dispatch(startL(true));
-      getData();
-      dispatch(updateHome(false));
-    }
-  }, [isFocused]);
-
-  useEffect(() => {
-    setLoading(true);
-    getData();
-  }, []);
-  const onRefresh = () => {
-    setRefreshing(true);
-    getData();
-  };
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
       item,
       onPressFav,
     });
   };
-  const getData = () => {
-    sendRequest(
-      {
-        user_id: 'Dummy',
-      },
-      EndPoints.favoriteList,
-      'POST',
-    )
-      .then(res => {
-        setRefreshing(false);
-        setLoading(false);
-        dispatch(startL(false));
-        dispatch(updateHome(false));
-        dispatch(setFavData(res?.data));
-      })
-      .catch(err => {
-        dispatch(startL(false));
-        setLoading(false);
-        setRefreshing(false);
-      });
-  };
+
   const performFavOp = data => {
-    let temp = JSON.parse(JSON.stringify(favList));
+    let temp = JSON.parse(JSON.stringify(roomDataHome));
     temp.map(item => {
       if (item?.rm_pkey === data?.roomId) {
         return (item.favorite_key = data?.like);
       } else return item;
     });
-    dispatch(setFavData(temp));
+
+    dispatch(setRoomDataHome(temp));
   };
+
   const onPressFav = async value1 => {
     let value = {...value1};
     let data = {
@@ -93,8 +54,6 @@ const Fav = ({navigation, route}) => {
           response?.message === 'Room removed to favorite list successfully.' ||
           response?.message === 'Room added to favorite list successfully.'
         ) {
-          dispatch(updateHome(true));
-          dispatch(updateFav(true));
           return true;
         } else {
           // performFavOp(value);
@@ -127,17 +86,17 @@ const Fav = ({navigation, route}) => {
   };
   return (
     <View style={StyleGlobel.containerStyle}>
-      <Header label={Labels.Favourite} navigation={navigation} />
-      {loading ? (
+      <Header label={Labels.AllRooms} navigation={navigation} />
+      {false ? (
         <LowOpacityLoader />
-      ) : favList?.length > 0 ? (
+      ) : roomDataHome?.length > 0 ? (
         <RenderRoom
-          container={style.container}
-          myRoomList={favList}
+          flat={style.container}
+          myRoomList={roomDataHome}
           onPress={onPressRoom}
           onPressFav={onPressFav}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
+          //   refreshing={refreshing}
+          //   onRefresh={onRefresh}
         />
       ) : (
         <View style={style.containerNoData}>
@@ -148,12 +107,11 @@ const Fav = ({navigation, route}) => {
   );
 };
 
-export default Fav;
+export default MoreRooms;
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
-    marginHorizontal: hp(0.5),
+    marginHorizontal: hp(1),
   },
   containerNoData: {
     flex: 1,

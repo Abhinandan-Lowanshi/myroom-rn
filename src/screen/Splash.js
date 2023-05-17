@@ -10,22 +10,49 @@ import {useDispatch} from 'react-redux';
 const Splash = ({navigation}) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    setTimeout(() => {
-      localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
-        if (res?.data?.usr_id) {
-          dispatch(getAccountImfo(res));
-          console.log(res, 'navigation.navigate splash');
+    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+      .then(value => {
+        if (value) {
+          setTimeout(() => {
+            localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
+              if (res?.data?.usr_id) {
+                dispatch(getAccountImfo(res));
+                console.log(res, 'navigation.navigate splash');
 
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: ScreenName.TabComponent}],
+                  }),
+                );
+              } else {
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: ScreenName.Login}],
+                  }),
+                );
+              }
+            });
+          }, 2000);
+        } else {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{name: ScreenName.TabComponent}],
+              routes: [{name: ScreenName.AppSettings}],
             }),
           );
-        } else navigation.navigate(ScreenName.Login);
+        }
+      })
+      .catch(() => {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: ScreenName.AppSettings}],
+          }),
+        );
       });
-    }, 2000);
-  });
+  }, []);
   return (
     <View style={StyleGlobel.containerStyle}>
       <Text style={{fontSize: 20}}>Splash</Text>

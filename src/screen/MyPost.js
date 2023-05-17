@@ -135,7 +135,7 @@ const MyPost = ({navigation}) => {
       {loading && <LowOpacityLoader />}
 
       <RenderRoom
-        flat={style.container}
+        container={style.container}
         onPress={onPressRoom}
         myRoomList={myRoomList}
         isFromMyPost={true}
@@ -174,6 +174,7 @@ const MyPost = ({navigation}) => {
 export default MyPost;
 const style = StyleSheet.create({
   container: {
-    marginHorizontal: hp(1),
+    flex: 1,
+    marginHorizontal: hp(0.5),
   },
 });
