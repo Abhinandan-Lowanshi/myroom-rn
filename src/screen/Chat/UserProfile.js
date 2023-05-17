@@ -247,5 +247,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
   },
-  ownerContainer: {},
+  ownerContainer: {
+    marginBottom: hp(3),
+  },
 });

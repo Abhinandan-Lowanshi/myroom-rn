@@ -3,6 +3,8 @@ import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Colors from '../common/Colors';
 import {hp, RF} from '../common/CommonFunctions';
 import C_Button from './C_Button';
+import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
+
 import {useEffect} from 'react';
 
 const GPSDialogue = ({
@@ -10,6 +12,7 @@ const GPSDialogue = ({
   useDefaultLocation,
   handleOpenSettings,
   closeModal,
+  closeApp,
 }) => {
   return (
     <Modal
@@ -27,6 +30,11 @@ const GPSDialogue = ({
       visible={visible}>
       <View style={style.lowOpacity}></View>
       <View style={style.container}>
+        {closeModal && (
+          <TouchableOpacity onPress={closeModal} style={style.closeIcon}>
+            <MaterialIcons size={hp(3)} color={Colors.PRIMARY} name={'close'} />
+          </TouchableOpacity>
+        )}
         <Text style={style.deleteLabel}>
           {'GPS service is not available or Permission denied'}
         </Text>
@@ -51,7 +59,7 @@ const GPSDialogue = ({
         </View>
         <C_Button
           outerContainer={style.exitButton}
-          onPress={handleOpenSettings}
+          onPress={closeApp}
           label={'Close App'}
         />
       </View>

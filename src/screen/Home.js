@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
-  Image,
+  BackHandler,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,8 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
+  ActivityIndicator,
+  AppState,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
@@ -19,6 +20,7 @@ import {
   updateHome,
   setLocation,
   setCurrentLocationName,
+  setLocationMode,
 } from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
@@ -64,6 +66,8 @@ const Home = ({route, navigation}) => {
   const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const filteredData = useSelector(state => state.AllData.filteredData);
+  const LocationMode = useSelector(state => state.AllData.LocationMode);
+  console.log(LocationMode, 'LocationMode');
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
   );
@@ -72,10 +76,51 @@ const Home = ({route, navigation}) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    console.log('requestLocationPermission');
-    requestLocationPermission();
+    localStorageOp('', AsyncKeys.LOCATION_MODE, '')
+      .then(value => {
+        if (value) {
+          if (value.mode === AsyncKeys.DEFAULT) {
+            dispatch(setLocationMode({locationMode: 'Default'}));
+            localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+              .then(value => {
+                dispatch(
+                  setCurrentLocationName({
+                    locationName: value?.formatted_address,
+                  }),
+                );
+                let Ob = {
+                  latitude: value?.geometry?.location?.lat,
+                  longitude: value?.geometry?.location?.lng,
+                };
+                dispatch(setLocation(Ob));
+              })
+              .catch(() => {});
+          } else {
+            dispatch(setLocationMode({locationMode: 'Live'}));
+            requestLocationPermission();
+          }
+        } else {
+          dispatch(setLocationMode({locationMode: 'Live'})),
+            requestLocationPermission();
+        }
+      })
+      .catch(() => {});
   }, []);
 
+  // useEffect(() => {
+  //   AppState.addEventListener('change', handleChange);
+
+  //   return () => {
+  //     AppState.removeEventListener('change', handleChange);
+  //   };
+  // }, []);
+
+  const handleChange = value => {
+    if (value === 'active') {
+      setVisible(false);
+      requestLocationPermission();
+    }
+  };
   useEffect(() => {
     if (searchUpdate) {
       dispatch(startL(true));
@@ -148,7 +193,7 @@ const Home = ({route, navigation}) => {
         );
       },
       error => {
-        setVisible(true);
+        // setVisible(true);
       },
       {
         enableHighAccuracy: false,
@@ -181,7 +226,7 @@ const Home = ({route, navigation}) => {
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           getOneTimeLocation();
         } else {
-          setVisible(true);
+          // setVisible(true);
         }
       } catch (err) {}
     }
@@ -422,21 +467,31 @@ const Home = ({route, navigation}) => {
   const handleDefault = () => {
     localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
       .then(value => {
-        console.log(value);
-        let Ob = {
-          latitude: value?.geometry?.location?.lat,
-          longitude: value?.geometry?.location?.lng,
-        };
-        dispatch(setLocation(Ob));
-        dispatch(
-          setCurrentLocationName({
-            locationName: value?.formatted_address,
-          }),
-        );
-        setVisible(false);
+        if (value) {
+          let Ob = {
+            latitude: value?.geometry?.location?.lat,
+            longitude: value?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+          dispatch(
+            setCurrentLocationName({
+              locationName: value?.formatted_address,
+            }),
+          );
+          setVisible(false);
+        } else {
+          showToast('Set Default Location first');
+          dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.AppSettings}],
+            }),
+          );
+        }
       })
       .catch(() => {});
   };
+
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -452,10 +507,10 @@ const Home = ({route, navigation}) => {
         confirmationMessage={'Are you want to use default location Now'}
         // confirmationMessageHigh={'logout?'}
         handleOpenSettings={handleOpenSettings}
-        closeModal={() => {
-          // setError('');
-        }}
         useDefaultLocation={handleDefault}
+        closeApp={() => {
+          BackHandler.exitApp();
+        }}
       />
       <View style={style.locationNameContainer}>
         <View style={style.innerContainerName}>
@@ -469,9 +524,14 @@ const Home = ({route, navigation}) => {
             {`Welcome ${accountData?.data?.usr_firstName}`}
           </Text>
         </View>
-        <Text style={style.labelLocation}>
-          {currentLocationName?.locationName}
-        </Text>
+        <View style={style.containerLocationMode}>
+          <Text style={style.labelLocationMode}>
+            {LocationMode?.locationMode}
+          </Text>
+          <Text style={style.labelLocation}>
+            {currentLocationName?.locationName}
+          </Text>
+        </View>
       </View>
       <SliderView
         isFocused={isFocused}
@@ -482,17 +542,20 @@ const Home = ({route, navigation}) => {
           gotoSearch();
         }}
       />
-      {filteredData?.length > 0 && !isFailed ? (
+      {/* {filteredData?.length > 0 && !isFailed ? (
         <FlatList
           horizontal
           data={filterList}
           renderItem={filterRender}
           style={style.filterFlatlist}
         />
-      ) : null}
-      {false ? (
-        <LowOpacityLoader />
-      ) : isFailed ? (
+      ) : null} */}
+      {loading ? (
+        <View style={style.loader}>
+          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+        </View>
+      ) : // <LowOpacityLoader />
+      isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
         <View>
@@ -574,5 +637,21 @@ const style = StyleSheet.create({
   innerContainerName: {
     flexDirection: 'row',
     marginTop: hp(1),
+  },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  containerLocationMode: {
+    flexDirection: 'row',
+  },
+  labelLocationMode: {
+    backgroundColor: Colors.RED,
+    color: Colors.WHITE,
+    fontSize: RF(1.3),
+    paddingHorizontal: hp(1),
+    borderRadius: hp(0.5),
+    marginRight: hp(0.5),
   },
 });

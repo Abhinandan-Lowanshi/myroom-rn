@@ -151,7 +151,7 @@ const RenderRoom = ({
     );
   };
   return (
-    <View>
+    <View style={container || {paddingBottom: hp(2)}}>
       <FlatList
         style={flat || {width: '100%'}}
         refreshing={refreshing || false}
