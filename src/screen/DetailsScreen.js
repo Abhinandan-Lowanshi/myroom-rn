@@ -266,6 +266,7 @@ const DetailsScreen = props => {
       </TouchableOpacity>
     );
   };
+
   const IconButton_MaterialCommunityIcons = props => {
     return (
       <TouchableOpacity
@@ -302,7 +303,6 @@ const DetailsScreen = props => {
           label={labels?.fullAddress}
           labelAns={getFullAddress()}
         />
-
         <SpecificationDetails
           containerInside={style.containerAddress}
           labelANS={style.fullAddressStyle}
@@ -329,12 +329,14 @@ const DetailsScreen = props => {
       navigation.navigate(ScreenName.UserProfile);
     }
   };
+
   const ownerDetails = () => {
     return (
       <TouchableOpacity
         style={style.ownerView}
         onPress={viewProfile}
-        disabled={disabled || props?.route?.params?.isFrom === 'MyPost'}>
+        // disabled={disabled || props?.route?.params?.isFrom === 'MyPost'}>
+        disabled={true}>
         <Image style={style.ownerImage} source={images.profileIcon}></Image>
         <View style={style.ownerNameContainer}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
