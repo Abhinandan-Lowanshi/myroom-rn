@@ -26,6 +26,7 @@ import Fav from './src/screen/Fav';
 import Chat from './src/screen/Chat/Chat';
 import UserProfile from './src/screen/Chat/UserProfile';
 import RoomDetailsOwner from './src/screen/RoomDetailsOwner';
+import MoreRooms from './src/screen/MoreRooms';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
           <Stack.Screen name={ScreenName.SignUp} component={SignUp} />
           <Stack.Screen name={ScreenName.EmailVerify} component={EmailVerify} />
           <Stack.Screen name={ScreenName.Fav} component={Fav} />
+          <Stack.Screen name={ScreenName.MoreRooms} component={MoreRooms} />
           <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
           <Stack.Screen name={ScreenName.Chat} component={Chat} />
           <Stack.Screen name={ScreenName.UserProfile} component={UserProfile} />

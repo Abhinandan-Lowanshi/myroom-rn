@@ -1,24 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useRef} from 'react';
 import {
-  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
-  ToastAndroid,
+  ActivityIndicator,
   TouchableOpacity,
   View,
 } from 'react-native';
-import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
-import {
-  getAllMyRooms,
-  setFavData,
-  startL,
-  UpdateFavData,
-  updateHome,
-  updateFav,
-  setRoomDataHome,
-} from '../redux/Slice';
+import {setRoomDataHome} from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
@@ -45,11 +35,17 @@ const MapSearch = ({route, navigation}) => {
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [locationData, setLocationData] = useState({});
-
+  const map = useRef();
+  console.log(data, 'Map Search');
   useEffect(() => {
     setRoomDataHomeTP(prepareData(roomDataHomeTemp));
-    setSelectedRoom(roomDataHomeTP[0]);
+
+    console.log('setSelectedRoom');
   }, [roomDataHomeTemp]);
+
+  useEffect(() => {
+    changeRegion();
+  }, [data]);
 
   const prepareData = data => {
     let temp = [];
@@ -244,6 +240,98 @@ const MapSearch = ({route, navigation}) => {
     return locationData;
   };
 
+  const changeRegion = () => {
+    let r = {
+      latitude: parseFloat(data ? data?.latitude : 0.0),
+      longitude: parseFloat(data ? data?.longitude : 0.0),
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+    map?.current?.animateToRegion(r, 2000);
+  };
+
+  const renderMap = useCallback(() => {
+    return (
+      <MapView
+        ref={map}
+        style={style.map}
+        initialRegion={{
+          // latitude: 22.7658,
+          // longitude: 75.8705,
+          // latitude: data ? data?.latitude : 0.0,
+          // longitude: data ? data?.longitude : 0.0,
+          latitude: parseFloat(data ? data?.latitude : 0.0),
+          longitude: parseFloat(data ? data?.longitude : 0.0),
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        }}>
+        {roomDataHomeTP[0] || selectedRoom ? (
+          <MapViewDirections
+            onReady={item => {
+              setLocationData(item?.legs[0]);
+            }}
+            optimizeWaypoints={true}
+            splitWaypoints={true}
+            // origin={{
+            //   latitude: 22.7658,
+            //   longitude: 75.8705,
+            // }}
+            origin={{
+              latitude: data?.latitude,
+              longitude: data?.longitude,
+            }}
+            destination={setDestination(
+              selectedRoom === null ? roomDataHomeTP[0] : selectedRoom,
+            )}
+            apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
+            strokeWidth={hp(0.5)}
+            strokeColor={Colors.GREEN}
+          />
+        ) : null}
+        <Marker
+          coordinate={{
+            latitude: parseFloat(data ? data?.latitude : 0.0),
+            longitude: parseFloat(data ? data?.longitude : 0.0),
+          }}
+          // coordinate={{
+          //   latitude: 22.7658,
+          //   longitude: 75.8705,
+          // }}
+        >
+          <View style={style.marker}>
+            <MaterialIcons
+              name={'human-greeting'}
+              size={hp(4)}
+              color={Colors.RED}
+            />
+          </View>
+        </Marker>
+        {roomDataHomeTP?.length > 0
+          ? roomDataHomeTP?.map((item, index) => (
+              <Marker
+                key={index}
+                coordinate={{
+                  latitude: parseFloat(item?.rm_latitude),
+                  longitude: parseFloat(item?.rm_longitude),
+                }}
+                onPress={() => {
+                  setSelectedRoom(item);
+                  preDataOnMap(item);
+                }}>
+                <View style={style.marker}>
+                  <MaterialIcons
+                    name={'home-map-marker'}
+                    size={hp(4)}
+                    color={item?.isSelected ? Colors.GREEN : Colors.PRIMARY}
+                  />
+                </View>
+              </Marker>
+            ))
+          : null}
+      </MapView>
+    );
+  }, [data]);
+
   const preDataOnMap = data => {
     let temp = JSON.parse(JSON.stringify(roomDataHomeTemp));
     temp.map((item, index) => {
@@ -258,84 +346,17 @@ const MapSearch = ({route, navigation}) => {
       contentContainerStyle={{flexGrow: 1}}
       style={StyleGlobel.containerStyle}>
       {data.length === 0 ? (
-        <LowOpacityLoader />
+        <View style={style.loader}>
+          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+        </View>
       ) : (
         <View style={style.mapContainer}>
-          <MapView
-            style={style.map}
-            initialRegion={{
-              // latitude: 22.7658,
-              // longitude: 75.8705,
-              latitude: parseFloat(data ? data?.latitude : 0.0),
-              longitude: parseFloat(data ? data?.longitude : 0.0),
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            }}>
-            <MapViewDirections
-              onReady={item => {
-                setLocationData(item?.legs[0]);
-              }}
-              optimizeWaypoints={true}
-              splitWaypoints={true}
-              // origin={{
-              //   latitude: 22.7658,
-              //   longitude: 75.8705,
-              // }}
-              origin={{
-                latitude: data?.latitude,
-                longitude: data?.longitude,
-              }}
-              destination={setDestination(
+          {renderMap()}
+          {selectedRoom || roomDataHomeTP[0]
+            ? renderSelectedRoom(
                 selectedRoom === null ? roomDataHomeTP[0] : selectedRoom,
-              )}
-              apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
-              strokeWidth={hp(0.5)}
-              strokeColor={Colors.PRIMARY}
-            />
-            <Marker
-              coordinate={{
-                latitude: parseFloat(data ? data?.latitude : 0.0),
-                longitude: parseFloat(data ? data?.longitude : 0.0),
-              }}
-              // coordinate={{
-              //   latitude: 22.7658,
-              //   longitude: 75.8705,
-              // }}
-            >
-              <View style={style.marker}>
-                <MaterialIcons
-                  name={'human-greeting'}
-                  size={hp(4)}
-                  color={Colors.RED}
-                />
-              </View>
-            </Marker>
-            {roomDataHomeTP?.length > 0
-              ? roomDataHomeTP?.map((item, index) => (
-                  <Marker
-                    key={index}
-                    coordinate={{
-                      latitude: parseFloat(item?.rm_latitude),
-                      longitude: parseFloat(item?.rm_longitude),
-                    }}
-                    onPress={() => {
-                      setSelectedRoom(item);
-                      preDataOnMap(item);
-                    }}>
-                    <View style={style.marker}>
-                      <MaterialIcons
-                        name={'home-map-marker'}
-                        size={hp(4)}
-                        color={item?.isSelected ? Colors.GREEN : Colors.PRIMARY}
-                      />
-                    </View>
-                  </Marker>
-                ))
-              : null}
-          </MapView>
-          {renderSelectedRoom(
-            selectedRoom === null ? roomDataHomeTP[0] : selectedRoom,
-          )}
+              )
+            : null}
         </View>
       )}
     </ScrollView>
@@ -526,5 +547,10 @@ const style = StyleSheet.create({
   },
   contentLocation: {
     margin: hp(0.5),
+  },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

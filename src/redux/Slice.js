@@ -22,6 +22,8 @@ export const slice = createSlice({
     searchUpdate: false,
     currentLocationName: '',
     filteredData: '',
+    gpsStatus: 'true',
+    LocationMode: '',
   },
   reducers: {
     startL: (state, actions) => {
@@ -78,6 +80,12 @@ export const slice = createSlice({
     filteredData: (state, actions) => {
       state.filteredData = actions.payload;
     },
+    gpsStatus: (state, actions) => {
+      state.gpsStatus = actions.payload;
+    },
+    LocationMode: (state, actions) => {
+      state.LocationMode = actions.payload;
+    },
   },
 });
 
@@ -100,6 +108,8 @@ export const {
   searchUpdate,
   currentLocationName,
   filteredData,
+  gpsStatus,
+  LocationMode,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -159,6 +169,12 @@ export const setCurrentLocationName = data => dispatch => {
 
 export const setFilteredData = data => dispatch => {
   dispatch(filteredData(data));
+};
+export const setGPSStatus = data => dispatch => {
+  dispatch(gpsStatus(data));
+};
+export const setLocationMode = data => dispatch => {
+  dispatch(LocationMode(data));
 };
 
 export default slice.reducer;

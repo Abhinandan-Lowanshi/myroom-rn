@@ -1,17 +1,27 @@
 import React, {useEffect, useState} from 'react';
 import {
-  FlatList,
-  Image,
+  BackHandler,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  Platform,
+  PermissionsAndroid,
+  Linking,
+  ActivityIndicator,
+  AppState,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
-import {startL, updateHome} from '../redux/Slice';
+import {
+  startL,
+  updateHome,
+  setLocation,
+  setCurrentLocationName,
+  setLocationMode,
+} from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
@@ -40,14 +50,15 @@ import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import localStorageOp from '../localStorage/LocalData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
+import Geolocation from '@react-native-community/geolocation';
+import GPSDialogue from '../component/GPSDialogue';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
-  const [userInfo, setUserInfo] = useState('');
   const [loading, setLoading] = useState(false);
-  // const [filteredData, setFilteredData] = useState([]);
+  const [visible, setVisible] = useState(false);
   const [filterList, setFilterList] = useState(filterDataAll);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
@@ -55,14 +66,61 @@ const Home = ({route, navigation}) => {
   const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const filteredData = useSelector(state => state.AllData.filteredData);
+  const LocationMode = useSelector(state => state.AllData.LocationMode);
+  console.log(LocationMode, 'LocationMode');
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
   );
   const accountData = useSelector(state => state.AllData.accountData);
   const dispatch = useDispatch();
-  let counter = 10;
   const isFocused = useIsFocused();
 
+  useEffect(() => {
+    localStorageOp('', AsyncKeys.LOCATION_MODE, '')
+      .then(value => {
+        if (value) {
+          if (value.mode === AsyncKeys.DEFAULT) {
+            dispatch(setLocationMode({locationMode: 'Default'}));
+            localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+              .then(value => {
+                dispatch(
+                  setCurrentLocationName({
+                    locationName: value?.formatted_address,
+                  }),
+                );
+                let Ob = {
+                  latitude: value?.geometry?.location?.lat,
+                  longitude: value?.geometry?.location?.lng,
+                };
+                dispatch(setLocation(Ob));
+              })
+              .catch(() => {});
+          } else {
+            dispatch(setLocationMode({locationMode: 'Live'}));
+            requestLocationPermission();
+          }
+        } else {
+          dispatch(setLocationMode({locationMode: 'Live'})),
+            requestLocationPermission();
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // useEffect(() => {
+  //   AppState.addEventListener('change', handleChange);
+
+  //   return () => {
+  //     AppState.removeEventListener('change', handleChange);
+  //   };
+  // }, []);
+
+  const handleChange = value => {
+    if (value === 'active') {
+      setVisible(false);
+      requestLocationPermission();
+    }
+  };
   useEffect(() => {
     if (searchUpdate) {
       dispatch(startL(true));
@@ -95,6 +153,84 @@ const Home = ({route, navigation}) => {
       'Non-serializable values were found in the navigation state',
     ]);
   }, []);
+
+  const getAddressFromCoordinates = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+          latitude +
+          ',' +
+          longitude +
+          '&key=' +
+          'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+      )
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.status === 'OK') {
+            dispatch(
+              setCurrentLocationName({
+                locationName: responseJson?.results?.[0]?.formatted_address,
+              }),
+            );
+            resolve(responseJson?.results?.[0]?.formatted_address);
+          } else {
+            reject('not found');
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  };
+
+  const getOneTimeLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        dispatch(setLocation(position.coords));
+        getAddressFromCoordinates(
+          position.coords?.latitude,
+          position.coords?.longitude,
+        );
+      },
+      error => {
+        // setVisible(true);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000,
+      },
+    );
+  };
+
+  const handleOpenSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'ios') {
+      getOneTimeLocation();
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message: 'This App needs to Access your location',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getOneTimeLocation();
+        } else {
+          // setVisible(true);
+        }
+      } catch (err) {}
+    }
+  };
 
   const calculateRoomCount = (filter, rooms) => {
     let temp = getRoomCount(filter, rooms);
@@ -193,10 +329,10 @@ const Home = ({route, navigation}) => {
       sendRequest(
         {
           user_id: 'Dummy',
-          latitude: 22.7196,
-          longitude: 75.8577,
-          // latitude: data.latitude,
-          // longitude: data.longitude,
+          // latitude: 22.7196,
+          // longitude: 75.8577,
+          latitude: data.latitude,
+          longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -208,10 +344,12 @@ const Home = ({route, navigation}) => {
           dispatch(startL(false));
           if (res.status === true) {
             if (res.data.length > 0) {
-              dispatch(setRoomDataHome(prepareData(res?.data)));
               calculateRoomCount(filterDataAll, res?.data);
+              dispatch(setRoomDataHome(prepareData(res?.data)));
               dispatch(setFilteredData(res?.data));
             } else {
+              dispatch(setRoomDataHome([]));
+              dispatch(setFilteredData([]));
               setError({
                 error:
                   'No rooms find at your location \n You can also search nearby rooms by Area name ',
@@ -220,6 +358,8 @@ const Home = ({route, navigation}) => {
               setIsFailed(true);
             }
           } else {
+            dispatch(setRoomDataHome([]));
+            dispatch(setFilteredData([]));
             setIsFailed(true);
             setError({
               error: res.message,
@@ -232,6 +372,8 @@ const Home = ({route, navigation}) => {
           setIsFailed(true);
           setRefreshing(false);
           dispatch(startL(false));
+          dispatch(setRoomDataHome([]));
+          dispatch(setFilteredData([]));
           setError({
             error: '',
             header: '',
@@ -318,6 +460,38 @@ const Home = ({route, navigation}) => {
     );
   };
 
+  const onPressMore = () => {
+    navigation.navigate(ScreenName.MoreRooms);
+  };
+
+  const handleDefault = () => {
+    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+      .then(value => {
+        if (value) {
+          let Ob = {
+            latitude: value?.geometry?.location?.lat,
+            longitude: value?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+          dispatch(
+            setCurrentLocationName({
+              locationName: value?.formatted_address,
+            }),
+          );
+          setVisible(false);
+        } else {
+          showToast('Set Default Location first');
+          dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.AppSettings}],
+            }),
+          );
+        }
+      })
+      .catch(() => {});
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{flexGrow: 1}}
@@ -325,7 +499,19 @@ const Home = ({route, navigation}) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      {getLocation()}
+      <GPSDialogue
+        labelTop={'Your GPS seems to disabled?'}
+        labelPositive={'Turn on GPS'}
+        labelNegative={'default location'}
+        visible={visible}
+        confirmationMessage={'Are you want to use default location Now'}
+        // confirmationMessageHigh={'logout?'}
+        handleOpenSettings={handleOpenSettings}
+        useDefaultLocation={handleDefault}
+        closeApp={() => {
+          BackHandler.exitApp();
+        }}
+      />
       <View style={style.locationNameContainer}>
         <View style={style.innerContainerName}>
           <MaterialIcons
@@ -338,9 +524,14 @@ const Home = ({route, navigation}) => {
             {`Welcome ${accountData?.data?.usr_firstName}`}
           </Text>
         </View>
-        <Text style={style.labelLocation}>
-          {currentLocationName?.locationName}
-        </Text>
+        <View style={style.containerLocationMode}>
+          <Text style={style.labelLocationMode}>
+            {LocationMode?.locationMode}
+          </Text>
+          <Text style={style.labelLocation}>
+            {currentLocationName?.locationName}
+          </Text>
+        </View>
       </View>
       <SliderView
         isFocused={isFocused}
@@ -351,31 +542,36 @@ const Home = ({route, navigation}) => {
           gotoSearch();
         }}
       />
-      {filteredData?.length > 0 ? (
+      {/* {filteredData?.length > 0 && !isFailed ? (
         <FlatList
           horizontal
           data={filterList}
           renderItem={filterRender}
           style={style.filterFlatlist}
         />
-      ) : null}
-      {false ? (
-        <LowOpacityLoader />
-      ) : isFailed ? (
+      ) : null} */}
+      {loading ? (
+        <View style={style.loader}>
+          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+        </View>
+      ) : // <LowOpacityLoader />
+      isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
         <View>
           {filteredData?.length > 0 ? (
             <RenderRoom2Column
-              myRoomList={
-                filteredData?.length > 5
-                  ? filteredData?.slice(0, 5)
-                  : filteredData
-              }
-              moreVisible={filteredData?.length > 5 ? true : false}
+              myRoomList={filteredData}
+              // myRoomList={
+              //   filteredData?.length > 5
+              //     ? filteredData?.slice(0, 5)
+              //     : filteredData
+              // }
+              // moreVisible={filteredData?.length > 5 ? true : false}
               onPress={onPressRoom}
               onPressFav={onPressFav}
               refreshing={false}
+              onPressMore={onPressMore}
             />
           ) : null}
         </View>
@@ -441,5 +637,21 @@ const style = StyleSheet.create({
   innerContainerName: {
     flexDirection: 'row',
     marginTop: hp(1),
+  },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  containerLocationMode: {
+    flexDirection: 'row',
+  },
+  labelLocationMode: {
+    backgroundColor: Colors.RED,
+    color: Colors.WHITE,
+    fontSize: RF(1.3),
+    paddingHorizontal: hp(1),
+    borderRadius: hp(0.5),
+    marginRight: hp(0.5),
   },
 });
