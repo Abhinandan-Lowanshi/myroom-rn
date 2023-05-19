@@ -85,10 +85,24 @@ const AppSettings = props => {
   }, []);
 
   const onSearch = value => {
-    console.log(value, 'value');
     setAddress(value?.formatted_address);
-
     setRowData(value);
+    if (value !== '') {
+      localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, value);
+      setSave(true);
+      dispatch(
+        setCurrentLocationName({
+          locationName: value?.formatted_address,
+        }),
+      );
+      let Ob = {
+        latitude: value?.geometry?.location?.lat,
+        longitude: value?.geometry?.location?.lng,
+      };
+      dispatch(setLocation(Ob));
+    } else {
+      showToast('Please select location');
+    }
     setSave(false);
   };
 
@@ -389,9 +403,9 @@ const AppSettings = props => {
         <View style={style.containerSave}>
           <Text style={style.labelDefaultLocation}>Default Location</Text>
           <View style={style.innerSave(save)}>
-            <Text style={style.labelSave(save)}>
+            {/* <Text style={style.labelSave(save)}>
               {save ? 'Saved' : 'Unsaved'}
-            </Text>
+            </Text> */}
           </View>
         </View>
 
@@ -399,15 +413,17 @@ const AppSettings = props => {
           {address || '- - - - - - - - - - - - - - - - -'}
         </Text>
 
-        <C_Button
+        {/* <C_Button
           onPress={saveLocation}
           outerContainer={style.outerContainer}
           // isSubmitDisabled={rowData == '' ? true : false}
           label={
             isHideBack ? 'Save Location' : save ? 'Go to home' : 'Save Location'
           }
-        />
-        <Text style={style.labelDefaultLocation}>Active Location</Text>
+        /> */}
+        <Text style={[style.labelDefaultLocation, {marginTop: hp(3)}]}>
+          Active Location
+        </Text>
         <Text style={style.labelLocation}>
           {currentLocationName?.locationName ||
             '- - - - - - - - - - - - - - - - -'}

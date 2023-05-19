@@ -45,7 +45,7 @@ const MyAccount = ({navigation}) => {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{name: ScreenName.Splash}],
+            routes: [{name: ScreenName.Login}],
           }),
         );
         // return true;

@@ -10,48 +10,28 @@ import {useDispatch} from 'react-redux';
 const Splash = ({navigation}) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
-      .then(value => {
-        if (value) {
-          setTimeout(() => {
-            localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
-              if (res?.data?.usr_id) {
-                dispatch(getAccountImfo(res));
-                console.log(res, 'navigation.navigate splash');
+    setTimeout(() => {
+      localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
+        if (res?.data?.usr_id) {
+          dispatch(getAccountImfo(res));
+          console.log(res, 'navigation.navigate splash');
 
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{name: ScreenName.TabComponent}],
-                  }),
-                );
-              } else {
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{name: ScreenName.Login}],
-                  }),
-                );
-              }
-            });
-          }, 2000);
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.TabComponent}],
+            }),
+          );
         } else {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{name: ScreenName.AppSettings}],
+              routes: [{name: ScreenName.Login}],
             }),
           );
         }
-      })
-      .catch(() => {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: ScreenName.AppSettings}],
-          }),
-        );
       });
+    }, 2000);
   }, []);
   return (
     <View style={StyleGlobel.containerStyle}>
@@ -61,3 +41,48 @@ const Splash = ({navigation}) => {
 };
 
 export default Splash;
+
+// useEffect(() => {
+//   localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+//     .then(value => {
+//       if (value) {
+//         setTimeout(() => {
+//           localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
+//             if (res?.data?.usr_id) {
+//               dispatch(getAccountImfo(res));
+//               console.log(res, 'navigation.navigate splash');
+
+//               navigation.dispatch(
+//                 CommonActions.reset({
+//                   index: 0,
+//                   routes: [{name: ScreenName.TabComponent}],
+//                 }),
+//               );
+//             } else {
+//               navigation.dispatch(
+//                 CommonActions.reset({
+//                   index: 0,
+//                   routes: [{name: ScreenName.Login}],
+//                 }),
+//               );
+//             }
+//           });
+//         }, 2000);
+//       } else {
+//         navigation.dispatch(
+//           CommonActions.reset({
+//             index: 0,
+//             routes: [{name: ScreenName.AppSettings}],
+//           }),
+//         );
+//       }
+//     })
+//     .catch(() => {
+//       navigation.dispatch(
+//         CommonActions.reset({
+//           index: 0,
+//           routes: [{name: ScreenName.AppSettings}],
+//         }),
+//       );
+//     });
+// }, []);

@@ -83,16 +83,24 @@ const Home = ({route, navigation}) => {
             dispatch(setLocationMode({locationMode: 'Default'}));
             localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
               .then(value => {
-                dispatch(
-                  setCurrentLocationName({
-                    locationName: value?.formatted_address,
-                  }),
-                );
-                let Ob = {
-                  latitude: value?.geometry?.location?.lat,
-                  longitude: value?.geometry?.location?.lng,
-                };
-                dispatch(setLocation(Ob));
+                if (value) {
+                  dispatch(
+                    setCurrentLocationName({
+                      locationName: value?.formatted_address,
+                    }),
+                  );
+                  let Ob = {
+                    latitude: value?.geometry?.location?.lat,
+                    longitude: value?.geometry?.location?.lng,
+                  };
+                  dispatch(setLocation(Ob));
+                } else {
+                  localStorageOp(true, AsyncKeys.LOCATION_MODE, {
+                    mode: AsyncKeys.CUSTOM,
+                  });
+                  dispatch(setLocationMode({locationMode: 'Live'}));
+                  requestLocationPermission();
+                }
               })
               .catch(() => {});
           } else {
