@@ -34,7 +34,7 @@ const GooglePlacesInput = props => {
         },
         description: {color: Colors.BLACK},
       }}
-      placeholder="Search location"
+      placeholder={props.placeholder || 'Search Location'}
       fetchDetails={true}
       onPress={(data, details = null) => {
         props?.onSearch(details);

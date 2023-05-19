@@ -375,6 +375,7 @@ const AppSettings = props => {
       <GooglePlacesInput
         containerPlaceHolder={style.containerPlaceHolder}
         onSearch={onSearch}
+        placeholder={'Set Default location'}
       />
       {loading && (
         <View style={style.loader}>
