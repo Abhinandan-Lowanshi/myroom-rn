@@ -21,7 +21,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import UploadFormSTP2 from './UploadFormSTP2';
 import Stapper from '../component/Stapper';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {setUploadData} from '../redux/Slice';
+import {setOwnerData, setUploadData} from '../redux/Slice';
 import {useIsFocused} from '@react-navigation/native';
 import localStorageOp from '../localStorage/LocalData';
 
@@ -74,11 +74,12 @@ const Upload = ({navigation}) => {
   const [descriptionError, setDescriptionError] = useState(false);
   const [userData, setUserData] = useState('');
   const isFocused = useIsFocused();
+  const OwnerData = useSelector(state => state.AllData.OwnerData);
 
   useEffect(() => {
     if (
-      name.length < 4 ||
-      mobileNumber.length < 10 ||
+      OwnerData?.name?.length < 4 ||
+      OwnerData?.mobile?.length < 10 ||
       roomSize.length === 0 ||
       furnishedStatus.length === 0 ||
       availableStatus === 0 ||
@@ -97,8 +98,6 @@ const Upload = ({navigation}) => {
       setIsSubmitDisabled(false);
     }
   }, [
-    name,
-    mobileNumber,
     roomSize,
     furnishedStatus,
     availableStatus,
@@ -121,19 +120,25 @@ const Upload = ({navigation}) => {
     localStorageOp('', AsyncKeys.USERDATA, '')
       .then(data => {
         if (data?.data) {
-          setName(data?.data?.usr_firstName);
-          setMobileNumber(data?.data?.usr_phone);
+          dispatch(
+            setOwnerData({
+              name: data?.data?.usr_firstName,
+              mobile: data?.data?.usr_phone,
+            }),
+          );
+          // setName(data?.data?.usr_firstName);
+          // setMobileNumber(data?.data?.usr_phone);
         }
       })
       .catch(() => {});
   }, []);
   const nameOnChange = name => {
-    setName(name);
-    if (name !== '' && name.length < 4) {
-      setErrorName(true);
-    } else {
-      setErrorName(false);
-    }
+    // setName(name);
+    // if (name !== '' && name.length < 4) {
+    //   setErrorName(true);
+    // } else {
+    //   setErrorName(false);
+    // }
   };
 
   // const locationOnChange = location => {
@@ -226,8 +231,8 @@ const Upload = ({navigation}) => {
   const onNextPress = () => {
     let data = {
       rm_usr_fkey: 2,
-      rm_own_Fullname: name,
-      rm_own_mble_num: mobileNumber,
+      rm_own_Fullname: OwnerData?.name,
+      rm_own_mble_num: OwnerData?.mobile,
       rm_size: roomSize,
       rm_furnisd_status: furnishedStatus,
       rm_availble: availableStatus,
@@ -247,12 +252,12 @@ const Upload = ({navigation}) => {
     navigation.navigate(ScreenName.UploadFormSTP2);
   };
   const mobileNumberOnChange = mobileNumber => {
-    setMobileNumber(mobileNumber);
-    if (mobileNumber !== '' && mobileNumber.length < 10) {
-      setMobileNumberError(true);
-    } else {
-      setMobileNumberError(false);
-    }
+    // setMobileNumber(mobileNumber);
+    // if (mobileNumber !== '' && mobileNumber.length < 10) {
+    //   setMobileNumberError(true);
+    // } else {
+    //   setMobileNumberError(false);
+    // }
   };
   const onMapData = value => {
     setRoomLocation(value);
@@ -268,7 +273,7 @@ const Upload = ({navigation}) => {
         <CustomInputText
           disabled
           onChangeText={nameOnChange}
-          value={name}
+          value={OwnerData?.name}
           maxLength={30}
           error={nameError}
           outerContainer={style.outerContainer}
@@ -280,7 +285,7 @@ const Upload = ({navigation}) => {
           maxLength={10}
           isNumeric={true}
           onChangeText={mobileNumberOnChange}
-          value={mobileNumber}
+          value={OwnerData?.mobile}
           error={mobileNumberError}
           placeholder={'Enter Mobile Number'}
           errorMessage={'Invalid Mobile Number'}

@@ -148,7 +148,22 @@ const MyAccount = ({navigation}) => {
             navigation.navigate(ScreenName.AppSettings, {isHideBack: true});
           }}
         />
-        <AccountTouchableCom label={'Contact Us'} type={ScreenName.ContactUs} />
+
+        <AccountTouchableCom
+          label={'About Us'}
+          type={ScreenName.AboutUs}
+          onPress={() => {
+            navigation.navigate(ScreenName.AboutUs, {isHideBack: true});
+          }}
+        />
+
+        {/* <AccountTouchableCom
+          label={'Privacy Policy'}
+          type={ScreenName.PrivacyPolicy}
+          onPress={() => {
+            navigation.navigate(ScreenName.PrivacyPolicy, {isHideBack: true});
+          }}
+        /> */}
         <AccountTouchableCom
           label={'Logout'}
           type={ScreenName.Logout}

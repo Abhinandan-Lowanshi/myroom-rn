@@ -46,11 +46,21 @@ const AccountTouchableCom = ({
           />
         );
       }
-      case ScreenName.ContactUs: {
+      case ScreenName.AboutUs: {
         return (
-          <Icon
+          <Icon3
             style={style.iconStyle}
-            name={'customerservice'}
+            name={'people'}
+            size={hp(4)}
+            color={Colors.PRIMARY}
+          />
+        );
+      }
+      case ScreenName.PrivacyPolicy: {
+        return (
+          <Icon3
+            style={style.iconStyle}
+            name={'privacy-tip'}
             size={hp(4)}
             color={Colors.PRIMARY}
           />

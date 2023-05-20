@@ -12,10 +12,11 @@ import ErrorModal from '../component/ErrorModal';
 import FreezScreen from '../component/FreezScreen';
 import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
-import {getAccountImfo} from '../redux/Slice';
+import {getAccountImfo, setOwnerData} from '../redux/Slice';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
+import Toast from 'react-native-simple-toast';
 
 const EditProfile = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -61,6 +62,10 @@ const EditProfile = ({navigation}) => {
     else setMobileNumberError(false);
   };
 
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
   const updateProfile = () => {
     if (accountData?.data?.usr_email && name && mobileNumber) {
       setLoading(true);
@@ -79,10 +84,17 @@ const EditProfile = ({navigation}) => {
         .then(response => {
           setLoading(false);
           if (response.status === true) {
+            showToast('Profile has successfully updated');
             let accountDataTemp = JSON.parse(JSON.stringify(accountData));
             accountDataTemp.data.usr_firstName = name;
             accountDataTemp.data.usr_phone = mobileNumber;
             localStorageOp(true, AsyncKeys.USERDATA, accountDataTemp);
+            dispatch(
+              setOwnerData({
+                name: name,
+                mobile: mobileNumber,
+              }),
+            );
             dispatch(getAccountImfo(accountDataTemp), navigation.goBack());
           } else {
             setEmailApiError(response.message);

@@ -22,6 +22,8 @@ import Notification from './src/screen/Notification';
 import EditRoom from './src/screen/EditRoom';
 import GetLocationByMap from './src/component/GetLocationByMap';
 import AppSettings from './src/screen/AppSettings';
+import AboutUs from './src/screen/AboutUs';
+import PrivacyPolicy from './src/screen/PrivacyPolicy';
 import Fav from './src/screen/Fav';
 import Chat from './src/screen/Chat/Chat';
 import UserProfile from './src/screen/Chat/UserProfile';
@@ -45,6 +47,11 @@ const App = () => {
           <Stack.Screen name={ScreenName.Fav} component={Fav} />
           <Stack.Screen name={ScreenName.MoreRooms} component={MoreRooms} />
           <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
+          <Stack.Screen name={ScreenName.AboutUs} component={AboutUs} />
+          <Stack.Screen
+            name={ScreenName.PrivacyPolicy}
+            component={PrivacyPolicy}
+          />
           <Stack.Screen name={ScreenName.Chat} component={Chat} />
           <Stack.Screen name={ScreenName.UserProfile} component={UserProfile} />
           <Stack.Screen
