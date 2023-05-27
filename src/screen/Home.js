@@ -147,6 +147,7 @@ const Home = ({route, navigation}) => {
   useEffect(() => {
     setLoading(true);
     getData();
+    updateUserNotification();
   }, [data]);
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
@@ -161,6 +162,25 @@ const Home = ({route, navigation}) => {
       'Non-serializable values were found in the navigation state',
     ]);
   }, []);
+
+  const updateUserNotification = () => {
+    if (data?.longitude && data?.latitude) {
+      sendRequest(
+        {
+          user_id: '1',
+          usr_latitude: data?.latitude,
+          usr_longitude: data?.longitude,
+          isNotify: true,
+        },
+        EndPoints.updateUserNotificationDetails,
+        'POST',
+      )
+        .then(response => {
+          console.log(response, 'updateUserNotification');
+        })
+        .catch(() => {});
+    }
+  };
 
   const getAddressFromCoordinates = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
@@ -537,7 +557,11 @@ const Home = ({route, navigation}) => {
             {LocationMode?.locationMode}
           </Text>
           <Text style={style.labelLocation}>
-            {currentLocationName?.locationName}
+            {LocationMode?.locationMode === 'Live'
+              ? loading
+                ? 'Getting location '
+                : currentLocationName?.locationName
+              : currentLocationName?.locationName}
           </Text>
         </View>
       </View>

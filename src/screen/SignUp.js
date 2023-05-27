@@ -139,7 +139,7 @@ const SignUp = ({navigation}) => {
             onChangeText={nameOnChange}
             outerContainer={style.outerContainerSocial}
             error={nameError}
-            placeholder={'Enter FullName'}
+            placeholder={'FullName'}
             errorMessage={'Invalid Name'}
           />
           <CustomInputText
@@ -147,7 +147,7 @@ const SignUp = ({navigation}) => {
             onChangeText={emailOnChange}
             outerContainer={style.outerContainerSocial}
             error={emailError}
-            placeholder={'Enter Email'}
+            placeholder={'Email'}
             errorMessage={'Invalid Email'}
           />
           <CustomInputText
@@ -155,7 +155,7 @@ const SignUp = ({navigation}) => {
             onChangeText={onChangeMobile}
             outerContainer={style.outerContainerSocial}
             error={mobileError}
-            placeholder={'Enter mobile number'}
+            placeholder={'mobile number'}
             errorMessage={'Invalid mobile number'}
           />
           <CustomInputText
@@ -163,7 +163,7 @@ const SignUp = ({navigation}) => {
             onChangeText={onChangePassword}
             outerContainer={style.outerContainerSocial}
             error={passwordError}
-            placeholder={'Enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />
@@ -172,7 +172,7 @@ const SignUp = ({navigation}) => {
             onChangeText={onRePasswordText}
             outerContainer={style.outerContainerSocial}
             error={rePasswordError}
-            placeholder={'Enter Re-Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Re-Password'}
             isEyeVisible={true}
           />

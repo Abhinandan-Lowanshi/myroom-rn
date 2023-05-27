@@ -25,6 +25,7 @@ const MyPost = ({navigation}) => {
   const myRoomList = useSelector(state => state.AllData.myposts);
   const dispatch = useDispatch();
 
+  console.log('onPressEditSuccess');
   useEffect(() => {
     setLoading(true);
     getRooms();
@@ -64,8 +65,13 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressEditSuccess = value => {
+    console.log(value);
+  };
+
   const onPressEdit = item => {
-    navigation.navigate(ScreenName.EditRoom, item);
+    navigation.navigate(ScreenName.EditRoom, {item, onPressEditSuccess});
   };
 
   const onPressDelete = id => {

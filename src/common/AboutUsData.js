@@ -96,19 +96,19 @@ const Value = [
       },
     ],
   },
-  // {
-  //   header: 'Contribution',
-  //   value: [
-  //     {
-  //       id: 17,
-  //       value: 'Abhinandan Lowanshi',
-  //     },
-  //     {
-  //       id: 18,
-  //       value: 'Vishal Yaduwanshi',
-  //     },
-  //   ],
-  // },
+  {
+    header: 'Contributor',
+    value: [
+      {
+        id: 17,
+        value: 'Abhinandan Lowanshi',
+      },
+      {
+        id: 18,
+        value: 'Vishal Yaduwanshi',
+      },
+    ],
+  },
 ];
 
 export default Value;

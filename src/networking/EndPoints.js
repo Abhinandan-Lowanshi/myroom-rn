@@ -24,5 +24,6 @@ const EndPoints = {
   addRoom: 'addRoom',
   chatUserList: 'chatUserList',
   chatList: 'chatList',
+  updateUserNotificationDetails: 'updateUserNotificationDetails',
 };
 export default EndPoints;

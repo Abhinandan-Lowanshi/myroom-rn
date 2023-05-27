@@ -113,7 +113,7 @@ const EmailVerify = ({navigation}) => {
         errorMessage={errorMessage}
         value={otp}
         onChangeText={otpOnChange}
-        placeholder={'Enter 6 digit otp'}
+        placeholder={'6 digit otp'}
       />
       <C_Button
         onPress={SignUp}

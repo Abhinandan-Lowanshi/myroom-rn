@@ -127,7 +127,7 @@ const EditProfile = ({navigation}) => {
             onChangeText={nameOnChange}
             outerContainer={style.outerContainerSocial}
             error={nameError}
-            placeholder={'Enter FullName'}
+            placeholder={'FullName'}
             errorMessage={'Invalid Name'}
           />
           {/* <CustomInputText
@@ -145,7 +145,7 @@ const EditProfile = ({navigation}) => {
             onChangeText={onMobileNumberText}
             outerContainer={style.outerContainerSocial}
             error={mobileNumberError}
-            placeholder={'Enter Mobile Number'}
+            placeholder={'Mobile Number'}
             errorMessage={'Invalid Mobile Number'}
           />
 

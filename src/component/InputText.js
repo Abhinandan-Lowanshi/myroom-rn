@@ -18,7 +18,7 @@ const CustomInputText = ({
   onChangeText,
   value,
   outerContainer,
-  toplabel,
+  topLabel,
   disabled,
   isEyeVisible,
   isNumeric,
@@ -26,8 +26,17 @@ const CustomInputText = ({
   multiline,
 }) => {
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
+  const [focus, setFocus] = React.useState(false);
+
+  const focusChange = value => {
+    console.log(value, 'Value');
+  };
+
   return (
     <View style={[style.outerContainer, outerContainer]}>
+      {(focus || value) && (
+        <Text style={[style.topLabel, topLabel]}>{placeholder}</Text>
+      )}
       <View style={[style.containerStyle(error, disabled), containerStyleP]}>
         <TextInput
           maxLength={maxLength || 50}
@@ -40,6 +49,8 @@ const CustomInputText = ({
           onChangeText={value => onChangeText(value)}
           multiline={multiline}
           secureTextEntry={isEyeVisible && isPassWordHidden}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
           keyboardType={
             isNumeric
               ? 'number-pad'
@@ -113,5 +124,9 @@ const style = StyleSheet.create({
   iconStyle: {
     alignSelf: 'center',
     marginRight: hp(2),
+  },
+  topLabel: {
+    color: Colors.BLACK,
+    fontSize: RF(1.4),
   },
 });

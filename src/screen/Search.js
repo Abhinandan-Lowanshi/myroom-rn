@@ -446,6 +446,7 @@ const Search = ({navigation}) => {
     return (
       <Modal
         transparent={true}
+        animationType={'slide'}
         style={{
           flex: 1,
         }}

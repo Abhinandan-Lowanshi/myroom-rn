@@ -147,6 +147,7 @@ const RoomDetailsOwner = props => {
       <Modal
         // transparent={true}
         visible={visible}
+        animationType={'slide'}
         onRequestClose={() => {
           setVisible(false);
         }}>

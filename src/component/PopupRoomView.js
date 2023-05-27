@@ -25,6 +25,7 @@ const PopupRoomView = props => {
       backdropOpacity={0.3}
       activeOpacity={0.9}
       transparent={true}
+      animationType={'slide'}
       style={style.outerContainer}
       visible={props?.visible}>
       <View style={style.parentContainer}>

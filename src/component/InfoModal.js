@@ -4,7 +4,7 @@ import C_Button from './C_Button';
 import {hp, RF} from '../common/CommonFunctions';
 const InfoModal = props => {
   return (
-    <Modal visible={props?.visible} transparent={true}>
+    <Modal visible={props?.visible} transparent={true} animationType={'slide'}>
       <View style={style.lowOpacity}></View>
       <View style={[style.containerInfo, props?.containerInfo]}>
         <View style={[style.containerLabel, props?.containerLabel]}>

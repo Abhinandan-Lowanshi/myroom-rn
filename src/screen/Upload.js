@@ -277,7 +277,7 @@ const Upload = ({navigation}) => {
           maxLength={30}
           error={nameError}
           outerContainer={style.outerContainer}
-          placeholder={'Enter Name'}
+          placeholder={'Name'}
           errorMessage={'Enter valid Name'}
         />
         <CustomInputText
@@ -287,7 +287,7 @@ const Upload = ({navigation}) => {
           onChangeText={mobileNumberOnChange}
           value={OwnerData?.mobile}
           error={mobileNumberError}
-          placeholder={'Enter Mobile Number'}
+          placeholder={'Mobile Number'}
           errorMessage={'Invalid Mobile Number'}
         />
 
@@ -336,7 +336,7 @@ const Upload = ({navigation}) => {
           maxLength={20}
           outerContainer={style.outerContainer}
           error={whichFloorError}
-          placeholder={'On which floor'}
+          placeholder={'floor'}
           errorMessage={'Enter floor'}
         />
 
@@ -347,7 +347,7 @@ const Upload = ({navigation}) => {
           outerContainer={style.outerContainer}
           error={rentError}
           isNumeric={true}
-          placeholder={'Enter Rent'}
+          placeholder={'Rent'}
           errorMessage={'Enter Rent'}
         />
         <CustomInputText
@@ -356,7 +356,7 @@ const Upload = ({navigation}) => {
           value={houseNumber}
           outerContainer={style.outerContainer}
           error={houseNumberError}
-          placeholder={'Enter House Number'}
+          placeholder={'House Number'}
           errorMessage={'Enter House Number'}
         />
 
@@ -366,7 +366,7 @@ const Upload = ({navigation}) => {
           value={colony}
           outerContainer={style.outerContainer}
           error={colonyError}
-          placeholder={'Enter Colony'}
+          placeholder={'Colony'}
           errorMessage={'Enter Colony'}
         />
         <CustomInputText
@@ -375,7 +375,7 @@ const Upload = ({navigation}) => {
           value={city}
           outerContainer={style.outerContainer}
           error={cityError}
-          placeholder={'Enter City'}
+          placeholder={'City'}
           errorMessage={'Enter City'}
         />
         <CustomInputText
@@ -385,7 +385,7 @@ const Upload = ({navigation}) => {
           value={description}
           InputTextStyleP={style.InputTextStyle}
           error={descriptionError}
-          placeholder={'Enter Description'}
+          placeholder={'Description'}
           errorMessage={'Enter Description'}
         />
         <TouchableOpacity

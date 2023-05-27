@@ -110,7 +110,7 @@ const DetailsScreen = props => {
     //       return level;
     //       console.log(0.07);
     //     }
-    //     return level;
+    //     return level;sssss
     //   }
     return level;
   };
@@ -146,6 +146,7 @@ const DetailsScreen = props => {
     return (
       <Modal
         // transparent={true}
+        animationType={'slide'}
         visible={visible}
         onRequestClose={() => {
           setVisible(false);
