@@ -28,7 +28,7 @@ import EndPoints from '../networking/EndPoints';
 const EditRoom = props => {
   const {navigation} = props;
   const {item, onPressEditSuccess} = props?.route?.params;
-  let temData = {...item};
+  const [temData, setTempData] = useState(item);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -85,7 +85,6 @@ const EditRoom = props => {
   const nameOnChange = name => {
     setName(name);
     if (name !== '' && name.length < 4) {
-      temData.rm_own_Fullname = name;
       setErrorName(true);
     } else {
       setErrorName(false);
@@ -96,7 +95,6 @@ const EditRoom = props => {
     setRent(rent);
 
     if (rent !== '' && rent.length < 3) {
-      temData.rm_rent = rent;
       setRentError(true);
     } else {
       setRentError(false);
@@ -106,7 +104,6 @@ const EditRoom = props => {
   const onWhichFloorOnChange = whichFloor => {
     setWhichFloor(whichFloor);
     if (whichFloor !== '' && whichFloor.length < 2) {
-      temData.rm_flor = whichFloor;
       setWhichFloorError(true);
     } else {
       setWhichFloorError(false);
@@ -126,6 +123,19 @@ const EditRoom = props => {
       rm_rent: rent,
     };
 
+    temData.rm_rent = rent;
+    setTempData({
+      ...temData,
+      rm_own_Fullname: 'name',
+      rm_own_mble_num: 'mobileNumber',
+      rm_size: 'roomSize',
+      rm_furnisd_status: furnishedStatus,
+      rm_availble: availableStatus,
+      rm_prking_avblity: parkingStatus,
+      rm_depndecy: dependencyStatus,
+      rm_flor: whichFloor,
+      rm_rent: rent,
+    });
     let rowData = {
       room_id: item?.rm_pkey,
       data: data,
@@ -136,6 +146,7 @@ const EditRoom = props => {
 
   const updateRoom = data => {
     setLoading(true);
+
     console.log(temData, 'temData');
     onPressEditSuccess(temData);
     navigation.goBack();

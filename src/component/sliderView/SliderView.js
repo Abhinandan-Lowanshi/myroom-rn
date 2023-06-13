@@ -36,7 +36,7 @@ const SliderView = props => {
   const renderItem = ({item, index}) => {
     return (
       <View style={style.itemContainer(windowWidth)}>
-        <Image source={item?.image} style={style.image} resizeMode="contain" />
+        <Image source={item?.image} style={style.image} resizeMode="stretch" />
         {index !== 0 && index === 2 && (
           <TouchableOpacity
             style={style.buttonUpload}
@@ -88,6 +88,7 @@ const SliderView = props => {
         inActiveDotColor={Colors.PRIMARYLITE}
         containerStyle={{
           position: 'absolute',
+          bottom: hp(-3),
         }}
       />
     </View>

@@ -660,6 +660,7 @@ const style = StyleSheet.create({
     fontWeight: '600',
   },
   labelLocation: {
+    maxWidth: '85%',
     color: Colors.BLACK,
     fontSize: RF(1.4),
     fontWeight: '600',
@@ -677,13 +678,16 @@ const style = StyleSheet.create({
   },
   containerLocationMode: {
     flexDirection: 'row',
+    marginTop: hp(0.5),
   },
   labelLocationMode: {
+    maxHeight: hp(2.5),
     backgroundColor: Colors.RED,
     color: Colors.WHITE,
     fontSize: RF(1.3),
     paddingHorizontal: hp(1),
     borderRadius: hp(0.5),
     marginRight: hp(0.5),
+    maxWidth: '15%',
   },
 });

@@ -135,10 +135,15 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressCancel = () => {
+    navigation.goBack();
+  };
+
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
       <Header label={'My Post'} navigation={navigation} />
-      {loading && <LowOpacityLoader />}
+      {loading && <LowOpacityLoader onPress={onPressCancel} />}
 
       <RenderRoom
         container={style.container}

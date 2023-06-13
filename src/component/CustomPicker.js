@@ -13,14 +13,16 @@ const CustomPicker = ({
   outerContainer,
   labelTop,
   value,
+  isLoading,
 }) => {
   // const [value, setValue] = useState(null);
   const [isFocus, setIsFocus] = useState(false);
   return (
     <View style={[outerContainer, styles.outerContainer]}>
       {labelTop && <Text style={styles.topLabel}>{labelTop}</Text>}
-      <View style={[styles.container, container]}>
+      <View style={[styles.container(isLoading), container]}>
         <Dropdown
+          disable={isLoading}
           style={[styles.dropdown, isFocus && {borderColor: 'blue'}]}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
@@ -50,17 +52,17 @@ const CustomPicker = ({
 export default CustomPicker;
 
 const styles = StyleSheet.create({
-  container: {
+  container: isLoading => ({
     backgroundColor: 'white',
     width: '90%',
     alignSelf: 'center',
     borderRadius: hp(0.8),
     height: hp(6.5),
     elevation: 3,
-    borderColor: Colors.GREY,
+    borderColor: isLoading ? Colors.PRIMARY : Colors.GREY,
     borderRadius: hp(1),
     borderWidth: hp(0.2),
-  },
+  }),
   outerContainer: {},
   topLabel: {
     fontSize: RF(1.3),

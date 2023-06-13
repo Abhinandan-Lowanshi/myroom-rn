@@ -102,8 +102,8 @@ const AppSettings = props => {
       dispatch(setLocation(Ob));
     } else {
       showToast('Please select location');
+      setSave(false);
     }
-    setSave(false);
   };
 
   const saveLocation = () => {

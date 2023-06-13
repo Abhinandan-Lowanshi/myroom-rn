@@ -16,7 +16,7 @@ import DetailsScreen from './src/screen/DetailsScreen';
 import MyPost from './src/screen/MyPost';
 import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
-import UploadFormSTP2 from './src/screen/UploadFormSTP2';
+import Upload from './src/screen/Upload';
 import localStorageOp from './src/localStorage/LocalData';
 import Notification from './src/screen/Notification';
 import EditRoom from './src/screen/EditRoom';
@@ -82,10 +82,7 @@ const App = () => {
             name={ScreenName.changePassword}
             component={ChangePassword}
           />
-          <Stack.Screen
-            name={ScreenName.UploadFormSTP2}
-            component={UploadFormSTP2}
-          />
+          <Stack.Screen name={ScreenName.Upload} component={Upload} />
           <Stack.Screen name={ScreenName.Search} component={Search} />
           <Stack.Screen
             name={ScreenName.DetailsScreen}
