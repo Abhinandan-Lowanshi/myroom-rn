@@ -104,7 +104,7 @@ const Login = ({navigation}) => {
             value={email}
             onChangeText={onEmailText}
             error={emailError}
-            placeholder={'Enter email'}
+            placeholder={'email'}
             errorMessage={'Invalid Email'}
           />
           <CustomInputText
@@ -112,7 +112,7 @@ const Login = ({navigation}) => {
             onChangeText={onPasswordText}
             outerContainer={style.inputContainerStyle}
             error={passwordError}
-            placeholder={'Enter password'}
+            placeholder={'password'}
             errorMessage={'Invalid password'}
             isPassworHidden={true}
             isEyeVisible={true}

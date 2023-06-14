@@ -163,7 +163,7 @@ const ForgotPassword = ({navigation}) => {
             onChangeText={onChangeEmail}
             outerContainer={style.outerContainerSocial}
             error={emailError}
-            placeholder={'Enter Email'}
+            placeholder={'Email'}
             errorMessage={'Invalid Email'}
             toplabel={'Enter Email'}
           />
@@ -175,7 +175,7 @@ const ForgotPassword = ({navigation}) => {
               onChangeText={onChangeOtp}
               outerContainer={style.outerContainerSocial}
               error={otpError}
-              placeholder={'Enter OTP'}
+              placeholder={'OTP'}
               errorMessage={'Invalid OTP'}
               toplabel={'Enter OTP'}
             />
@@ -188,7 +188,7 @@ const ForgotPassword = ({navigation}) => {
                 onChangeText={onChangePassword}
                 outerContainer={style.outerContainerSocial}
                 error={passwordError}
-                placeholder={'Enter Password'}
+                placeholder={'Password'}
                 errorMessage={'Invalid Password'}
                 toplabel={'Enter Password'}
                 isEyeVisible={true}
@@ -198,7 +198,7 @@ const ForgotPassword = ({navigation}) => {
                 onChangeText={onChangeRePassword}
                 outerContainer={style.outerContainerSocial}
                 error={rePasswordError}
-                placeholder={'Enter Re-Password'}
+                placeholder={'Re-Password'}
                 errorMessage={'Invalid Re-Password'}
                 toplabel={'Enter Re-Password'}
                 isEyeVisible={true}

@@ -21,6 +21,8 @@ const SignUp = ({navigation}) => {
   const [nameError, setErrorName] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setErrorPassword] = useState(false);
+  const [mobile, setMobile] = useState('');
+  const [mobileError, setMobileError] = useState(false);
   const [rePassword, setRePassword] = useState('');
   const [rePasswordError, setRePasswordError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,13 +37,14 @@ const SignUp = ({navigation}) => {
       !validateEmail(email) ||
       password.length < 8 ||
       rePassword.length < 8 ||
+      mobile.length < 10 ||
       !isPasswordMatch
     ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
-  }, [name, email, password, rePassword, isPasswordMatch]);
+  }, [name, email, password, rePassword, isPasswordMatch, mobile]);
 
   useEffect(() => {
     if (password === rePassword) {
@@ -73,6 +76,12 @@ const SignUp = ({navigation}) => {
     else setErrorPassword(false);
   };
 
+  const onChangeMobile = mobile => {
+    setMobile(mobile);
+    if (mobile.length < 10 && !mobile == '') setMobileError(true);
+    else setMobileError(false);
+  };
+
   const onRePasswordText = password => {
     setRePassword(password);
     if (password.length < 8 && !password == '') setRePasswordError(true);
@@ -92,7 +101,7 @@ const SignUp = ({navigation}) => {
                 firstName: name,
                 lastName: '',
                 email: email,
-                phone: '',
+                phone: mobile,
                 currentAdrs: '',
                 prmntAddress: '',
                 password: password,
@@ -130,7 +139,7 @@ const SignUp = ({navigation}) => {
             onChangeText={nameOnChange}
             outerContainer={style.outerContainerSocial}
             error={nameError}
-            placeholder={'Enter FullName'}
+            placeholder={'FullName'}
             errorMessage={'Invalid Name'}
           />
           <CustomInputText
@@ -138,15 +147,23 @@ const SignUp = ({navigation}) => {
             onChangeText={emailOnChange}
             outerContainer={style.outerContainerSocial}
             error={emailError}
-            placeholder={'Enter Email'}
+            placeholder={'Email'}
             errorMessage={'Invalid Email'}
+          />
+          <CustomInputText
+            value={mobile}
+            onChangeText={onChangeMobile}
+            outerContainer={style.outerContainerSocial}
+            error={mobileError}
+            placeholder={'mobile number'}
+            errorMessage={'Invalid mobile number'}
           />
           <CustomInputText
             value={password}
             onChangeText={onChangePassword}
             outerContainer={style.outerContainerSocial}
             error={passwordError}
-            placeholder={'Enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />
@@ -155,7 +172,7 @@ const SignUp = ({navigation}) => {
             onChangeText={onRePasswordText}
             outerContainer={style.outerContainerSocial}
             error={rePasswordError}
-            placeholder={'Enter Re-Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Re-Password'}
             isEyeVisible={true}
           />

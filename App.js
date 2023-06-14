@@ -16,12 +16,14 @@ import DetailsScreen from './src/screen/DetailsScreen';
 import MyPost from './src/screen/MyPost';
 import ChangePassword from './src/screen/ChangePassword';
 import {Provider} from 'react-redux';
-import UploadFormSTP2 from './src/screen/UploadFormSTP2';
+import Upload from './src/screen/Upload';
 import localStorageOp from './src/localStorage/LocalData';
 import Notification from './src/screen/Notification';
 import EditRoom from './src/screen/EditRoom';
 import GetLocationByMap from './src/component/GetLocationByMap';
 import AppSettings from './src/screen/AppSettings';
+import AboutUs from './src/screen/AboutUs';
+import PrivacyPolicy from './src/screen/PrivacyPolicy';
 import Fav from './src/screen/Fav';
 import Chat from './src/screen/Chat/Chat';
 import UserProfile from './src/screen/Chat/UserProfile';
@@ -45,6 +47,11 @@ const App = () => {
           <Stack.Screen name={ScreenName.Fav} component={Fav} />
           <Stack.Screen name={ScreenName.MoreRooms} component={MoreRooms} />
           <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
+          <Stack.Screen name={ScreenName.AboutUs} component={AboutUs} />
+          <Stack.Screen
+            name={ScreenName.PrivacyPolicy}
+            component={PrivacyPolicy}
+          />
           <Stack.Screen name={ScreenName.Chat} component={Chat} />
           <Stack.Screen name={ScreenName.UserProfile} component={UserProfile} />
           <Stack.Screen
@@ -75,10 +82,7 @@ const App = () => {
             name={ScreenName.changePassword}
             component={ChangePassword}
           />
-          <Stack.Screen
-            name={ScreenName.UploadFormSTP2}
-            component={UploadFormSTP2}
-          />
+          <Stack.Screen name={ScreenName.Upload} component={Upload} />
           <Stack.Screen name={ScreenName.Search} component={Search} />
           <Stack.Screen
             name={ScreenName.DetailsScreen}

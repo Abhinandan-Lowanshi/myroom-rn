@@ -83,16 +83,24 @@ const Home = ({route, navigation}) => {
             dispatch(setLocationMode({locationMode: 'Default'}));
             localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
               .then(value => {
-                dispatch(
-                  setCurrentLocationName({
-                    locationName: value?.formatted_address,
-                  }),
-                );
-                let Ob = {
-                  latitude: value?.geometry?.location?.lat,
-                  longitude: value?.geometry?.location?.lng,
-                };
-                dispatch(setLocation(Ob));
+                if (value) {
+                  dispatch(
+                    setCurrentLocationName({
+                      locationName: value?.formatted_address,
+                    }),
+                  );
+                  let Ob = {
+                    latitude: value?.geometry?.location?.lat,
+                    longitude: value?.geometry?.location?.lng,
+                  };
+                  dispatch(setLocation(Ob));
+                } else {
+                  localStorageOp(true, AsyncKeys.LOCATION_MODE, {
+                    mode: AsyncKeys.CUSTOM,
+                  });
+                  dispatch(setLocationMode({locationMode: 'Live'}));
+                  requestLocationPermission();
+                }
               })
               .catch(() => {});
           } else {
@@ -139,6 +147,7 @@ const Home = ({route, navigation}) => {
   useEffect(() => {
     setLoading(true);
     getData();
+    updateUserNotification();
   }, [data]);
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
@@ -153,6 +162,25 @@ const Home = ({route, navigation}) => {
       'Non-serializable values were found in the navigation state',
     ]);
   }, []);
+
+  const updateUserNotification = () => {
+    if (data?.longitude && data?.latitude) {
+      sendRequest(
+        {
+          user_id: '1',
+          usr_latitude: data?.latitude,
+          usr_longitude: data?.longitude,
+          isNotify: true,
+        },
+        EndPoints.updateUserNotificationDetails,
+        'POST',
+      )
+        .then(response => {
+          console.log(response, 'updateUserNotification');
+        })
+        .catch(() => {});
+    }
+  };
 
   const getAddressFromCoordinates = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
@@ -529,7 +557,11 @@ const Home = ({route, navigation}) => {
             {LocationMode?.locationMode}
           </Text>
           <Text style={style.labelLocation}>
-            {currentLocationName?.locationName}
+            {LocationMode?.locationMode === 'Live'
+              ? loading
+                ? 'Getting location '
+                : currentLocationName?.locationName
+              : currentLocationName?.locationName}
           </Text>
         </View>
       </View>
@@ -628,6 +660,7 @@ const style = StyleSheet.create({
     fontWeight: '600',
   },
   labelLocation: {
+    maxWidth: '85%',
     color: Colors.BLACK,
     fontSize: RF(1.4),
     fontWeight: '600',
@@ -645,13 +678,16 @@ const style = StyleSheet.create({
   },
   containerLocationMode: {
     flexDirection: 'row',
+    marginTop: hp(0.5),
   },
   labelLocationMode: {
+    maxHeight: hp(2.5),
     backgroundColor: Colors.RED,
     color: Colors.WHITE,
     fontSize: RF(1.3),
     paddingHorizontal: hp(1),
     borderRadius: hp(0.5),
     marginRight: hp(0.5),
+    maxWidth: '15%',
   },
 });

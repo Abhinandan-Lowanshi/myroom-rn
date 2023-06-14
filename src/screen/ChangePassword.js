@@ -114,7 +114,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={onCurrentPasswordText}
             outerContainer={style.outerContainerSocial}
             error={currentPasswordError}
-            placeholder={'Enter Current Password'}
+            placeholder={'Current Password'}
             errorMessage={'Enter Current Password'}
             isEyeVisible={true}
           />
@@ -123,7 +123,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={passwordOnChange}
             outerContainer={style.outerContainerSocial}
             error={passwordError}
-            placeholder={'Enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />
@@ -132,7 +132,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={rePasswordOnChange}
             outerContainer={style.outerContainerSocial}
             error={rePasswordError}
-            placeholder={'Re-enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />

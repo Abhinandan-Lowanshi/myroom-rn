@@ -37,16 +37,19 @@ const Fav = ({navigation, route}) => {
     setLoading(true);
     getData();
   }, []);
+
   const onRefresh = () => {
     setRefreshing(true);
     getData();
   };
+
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
       item,
       onPressFav,
     });
   };
+
   const getData = () => {
     sendRequest(
       {
@@ -68,6 +71,7 @@ const Fav = ({navigation, route}) => {
         setRefreshing(false);
       });
   };
+
   const performFavOp = data => {
     let temp = JSON.parse(JSON.stringify(favList));
     temp.map(item => {
@@ -77,6 +81,7 @@ const Fav = ({navigation, route}) => {
     });
     dispatch(setFavData(temp));
   };
+
   const onPressFav = async value1 => {
     let value = {...value1};
     let data = {
@@ -122,14 +127,20 @@ const Fav = ({navigation, route}) => {
       return false;
     }
   };
+
   const showToast = message => {
     Toast.show(message, Toast.LONG);
   };
+
+  const onPressCancel = () => {
+    navigation.goBack();
+  };
+
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels.Favourite} navigation={navigation} />
       {loading ? (
-        <LowOpacityLoader />
+        <LowOpacityLoader onPress={onPressCancel} cancel={true} />
       ) : favList?.length > 0 ? (
         <RenderRoom
           container={style.container}

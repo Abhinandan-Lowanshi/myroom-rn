@@ -36,4 +36,6 @@ export default Screen = {
   UserProfile: 'UserProfile',
   RoomDetailsOwner: 'RoomDetailsOwner',
   MoreRooms: 'MoreRooms',
+  AboutUs: 'AboutUs',
+  PrivacyPolicy: 'PrivacyPolicy',
 };
