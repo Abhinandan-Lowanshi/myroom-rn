@@ -27,10 +27,10 @@ import {getAccountImfo} from '../redux/Slice';
 import {useDispatch} from 'react-redux';
 const Login = ({navigation}) => {
   // const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
   const [loading, SetIsLoading] = useState(false);
   // const [password, setPassword] = useState('Abhi@7049');
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('Abhi@7049');
   const [emailError, setEmailError] = useState(false);
   const [authError, setAuthError] = useState('');
   const [passwordError, setPasswordError] = useState(false);
@@ -57,11 +57,18 @@ const Login = ({navigation}) => {
   };
 
   const SignUp = () => {
+    let token = '';
+    localStorageOp('', AsyncKeys.FCMToken, '')
+      .then(data => {
+        token = data?.token;
+      })
+      .catch(error => {});
     SetIsLoading(true);
     sendRequest(
       {
         email: email,
         password: password,
+        // device_token : token
       },
       EndPoints.login,
       'POST',
@@ -72,7 +79,6 @@ const Login = ({navigation}) => {
           setApiError(response?.message);
           localStorageOp(true, AsyncKeys.USERDATA, response);
           dispatch(getAccountImfo(response));
-          // navigation.navigate(ScreenName.TabComponent);
           navigation.dispatch(
             CommonActions.reset({
               index: 0,

@@ -7,9 +7,11 @@ import AsyncKeys from '../localStorage/AsyncKeys';
 import {CommonActions} from '@react-navigation/native';
 import {getAccountImfo} from '../redux/Slice';
 import {useDispatch} from 'react-redux';
+import {getFCMToken} from '../Utils/PushNotification';
 const Splash = ({navigation}) => {
   const dispatch = useDispatch();
   useEffect(() => {
+    getFCMToken();
     setTimeout(() => {
       localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
         if (res?.data?.usr_id) {

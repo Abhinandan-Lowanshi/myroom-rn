@@ -29,9 +29,20 @@ import Chat from './src/screen/Chat/Chat';
 import UserProfile from './src/screen/Chat/UserProfile';
 import RoomDetailsOwner from './src/screen/RoomDetailsOwner';
 import MoreRooms from './src/screen/MoreRooms';
-
+import {getFCMToken} from './src/Utils/PushNotification';
+import {Alert} from 'react-native';
+import messaging from '@react-native-firebase/messaging';
+import {notificationListener} from './src/Utils/PushNotification';
 const Stack = createNativeStackNavigator();
+
 const App = () => {
+  useEffect(() => {
+    notificationListener();
+  }, []);
+
+  useEffect(() => {
+    getFCMToken();
+  }, []);
   return (
     <Provider store={store}>
       <NavigationContainer>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "652059925016",
+    "project_id": "myroom-45d2a",
+    "storage_bucket": "myroom-45d2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:652059925016:android:d42bdf4e10910e99a4016d",
+        "android_client_info": {
+          "package_name": "com.myroom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "652059925016-n9gdjksbambrrdblo5v9nancvsduufue.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRj8000D5l3jHoWgXjLT8SY7_yTyJtpl8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "652059925016-n9gdjksbambrrdblo5v9nancvsduufue.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
