@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useRef} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -47,7 +47,8 @@ const DetailsScreen = props => {
   const [imageData, setImageData] = useState({});
   const propData = props?.route?.params?.item;
   const [visible, setVisible] = useState(false);
-  const [item, setItem] = useState({});
+  const [item, setItem] = useState(null);
+  const [imageBottomData, setImageBottomData] = useState([]);
   const onPressFav = props?.route?.params?.onPressFav;
   const roomInfo = props?.route?.params.roomInfo;
   const disabled = props?.route?.params.disabled;
@@ -55,6 +56,11 @@ const DetailsScreen = props => {
   const windowHeight = Dimensions.get('window').height;
   const data = useSelector(state => state.AllData.locationInfo);
   const [locationData, setLocationData] = useState({});
+  const [index, setIndex] = useState(0);
+  const flatlistRef = useRef();
+  const flatlistRefModal = useRef();
+  const flatlistRefBottom = useRef();
+
   useEffect(() => {
     setLike(propData?.favorite_key);
     setItem(propData);
@@ -63,6 +69,22 @@ const DetailsScreen = props => {
       getRoomFromServer(roomInfo?.roomId);
     } else setCheck(true);
   }, []);
+
+  useEffect(() => {
+    if (item?.images) {
+      console.log(item, 'useEffect');
+      prepareImage(item?.images);
+    }
+  }, [item]);
+
+  const prepareImage = data => {
+    let temp = [];
+    temp = data?.map((item, index) => {
+      return {...item, active: index === 0 ? true : false};
+    });
+    console.log(temp, 'setImageBottomData');
+    setImageBottomData(temp);
+  };
 
   const setZoom = () => {
     let level = 0.001;
@@ -142,6 +164,19 @@ const DetailsScreen = props => {
         setApiError(err.toString());
       });
   };
+
+  const renderFullImages = ({item}) => {
+    console.log(item, 'renderFullImages');
+    return (
+      <View style={{}}>
+        <Custom_Image
+          resizeMode={ImageScaleType.contain}
+          uri={item?.img_name}
+          container={{width: windowWidth}}
+        />
+      </View>
+    );
+  };
   const ShowFullImage = () => {
     return (
       <Modal
@@ -151,18 +186,22 @@ const DetailsScreen = props => {
         onRequestClose={() => {
           setVisible(false);
         }}>
-        <Custom_Image
-          resizeMode={ImageScaleType.contain}
-          uri={imageData?.img_name}
-          container={{width: '100%', height: '97%', borderRadius: hp(2)}}
-        />
-        <IconButton_MaterialCommunityIcons
-          onPress={() => {
-            setVisible(false);
-          }}
-          iconContainer={{position: 'absolute', right: hp(2), top: hp(1)}}
-          fValue={IconName?.close}
-        />
+        <View style={{flex: 1}}>
+          <FlatList
+            style={{flex: 1}}
+            horizontal={true}
+            data={imageBottomData}
+            renderItem={renderFullImages}
+          />
+
+          <IconButton_MaterialCommunityIcons
+            onPress={() => {
+              setVisible(false);
+            }}
+            iconContainer={{position: 'absolute', right: hp(2), top: hp(1)}}
+            fValue={IconName?.close}
+          />
+        </View>
       </Modal>
     );
   };
@@ -229,13 +268,12 @@ const DetailsScreen = props => {
       </View>
     );
   };
-  const renderImages = ({item}) => {
+  const renderImages = ({item, index}) => {
     return (
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          setVisible(true);
-          setImageData(item);
+          onPressFullImage(index);
         }}>
         <Custom_Image
           uri={item?.img_name}
@@ -243,6 +281,19 @@ const DetailsScreen = props => {
         />
       </TouchableOpacity>
     );
+  };
+
+  const onPressFullImage = index => {
+    setVisible(true);
+    setImageData(item);
+    setTimeout(() => {
+      if (flatlistRefModal.current) {
+        flatlistRefModal.current.scrollToIndex({
+          animated: true,
+          index: index,
+        });
+      }
+    }, 50);
   };
 
   const SpecificationDetails = props => {
@@ -364,13 +415,48 @@ const DetailsScreen = props => {
     );
   };
 
-  // const viewProfile = () => {
-  //   return (
-  //     <View>
-  //       <Text style={{color: Colors.BLACK}}>View profile</Text>
-  //     </View>
-  //   );
-  // };
+  const changeImageIndex = (indexF, fromMain = false) => {
+    if (fromMain) {
+      flatlistRef.current.scrollToIndex({animated: true, index: indexF});
+    }
+    let temp = [];
+    temp = imageBottomData?.map((item, index) => {
+      return {...item, active: index === indexF ? true : false};
+    });
+    console.log(temp, 'indexF === index');
+    setImageBottomData(temp);
+  };
+
+  const renderBottomImages = ({item, index}) => {
+    return (
+      <TouchableOpacity
+        style={style.imageBottomContainer(item?.active)}
+        activeOpacity={0.9}
+        onPress={() => changeImageIndex(index, true)}>
+        <Custom_Image uri={item?.img_name} container={style.imageBottom} />
+      </TouchableOpacity>
+    );
+  };
+  const handleScroll = event => {
+    let index = Math.ceil(event.nativeEvent.contentOffset.x / windowWidth);
+    if (index => 0) {
+      setIndex(index);
+      changeImageIndex(index);
+    }
+  };
+
+  const imageCount = (images = []) => {
+    if (images?.length) {
+      return (
+        <View style={style.imageCountContainer}>
+          <Text style={style.imageCountLabel}>{`${index + 1}/${
+            images?.length
+          }`}</Text>
+        </View>
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
@@ -378,11 +464,25 @@ const DetailsScreen = props => {
       {roomInfo?.isServer && loading && <LowOpacityLoader />}
       {check && (
         <ScrollView style={{opacity: visible ? 0.2 : 1}}>
-          <FlatList
-            horizontal={true}
-            data={item?.images}
-            renderItem={renderImages}
-          />
+          <View>
+            <FlatList
+              onScroll={handleScroll}
+              ref={flatlistRef}
+              horizontal={true}
+              data={item?.images}
+              renderItem={renderImages}
+            />
+            {imageCount(item?.images)}
+          </View>
+          <View style={style.imageContainer}>
+            <FlatList
+              ref={flatlistRefBottom}
+              horizontal={true}
+              data={imageBottomData}
+              renderItem={renderBottomImages}
+            />
+          </View>
+
           <View style={style.contentContainer}>
             <View style={style.addressView}>
               <View style={style.addressContainer}>
@@ -689,5 +789,33 @@ const style = StyleSheet.create({
     position: 'absolute',
     marginLeft: hp(1.5),
     marginTop: hp(0.6),
+  },
+  imageBottom: {
+    height: hp(8),
+    width: hp(8),
+    borderRadius: 10,
+  },
+  imageBottomContainer: active => ({
+    borderWidth: active ? 2 : 0,
+    borderColor: Colors.PRIMARY,
+    margin: hp(1),
+    borderRadius: 10,
+  }),
+  imageContainer: {
+    marginTop: hp(2),
+    marginHorizontal: hp(1),
+  },
+  imageCountContainer: {
+    position: 'absolute',
+    backgroundColor: Colors.BLACK1,
+    borderRadius: hp(1),
+    bottom: hp(1.4),
+    left: hp(1),
+  },
+  imageCountLabel: {
+    fontSize: RF(1.9),
+    marginHorizontal: hp(2),
+    marginVertical: hp(0.3),
+    color: Colors.WHITE,
   },
 });

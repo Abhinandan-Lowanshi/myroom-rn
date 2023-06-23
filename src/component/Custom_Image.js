@@ -22,14 +22,18 @@ const Custom_Image = props => {
           uri: isBroken ? 'https://picsum.photos/id/237/200/300' : props.uri,
         }}></FastImage>
       {loadImage && (
-        <ActivityIndicator
-          size={'large'}
+        <View
           style={{
+            width: '100%',
+            height: '100%',
             position: 'absolute',
-            top: '50%',
-            right: '50%',
-          }}
-          color={Colors.PRIMARY}></ActivityIndicator>
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <ActivityIndicator
+            size={'large'}
+            color={Colors.PRIMARY}></ActivityIndicator>
+        </View>
       )}
     </View>
   );
