@@ -2,6 +2,7 @@ import React from 'react';
 import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import Colors from '../common/Colors';
+import images from '../common/images';
 const Custom_Image = props => {
   let [loadImage, setLoadImage] = React.useState(true);
   const [isBroken, setIsBroken] = React.useState(false);
@@ -9,8 +10,8 @@ const Custom_Image = props => {
   return (
     <View style={[style.container, props.container]}>
       <FastImage
-        resizeMode={props?.resizeMode || FastImage.resizeMode.cover}
-        style={props?.imageStyle || {flex: 1, borderRadius: 5}}
+        resizeMode={FastImage.resizeMode.cover || props?.resizeMode}
+        style={{flex: 1, borderRadius: 5} || props?.imageStyle}
         onLoadEnd={() => {
           setLoadImage(false);
         }}
@@ -18,9 +19,9 @@ const Custom_Image = props => {
           setIsBroken(true);
         }}
         onLoadStart={() => {}}
-        source={{
-          uri: isBroken ? 'https://picsum.photos/id/237/200/300' : props.uri,
-        }}></FastImage>
+        source={
+          props.uri ? {uri: props.uri} : images.imagePlaceHolder
+        }></FastImage>
       {loadImage && (
         <View
           style={{
@@ -42,5 +43,6 @@ export default Custom_Image;
 const style = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.GREY5,
   },
 });

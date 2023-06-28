@@ -246,7 +246,7 @@ const style = StyleSheet.create({
   },
   labelRent: {
     color: 'green',
-    fontSize: 20,
+    fontSize: hp(2),
     fontWeight: '700',
     marginLeft: 5,
     position: 'absolute',
@@ -279,6 +279,7 @@ const style = StyleSheet.create({
     borderRadius: 5,
   },
   labelLow: {
+    fontSize: RF(1.2),
     marginHorizontal: 8,
     marginVertical: 2,
     color: 'white',
@@ -290,13 +291,13 @@ const style = StyleSheet.create({
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: 18,
+    fontSize: RF(2),
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
     color: 'black',
-    fontSize: 13,
+    fontSize: RF(1.6),
     fontWeight: '400',
     marginLeft: 5,
   },

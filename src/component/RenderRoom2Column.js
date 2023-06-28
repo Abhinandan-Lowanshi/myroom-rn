@@ -274,8 +274,8 @@ const style = StyleSheet.create({
   },
   labelRent: {
     color: 'green',
-    fontSize: RF(2),
-    fontWeight: '700',
+    fontSize: RF(1.8),
+    fontWeight: '600',
     alignSelf: 'flex-end',
   },
   timestamp: {
@@ -304,6 +304,7 @@ const style = StyleSheet.create({
     borderRadius: 5,
   },
   labelLow: {
+    fontSize: hp(0.4),
     marginHorizontal: 8,
     marginVertical: 2,
     color: 'white',
@@ -315,13 +316,13 @@ const style = StyleSheet.create({
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: 18,
+    fontSize: hp(2),
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
-    color: 'black',
-    fontSize: 13,
+    color: Colors.GREY4,
+    fontSize: hp(1.3),
     fontWeight: '400',
   },
   containerBottom: {
@@ -338,7 +339,7 @@ const style = StyleSheet.create({
   },
   labelAvailable: {
     color: 'black',
-    fontSize: 10,
+    fontSize: hp(1.2),
   },
   containerOptional: {
     backgroundColor: Colors.PRIMARY,

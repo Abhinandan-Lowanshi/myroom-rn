@@ -18,8 +18,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import StyleGlobel from '../Style/StyleGlobel';
 import Custom_Image from '../component/Custom_Image';
 import Header from '../component/Header';
-import Icon from 'react-native-vector-icons/dist/Entypo';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
+
 import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import {RF, hp} from '../common/CommonFunctions';
 import labels from '../common/labels';
@@ -27,7 +26,7 @@ import Labels from '../common/labels';
 import IconName from '../common/IconName';
 import Colors from '../common/Colors';
 import ImageScaleType from '../common/ImageScaleType';
-import MapView, {Marker} from 'react-native-maps';
+import MapScreen, {Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
@@ -36,7 +35,8 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import images from '../common/images';
 import ScreenName from '../common/ScreenName';
-
+import {styles} from 'react-native-image-slider-banner/src/style';
+import Icon from '../component/Icon';
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
@@ -60,7 +60,7 @@ const DetailsScreen = props => {
   const flatlistRef = useRef();
   const flatlistRefModal = useRef();
   const flatlistRefBottom = useRef();
-
+  let lastIndex = 0;
   useEffect(() => {
     setLike(propData?.favorite_key);
     setItem(propData);
@@ -70,6 +70,9 @@ const DetailsScreen = props => {
     } else setCheck(true);
   }, []);
 
+  useEffect(() => {
+    console.log(item?.images?.length, 'useEffect');
+  }, []);
   useEffect(() => {
     if (item?.images) {
       console.log(item, 'useEffect');
@@ -86,56 +89,6 @@ const DetailsScreen = props => {
     setImageBottomData(temp);
   };
 
-  const setZoom = () => {
-    let level = 0.001;
-    //   let distance = 1;
-    //   if (locationData?.distance?.value) {
-    //     distance = locationData?.distance?.value;
-    //     console.log(distance);
-    //     if (distance < 500) {
-    //       level = 0.001;
-    //       return level;
-    //       console.log(0.001);
-    //     } else if (distance < 1000) {
-    //       level = 0.002;
-    //       return level;
-    //       console.log(0.002);
-    //     } else if (distance < 1500) {
-    //       level = 0.05;
-    //       return level;
-    //       console.log(0.004);
-    //     } else if (distance < 2000) {
-    //       level = 0.005;
-    //       console.log(0.005);
-    //     } else if (distance < 4000) {
-    //       level = 0.007;
-    //       return level;
-    //       console.log(0.007);
-    //     } else if (distance < 7000) {
-    //       level = 0.009;
-    //       return level;
-    //       console.log(0.009);
-    //     } else if (distance < 11000) {
-    //       level = 0.01;
-    //       return level;
-    //       console.log(0.01);
-    //     } else if (distance < 15000) {
-    //       level = 0.03;
-    //       return level;
-    //       console.log(0.03);
-    //     } else if (distance < 25000) {
-    //       level = 0.05;
-    //       return level;
-    //       console.log(0.05);
-    //     } else {
-    //       level = 0.07;
-    //       return level;
-    //       console.log(0.07);
-    //     }
-    //     return level;sssss
-    //   }
-    return level;
-  };
   const getRoomFromServer = roomId => {
     sendRequest(
       {
@@ -206,27 +159,6 @@ const DetailsScreen = props => {
     );
   };
 
-  const ShareLayout = () => {
-    return (
-      <View style={style.containeshare}>
-        <IconButton_MaterialCommunityIcons
-          iconContainer={style.iconeShareContainer}
-          fValue={IconName?.googlemaps}
-          iconColor={Colors.GREEN1}
-        />
-        <IconButton_MaterialCommunityIcons
-          iconContainer={style.iconeShareContainer}
-          fValue={IconName?.whatsapp}
-          iconColor={Colors.GREEN2}
-        />
-        <IconButton_MaterialCommunityIcons
-          iconContainer={style.iconeShareContainer}
-          fValue={IconName?.share}
-        />
-      </View>
-    );
-  };
-
   const handleCall = (number = '') => {
     if (number !== '') {
       let phoneNumber;
@@ -251,6 +183,7 @@ const DetailsScreen = props => {
       navigation.navigate(ScreenName.Chat, {item: ob});
     }
   };
+
   const handleMessage = (phoneNumber = '') => {
     if (phoneNumber !== '') {
       let url = `sms:${phoneNumber}${
@@ -261,13 +194,7 @@ const DetailsScreen = props => {
       Toast.show('Something went wrong', Toast.LONG);
     }
   };
-  const ContentHeader = props => {
-    return (
-      <View style={[style.headerContainer, props.headerContainer]}>
-        <Text style={style.labelOwnerInfo}>{props?.label}</Text>
-      </View>
-    );
-  };
+
   const renderImages = ({item, index}) => {
     return (
       <TouchableOpacity
@@ -296,15 +223,6 @@ const DetailsScreen = props => {
     }, 50);
   };
 
-  const SpecificationDetails = props => {
-    return (
-      <View style={[style.containerInside, props?.containerInside]}>
-        <Text style={[style.labelSt, props?.labelSt]}>{props?.label}</Text>
-        <Text style={[style.labelANS, props?.labelANS]}>{props?.labelAns}</Text>
-      </View>
-    );
-  };
-
   const IconButton_Entypo = props => {
     return (
       <TouchableOpacity
@@ -324,10 +242,11 @@ const DetailsScreen = props => {
       <TouchableOpacity
         style={[style.iconContainer, props?.iconContainer]}
         onPress={props?.onPress}>
-        <MaterialCommunityIcons
+        <Icon
           name={props?.value ? props?.tValue : props.fValue}
           size={props?.iconSize || hp(5)}
           color={props?.iconColor || Colors.RED}
+          iconCommunity={'MaterialCommunityIcons'}
         />
       </TouchableOpacity>
     );
@@ -335,7 +254,7 @@ const DetailsScreen = props => {
 
   const getFullAddress = () => {
     let data = locationData?.end_address;
-    let address = '-------';
+    let address = '----------------';
     if (data) {
       let addressArray = data?.split(',');
       addressArray.shift();
@@ -344,75 +263,9 @@ const DetailsScreen = props => {
     return address;
   };
 
-  const RoomInformation = () => {
-    console.log(locationData, 'locationData');
-    return (
-      <View style={style.containerAddressView}>
-        <ContentHeader label={labels?.LocationInfo} />
-        <SpecificationDetails
-          containerInside={style.containerAddress}
-          labelANS={style.fullAddressStyle}
-          label={labels?.fullAddress}
-          labelAns={getFullAddress()}
-        />
-        <SpecificationDetails
-          containerInside={style.containerAddress}
-          labelANS={style.fullAddressStyle}
-          label={labels?.Distance}
-          labelAns={locationData?.distance?.text || '-------'}
-        />
-        <SpecificationDetails
-          containerInside={style.containerAddress}
-          labelANS={style.fullAddressStyle}
-          label={labels?.Time}
-          labelAns={locationData?.duration?.text || '-------'}
-        />
-      </View>
-    );
-  };
-
   const handleDismiss = () => {
     setApiError('');
     navigation.goBack();
-  };
-
-  const viewProfile = () => {
-    if (item?.rm_usr_fkey) {
-      navigation.navigate(ScreenName.UserProfile);
-    }
-  };
-
-  const ownerDetails = () => {
-    return (
-      <TouchableOpacity
-        style={style.ownerView}
-        onPress={viewProfile}
-        // disabled={disabled || props?.route?.params?.isFrom === 'MyPost'}>
-        disabled={true}>
-        <Image style={style.ownerImage} source={images.profileIcon}></Image>
-        <View style={style.ownerNameContainer}>
-          <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
-          <Text style={style.labelmoble}>{item?.rm_own_mble_num}</Text>
-        </View>
-        <View style={style.containerContact}>
-          <IconButton_Entypo
-            fValue={IconName?.message}
-            iconColor={Colors.BLUE2}
-            onPress={() => {
-              // handleMessage(item?.rm_own_mble_num);
-              handleChat();
-            }}
-          />
-          <IconButton_Entypo
-            fValue={IconName?.phone}
-            iconColor={Colors.GREEN1}
-            onPress={() => {
-              handleCall(item?.rm_own_mble_num);
-            }}
-          />
-        </View>
-      </TouchableOpacity>
-    );
   };
 
   const changeImageIndex = (indexF, fromMain = false) => {
@@ -439,7 +292,9 @@ const DetailsScreen = props => {
   };
   const handleScroll = event => {
     let index = Math.ceil(event.nativeEvent.contentOffset.x / windowWidth);
+
     if (index => 0) {
+      lastIndex = index;
       setIndex(index);
       changeImageIndex(index);
     }
@@ -457,161 +312,460 @@ const DetailsScreen = props => {
     }
   };
 
+  const shareProperty = () => {
+    return (
+      <View style={style.shareContainer}>
+        <IconButton_MaterialCommunityIcons
+          fValue={'share-variant'}
+          iconSize={hp(2.4)}
+          iconColor={Colors.WHITE}
+          iconContainer={style.shareInnerContainer}
+        />
+        <Text style={style.shareLabel}>Share property with your friend</Text>
+        <IconButton_MaterialCommunityIcons
+          fValue={'chevron-right'}
+          iconSize={hp(4)}
+          iconColor={Colors.WHITE}
+          iconContainer={style.arrowContainer}
+        />
+      </View>
+    );
+  };
+
+  const rentView = () => {
+    return (
+      <View style={style.containerRent}>
+        <Text style={style.rent}>
+          {`\u20B9 ${item?.rm_rent}`}
+          <Text style={style.month}>{` / Month (\u20B9 36000 Deposit)`}</Text>
+        </Text>
+      </View>
+    );
+  };
+
+  const roomSize = () => {
+    return <Text style={style.size}>{item?.rm_size}</Text>;
+  };
+
+  const FullAddress = () => {
+    return (
+      <View style={style.addressContainer}>
+        <Text style={style.address}>
+          {`${item?.rm_house_no},${item?.rm_colny}, ${item?.rm_city}`}
+        </Text>
+      </View>
+    );
+  };
+
+  const MapButton = ({
+    container,
+    leftIconStyle,
+    leftIcon,
+    rightIconStyle,
+    rightIcon,
+    label,
+    labelStyle,
+    rightColor,
+    rightSize,
+    leftSize,
+    leftColor,
+    iconCommunity,
+    onPress,
+  }) => {
+    return (
+      <TouchableOpacity onPress={onPress} style={container}>
+        {leftIcon && (
+          <Icon
+            style={leftIconStyle}
+            name={leftIcon || leftIcon}
+            color={leftColor || Colors.GREY4}
+            size={leftSize || hp(2.5)}
+            iconCommunity={iconCommunity}
+          />
+        )}
+        <Text style={[{color: Colors.GREY4, fontSize: RF(1.3)}, labelStyle]}>
+          {label}
+        </Text>
+        {rightIcon && (
+          <Icon
+            style={rightIconStyle}
+            name={rightIcon || rightIcon}
+            color={rightColor || Colors.GREY4}
+            size={rightSize || hp(3)}
+            iconCommunity={iconCommunity}
+          />
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const NameRow = ({label1, label2, style}) => {
+    return (
+      <View style={style}>
+        <Text
+          style={{
+            color: Colors.BLACK,
+            fontSize: RF(1.8),
+            fontWeight: '500',
+          }}>
+          {label1}
+        </Text>
+        <Text style={{color: Colors.GREY4, fontSize: RF(1.6)}}>{label2}</Text>
+      </View>
+    );
+  };
+
+  const contactView = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          paddingHorizontal: hp(3),
+          paddingBottom: hp(1),
+          // borderTopLeftRadius: hp(5),
+          // borderTopRightRadius: hp(5),
+          backgroundColor: Colors.GREY5,
+          paddingTop: hp(1),
+        }}>
+        <MapButton
+          container={{
+            flex: 1,
+            flexDirection: 'row',
+            backgroundColor: Colors.PRIMARY,
+            height: hp(4.8),
+            alignItems: 'center',
+            paddingHorizontal: hp(1),
+            borderRadius: hp(1.2),
+            alignSelf: 'center',
+            marginHorizontal: hp(2),
+            justifyContent: 'center',
+          }}
+          label={'Chat with Owner'}
+          labelStyle={{color: Colors.WHITE, marginLeft: hp(1.2)}}
+          leftIcon={'phone-call'}
+          leftColor={Colors.WHITE}
+          iconCommunity={'Feather'}
+        />
+        <MapButton
+          container={{
+            flex: 1,
+            flexDirection: 'row',
+            backgroundColor: Colors.PRIMARY,
+            height: hp(4.8),
+            alignItems: 'center',
+            paddingHorizontal: hp(1),
+            borderRadius: hp(1.2),
+            alignSelf: 'center',
+            marginHorizontal: hp(2),
+            justifyContent: 'center',
+          }}
+          label={'Chat with Owner'}
+          labelStyle={{color: Colors.WHITE, marginLeft: hp(1.2)}}
+          leftIcon={'message-circle'}
+          leftColor={Colors.WHITE}
+          iconCommunity={'Feather'}
+        />
+      </View>
+    );
+  };
+  const getDate = data => {
+    let date = '';
+    date = new Date(data);
+    return date.toLocaleString();
+  };
+
+  const ownerView = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: Colors.GREY5,
+          marginHorizontal: hp(1.5),
+          paddingVertical: hp(1.2),
+          paddingHorizontal: hp(1.5),
+          marginBottom: hp(2),
+          borderRadius: hp(1),
+        }}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View>
+            <NameRow
+              label1={item?.rm_own_Fullname}
+              label2={item?.rm_own_mble_num}
+            />
+            <NameRow
+              style={{marginTop: hp(1)}}
+              label1={'Posted On'}
+              label2={getDate(item?.created_at)}
+            />
+          </View>
+          <MapButton
+            container={{
+              flexDirection: 'row',
+              backgroundColor: Colors.PRIMARY,
+              height: hp(4.8),
+              alignItems: 'center',
+              paddingHorizontal: hp(1),
+              borderRadius: hp(1.2),
+              alignSelf: 'center',
+            }}
+            label={'Chat with Owner'}
+            // leftIcon={'map-o'}
+            rightIcon={'angle-right'}
+            labelStyle={{color: Colors.WHITE}}
+            rightColor={Colors.WHITE}
+            onPress={handleChat}
+          />
+        </View>
+      </View>
+    );
+  };
+  const SpecificationDetails = props => {
+    return (
+      <View style={[style.containerInside, props?.containerInside]}>
+        <Text style={[style.labelSt, props?.labelSt]}>{props?.label}</Text>
+        <Text style={[style.labelANS, props?.labelANS]}>{props?.labelAns}</Text>
+      </View>
+    );
+  };
+  const RoomInformation = () => {
+    console.log(locationData, 'locationData');
+    return (
+      <View
+        style={{
+          marginBottom: hp(3),
+        }}>
+        <MoreDetails
+          name={'address'}
+          color={Colors.GREY}
+          size={hp(3.2)}
+          header={'Location based address'}
+          data={getFullAddress()}
+          iconCommunity={'Entypo'}
+        />
+        <MoreDetails
+          name={'signal-distance-variant'}
+          color={Colors.GREY}
+          size={hp(3.2)}
+          header={labels?.Distance}
+          data={locationData?.distance?.text || '-------'}
+          iconCommunity={'MaterialCommunityIcons'}
+        />
+        <MoreDetails
+          name={'timer-sand'}
+          color={Colors.GREY}
+          size={hp(3.2)}
+          header={labels?.Time}
+          data={locationData?.distance?.text || '-------'}
+          iconCommunity={'MaterialCommunityIcons'}
+        />
+      </View>
+    );
+  };
+
+  const onPressMap = () => {
+    navigation.navigate(ScreenName.MapScreen, {
+      desRm_latitude: item?.rm_latitude,
+      desRm_longitude: item?.rm_longitude,
+      OrRm_latitude: data?.latitude,
+      OrRm_longitude: data?.longitude,
+    });
+  };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
       <Header label={Labels?.Details} navigation={navigation} />
       {roomInfo?.isServer && loading && <LowOpacityLoader />}
       {check && (
-        <ScrollView style={{opacity: visible ? 0.2 : 1}}>
-          <View>
-            <FlatList
-              onScroll={handleScroll}
-              ref={flatlistRef}
-              horizontal={true}
-              data={item?.images}
-              renderItem={renderImages}
-            />
-            {imageCount(item?.images)}
-          </View>
-          <View style={style.imageContainer}>
-            <FlatList
-              ref={flatlistRefBottom}
-              horizontal={true}
-              data={imageBottomData}
-              renderItem={renderBottomImages}
-            />
-          </View>
-
-          <View style={style.contentContainer}>
-            <View style={style.addressView}>
-              <View style={style.addressContainer}>
-                <Text style={style.sizelabel}>{item?.rm_size}</Text>
-                <Text style={style.labelAddress}>
-                  {`${item?.rm_house_no},${item?.rm_colny}, ${item?.rm_city}`}
-                </Text>
-              </View>
-              {props?.route?.params?.isFrom === 'MyPost' ? null : (
-                <IconButton_Entypo
-                  value={like}
-                  tValue={IconName?.heartActive}
-                  fValue={IconName?.heartDeActive}
-                  isLike={true}
-                  onPress={() => {
-                    setLike(!like);
-                    onPressFav({roomId: item?.rm_pkey, like: !like}).then(
-                      res => {
-                        if (res === false) {
-                          setLike(like);
-                        }
-                      },
-                    );
-                  }}
+        <>
+          <ScrollView style={{opacity: visible ? 0.2 : 1}}>
+            <View>
+              {item?.images?.length === 0 ? (
+                <Custom_Image
+                  resizeMode={ImageScaleType.contain}
+                  container={{width: windowWidth, height: hp(30)}}
                 />
+              ) : (
+                <View>
+                  <FlatList
+                    onScroll={handleScroll}
+                    ref={flatlistRef}
+                    horizontal={true}
+                    data={item?.images}
+                    renderItem={renderImages}
+                  />
+                  {imageCount(item?.images)}
+                </View>
               )}
             </View>
-            <View
-              style={{
-                marginTop: 20,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <ContentHeader
-                label={labels.ListingAgent}
-                headerContainer={{marginTop: 0}}
+            {/* <View style={style.imageContainer}>
+              <FlatList
+                ref={flatlistRefBottom}
+                horizontal={true}
+                data={imageBottomData}
+                renderItem={renderBottomImages}
               />
-              <Text style={style.labelRent}>{`\u20B9${item?.rm_rent}`}</Text>
+            </View> */}
+            <View style={style.contentContainer}>
+              {shareProperty()}
+              {rentView()}
+              {roomSize()}
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flex: 1,
+                }}>
+                <FullAddress />
+                <MapButton
+                  container={{
+                    flexDirection: 'row',
+                    flex: 0.38,
+                    backgroundColor: Colors.GREY5,
+                    height: hp(4.8),
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    paddingHorizontal: hp(1),
+                    marginLeft: hp(1),
+                    borderRadius: hp(1.2),
+                  }}
+                  label={'See on Map'}
+                  leftIcon={'map-o'}
+                  rightIcon={'angle-right'}
+                  iconCommunity={'FontAwesome'}
+                  onPress={onPressMap}
+                />
+              </View>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginTop: hp(1),
+                }}>
+                <Text
+                  style={{
+                    color: Colors.GREY4,
+                    fontSize: RF(1.5),
+                    fontWeight: '500',
+                  }}>
+                  Prefered balant type :{' '}
+                </Text>
+                <Text
+                  style={{
+                    color: Colors.GREY3,
+                    fontSize: RF(1.3),
+                    fontWeight: '400',
+                    alignSelf: 'center',
+                  }}>
+                  {item?.rm_availble}
+                </Text>
+              </View>
+              <View style={{marginVertical: hp(2), marginLeft: hp(0.5)}}>
+                <MoreDetails
+                  name={'floor-plan'}
+                  color={Colors.GREY}
+                  size={hp(3.2)}
+                  header={'Floor'}
+                  data={`Proper is on ${item?.rm_flor}`}
+                  iconCommunity={'MaterialCommunityIcons'}
+                />
+                <MoreDetails
+                  name={'car-brake-parking'}
+                  color={Colors.GREY}
+                  size={hp(3.2)}
+                  header={'Parking'}
+                  data={'Open parking available'}
+                  iconCommunity={'MaterialCommunityIcons'}
+                />
+                <MoreDetails
+                  name={'chain-broken'}
+                  color={Colors.GREY}
+                  size={hp(3.2)}
+                  header={'Independent'}
+                  data={`${item?.rm_depndecy}`}
+                  fontAwesome={true}
+                  iconCommunity={'FontAwesome'}
+                />
+                <MoreDetails
+                  name={'table-furniture'}
+                  color={Colors.GREY}
+                  size={hp(3.2)}
+                  header={'Furnished'}
+                  data={`${item?.rm_furnisd_status}`}
+                  iconCommunity={'MaterialCommunityIcons'}
+                />
+                <MoreDetails
+                  name={'iobroker'}
+                  color={Colors.GREY}
+                  size={hp(3.2)}
+                  header={'maintenance, Deposit'}
+                  data={`1000/month maintenance, 15000 fix deposite`}
+                  iconCommunity={'MaterialCommunityIcons'}
+                />
+              </View>
+              {ownerView()}
+              <RoomInformation />
             </View>
 
-            {ownerDetails()}
-            {/* {viewProfile()} */}
-            <ContentHeader label={labels.Specification} />
-            <View style={style.contantConatainer2}>
-              <SpecificationDetails
-                label={labels?.Availablefor}
-                labelAns={item?.rm_availble}
-              />
-              <SpecificationDetails
-                label={labels?.ParkingAvailability}
-                labelAns={item?.rm_prking_avblity}
-              />
-              <SpecificationDetails
-                label={labels?.WhichFloor}
-                labelAns={item?.rm_flor}
-              />
-              <SpecificationDetails
-                label={labels?.Dependency}
-                labelAns={item?.rm_depndecy}
-              />
-              <SpecificationDetails
-                label={labels?.Furnished}
-                labelAns={item?.rm_furnisd_status}
-              />
-            </View>
-            <ContentHeader label={labels?.Description} />
-            <Text style={style.labelDescription}>{item?.rm_description}</Text>
-            {/* <ShareLayout /> */}
-            <RoomInformation />
-          </View>
-          {item?.rm_latitude && (
-            <View style={style.mapContainer(windowHeight, mapOnFocus)}>
-              <MapView
-                style={style.map}
-                zoomEnabled={true}
-                initialRegion={{
-                  latitude: item ? parseFloat(item?.rm_latitude) : 0.0,
-                  longitude: item ? parseFloat(item?.rm_longitude) : 0.0,
-                  latitudeDelta: 0.05,
-                  longitudeDelta: 0.05,
-                }}>
-                <MapViewDirections
-                  onReady={item => {
-                    setLocationData(item?.legs[0]);
-                  }}
-                  optimizeWaypoints={true}
-                  splitWaypoints={true}
-                  origin={{
-                    latitude: data?.latitude,
-                    longitude: data?.longitude,
-                  }}
-                  destination={{
-                    latitude: parseFloat(item?.rm_latitude),
-                    longitude: parseFloat(item?.rm_longitude),
-                  }}
-                  apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
-                  strokeWidth={hp(0.5)}
-                  strokeColor={Colors.PRIMARY}
-                />
-                <Marker
-                  title={'Room location'}
-                  pinColor={'green'}
-                  key={0}
-                  coordinate={{
-                    latitude: parseFloat(item?.rm_latitude),
-                    longitude: parseFloat(item?.rm_longitude),
-                  }}></Marker>
-                <Marker
-                  title={'Your location'}
-                  key={1}
-                  coordinate={{
-                    latitude: data?.latitude,
-                    longitude: data?.longitude,
-                  }}></Marker>
-              </MapView>
-              <TouchableOpacity
-                style={style.fullMapContainer}
-                onPress={() => {
-                  setMapOnFocus(!mapOnFocus);
-                }}>
-                <MaterialIcons
-                  size={hp(4.5)}
-                  color={Colors.BLACK}
-                  name={mapOnFocus ? 'fullscreen-exit' : 'fullscreen'}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
-        </ScrollView>
+            {item?.rm_latitude && (
+              <View style={style.mapContainer(windowHeight, mapOnFocus)}>
+                <MapScreen
+                  style={style.map}
+                  zoomEnabled={true}
+                  initialRegion={{
+                    latitude: item ? parseFloat(item?.rm_latitude) : 0.0,
+                    longitude: item ? parseFloat(item?.rm_longitude) : 0.0,
+                    latitudeDelta: 0.05,
+                    longitudeDelta: 0.05,
+                  }}>
+                  <MapViewDirections
+                    onReady={item => {
+                      setLocationData(item?.legs[0]);
+                    }}
+                    optimizeWaypoints={true}
+                    splitWaypoints={true}
+                    origin={{
+                      latitude: data?.latitude,
+                      longitude: data?.longitude,
+                    }}
+                    destination={{
+                      latitude: parseFloat(item?.rm_latitude),
+                      longitude: parseFloat(item?.rm_longitude),
+                    }}
+                    apikey={'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc'}
+                    strokeWidth={hp(0.5)}
+                    strokeColor={Colors.PRIMARY}
+                  />
+                  <Marker
+                    title={'Room location'}
+                    pinColor={'green'}
+                    key={0}
+                    coordinate={{
+                      latitude: parseFloat(item?.rm_latitude),
+                      longitude: parseFloat(item?.rm_longitude),
+                    }}></Marker>
+                  <Marker
+                    title={'Your location'}
+                    key={1}
+                    coordinate={{
+                      latitude: data?.latitude,
+                      longitude: data?.longitude,
+                    }}></Marker>
+                </MapScreen>
+                <TouchableOpacity
+                  style={style.fullMapContainer}
+                  onPress={() => {
+                    setMapOnFocus(!mapOnFocus);
+                  }}>
+                  <MaterialIcons
+                    size={hp(4.5)}
+                    color={Colors.BLACK}
+                    name={mapOnFocus ? 'fullscreen-exit' : 'fullscreen'}
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+          </ScrollView>
+          {contactView()}
+        </>
       )}
       {apiError && (
         <ErrorModal
@@ -626,15 +780,6 @@ const DetailsScreen = props => {
 
 export default DetailsScreen;
 const style = StyleSheet.create({
-  headerContainer: {
-    alignSelf: 'flex-start',
-    backgroundColor: Colors.PRIMARY,
-    marginTop: hp(3),
-    paddingHorizontal: hp(2),
-    borderRadius: hp(0.5),
-    paddingVertical: hp(0.2),
-    elevation: hp(0.5),
-  },
   iconContainer: {
     justifyContent: 'center',
     backgroundColor: 'white',
@@ -645,146 +790,18 @@ const style = StyleSheet.create({
     height: hp(5),
     width: hp(5),
   },
-
-  labelDescription: {
-    color: Colors.GREY2,
-    marginTop: hp(1),
-    fontWeight: '600',
-    fontSize: RF(2),
-    marginLeft: hp(0.8),
-  },
-  containerInside: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  labelSt: {
-    fontWeight: '600',
-    marginLeft: hp(0.8),
-    fontSize: RF(1.8),
-    color: Colors.BLACK,
-  },
-  labelANS: {
-    color: Colors.GREY2,
-    marginLeft: hp(0),
-    fontSize: RF(1.8),
-    fontWeight: '600',
-    marginRight: hp(1.5),
-  },
-
-  contantConatainer2: {
-    marginTop: 5,
-  },
-  contentContainer: {
-    marginHorizontal: hp(2),
-  },
-  containerContact: {
-    flexDirection: 'row',
-  },
-  ownerNameContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    marginLeft: hp(1.3),
-  },
   image: width => ({
-    height: hp(60),
-    width: width,
+    height: hp(30),
+    width: width - hp(2),
+    margin: hp(1),
   }),
-  addressView: {
-    flexDirection: 'row',
-    marginTop: hp(2),
-  },
-  sizelabel: {
-    color: Colors.BLACK,
-    fontSize: RF(3),
-    fontWeight: '700',
-  },
-  labelAddress: {
-    color: Colors.GREY2,
-    fontSize: hp(2.2),
-    fontWeight: '600',
-  },
-  addressContainer: {
-    flex: 1,
-  },
-  labelOwnerInfo: {
-    fontSize: RF(2),
-    color: Colors.WHITE,
-    fontWeight: '600',
-  },
-  ownerView: {
-    flexDirection: 'row',
-    marginTop: hp(1.5),
-  },
-  ownerImage: {
-    height: hp(8),
-    width: hp(8),
-    borderRadius: hp(90),
-  },
-  labelName: {
-    color: Colors.BLACK,
-    fontWeight: '600',
-    fontSize: RF(2.2),
-  },
-  labelmoble: {
-    color: Colors.GREY2,
-    fontWeight: '600',
-    marginTop: hp(0.2),
-  },
-  containeshare: {
-    flexDirection: 'row',
-    backgroundColor: Colors.GREY,
-    marginBottom: hp(10),
-    marginTop: hp(4),
-    borderRadius: hp(1.5),
-    // elevation: 10,
-    opacity: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 1,
-  },
-  iconeShareContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: Colors.WHITE,
-    alignItems: 'center',
-    elevation: hp(1),
-    marginHorizontal: hp(2),
-    borderRadius: hp(90),
-    height: hp(7.2),
-    width: hp(7.2),
-    marginVertical: hp(1.5),
-  },
-  labelRent: {
-    fontSize: RF(2.5),
-    color: Colors.GREEN1,
-    fontWeight: '700',
-  },
   map: {
     flex: 1,
   },
   mapContainer: (windowHeight, isMapOnFocus) => ({
-    height: isMapOnFocus ? windowHeight - hp(25) : hp(30),
+    height: isMapOnFocus ? windowHeight - hp(0.1) : hp(0.1),
     borderRadius: hp(10),
   }),
-  fullScreenIcon: {
-    position: 'absolute',
-  },
-  labelRoomInformation: {
-    color: Colors.GREY2,
-    fontWeight: '600',
-    fontSize: RF(2),
-    marginLeft: hp(0.8),
-  },
-  fullAddressStyle: {
-    marginLeft: hp(2),
-    maxWidth: '70%',
-  },
-  containerAddress: {
-    marginTop: hp(0.8),
-  },
-  containerAddressView: {
-    marginBottom: hp(2),
-  },
   fullMapContainer: {
     position: 'absolute',
     marginLeft: hp(1.5),
@@ -809,13 +826,116 @@ const style = StyleSheet.create({
     position: 'absolute',
     backgroundColor: Colors.BLACK1,
     borderRadius: hp(1),
-    bottom: hp(1.4),
-    left: hp(1),
+    bottom: hp(2),
+    left: hp(2),
   },
   imageCountLabel: {
-    fontSize: RF(1.9),
+    fontSize: RF(1.2),
     marginHorizontal: hp(2),
     marginVertical: hp(0.3),
     color: Colors.WHITE,
   },
+  shareContainer: {
+    flexDirection: 'row',
+    backgroundColor: Colors.PRIMARY,
+    marginVertical: hp(1),
+    borderRadius: hp(1.6),
+  },
+  shareIcon: {},
+  shareLabel: {
+    alignSelf: 'center',
+    fontSize: RF(1.5),
+    color: Colors.WHITE,
+  },
+  arrow: {},
+  shareInnerContainer: {
+    backgroundColor: Colors.RED,
+    marginVertical: hp(1),
+    marginLeft: hp(1),
+    height: hp(4),
+    width: hp(4),
+  },
+  arrowContainer: {
+    backgroundColor: Colors.PRIMARY,
+    elevation: 0,
+    alignSelf: 'center',
+    position: 'absolute',
+    right: hp(0),
+    height: hp(4),
+    width: hp(4),
+  },
+  rent: {
+    color: Colors.BLACK,
+    fontSize: RF(2),
+    fontWeight: '600',
+  },
+  month: {
+    color: Colors.BLACK1,
+    fontSize: RF(1.4),
+    fontWeight: '500',
+  },
+  containerRent: {},
+  contentContainer: {
+    marginHorizontal: hp(1.5),
+  },
+  size: {
+    color: Colors.BLACK,
+    fontSize: RF(2.1),
+    fontWeight: '500',
+    marginTop: hp(1),
+  },
+  address: {
+    color: Colors.GREY4,
+    fontSize: RF(1.4),
+  },
+  addressContainer: {
+    flexDirection: 'row',
+    marginTop: hp(1),
+    flex: 0.6,
+  },
+  containerMapButton: {},
+  labelMap: {},
 });
+
+export const MoreDetails = ({
+  color,
+  name,
+  size,
+  header,
+  data,
+  image,
+  iconCommunity,
+}) => {
+  return (
+    <View style={{flexDirection: 'row', marginTop: hp(1)}}>
+      {name && (
+        <Icon
+          name={name}
+          color={color}
+          size={size}
+          iconCommunity={iconCommunity}
+        />
+      )}
+      <View style={{}}>
+        <Text
+          style={{
+            marginLeft: hp(1),
+            color: Colors.BLACK,
+            fontWeight: '600',
+            fontSize: RF(1.5),
+          }}>
+          {header}
+        </Text>
+        <Text
+          style={{
+            marginLeft: hp(1.8),
+            color: Colors.GREY3,
+
+            fontSize: RF(1.3),
+          }}>
+          {data}
+        </Text>
+      </View>
+    </View>
+  );
+};

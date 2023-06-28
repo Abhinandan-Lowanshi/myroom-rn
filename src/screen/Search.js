@@ -416,7 +416,7 @@ const Search = ({navigation}) => {
             </View>
             <Text
               style={{
-                fontSize: hp(1.8),
+                fontSize: hp(1.5),
                 paddingVertical: hp(1),
                 color: Colors.BLACK,
                 fontWeight: '600',
@@ -474,7 +474,7 @@ const Search = ({navigation}) => {
               style={{
                 color: Colors.BLACK1,
                 fontWeight: '600',
-                fontSize: RF(2.5),
+                fontSize: RF(2),
               }}>
               Room Categories
             </Text>
@@ -490,7 +490,7 @@ const Search = ({navigation}) => {
           </View>
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity onPress={() => manageFilter({}, Labels.ALL)}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.8)}}>
+              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
                 Select all
               </Text>
             </TouchableOpacity>
@@ -500,7 +500,7 @@ const Search = ({navigation}) => {
                 manageFilter({}, Labels.RESET);
                 getFilteredData(data, false);
               }}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.8)}}>
+              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
                 Reset
               </Text>
             </TouchableOpacity>
@@ -546,7 +546,7 @@ const Search = ({navigation}) => {
             style={{
               color: 'black',
               alignSelf: 'center',
-              fontSize: RF(2.3),
+              fontSize: RF(2),
               marginTop: '50%',
             }}>
             {message}

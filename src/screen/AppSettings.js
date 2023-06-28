@@ -317,8 +317,8 @@ const AppSettings = props => {
         <View
           style={{
             backgroundColor: item.isChecked ? Colors.PRIMARYLITE1 : 'white',
-            height: hp(2.5),
-            width: hp(2.5),
+            height: hp(2.1),
+            width: hp(2.1),
             borderRadius: hp(90),
             borderWidth: hp(0.3),
             borderColor: Colors.PRIMARY,
@@ -330,7 +330,7 @@ const AppSettings = props => {
             color: item.isChecked ? Colors.PRIMARYDARK : 'black',
             marginLeft: hp(1),
             alignSelf: 'center',
-            fontSize: RF(1.8),
+            fontSize: RF(1.5),
           }}>
           {item?.label}
         </Text>
@@ -380,7 +380,7 @@ const AppSettings = props => {
       {loading && (
         <View style={style.loader}>
           <Text style={style.labelLocationText}>Getting Current Location</Text>
-          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+          <ActivityIndicator size={hp(5)} color={Colors.PRIMARY} />
         </View>
       )}
       <GPSDialogue
@@ -455,8 +455,10 @@ const style = StyleSheet.create({
   },
   labelLocation: {
     color: Colors.BLACK,
+    fontSize: hp(1.6),
   },
   containerPlaceHolder: {
+    fontSize: RF(2),
     position: 'absolute',
     top: hp(7.5),
     borderBottomLeftRadius: 4,
@@ -467,7 +469,7 @@ const style = StyleSheet.create({
   labelDefaultLocation: {
     color: Colors.BLACK,
     fontWeight: '600',
-    fontSize: RF(2),
+    fontSize: RF(1.6),
   },
   outerContainer: {
     height: hp(5),
@@ -522,7 +524,7 @@ const style = StyleSheet.create({
   },
   labelLocationText: {
     color: Colors.BLACK,
-    fontSize: hp(2),
+    fontSize: hp(1.9),
     marginBottom: hp(2),
   },
   buttonHome: {

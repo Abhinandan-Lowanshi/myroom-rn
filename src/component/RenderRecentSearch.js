@@ -40,5 +40,6 @@ const style = StyleSheet.create({
   labelRecent: {
     color: Colors.GREY2,
     marginBottom: hp(0.5),
+    fontSize: hp(1.5),
   },
 });

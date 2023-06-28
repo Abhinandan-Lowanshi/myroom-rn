@@ -38,4 +38,5 @@ export default Screen = {
   MoreRooms: 'MoreRooms',
   AboutUs: 'AboutUs',
   PrivacyPolicy: 'PrivacyPolicy',
+  MapScreen: 'MapScreen',
 };

@@ -43,10 +43,9 @@ const style = StyleSheet.create({
     alignSelf: 'center',
   },
   labelSignUp: {
-    fontSize: hp(3),
     alignSelf: 'center',
     color: Colors.PRIMARY,
-    fontSize: hp(2.6),
+    fontSize: hp(2),
   },
   containerInner: {
     flexDirection: 'row',

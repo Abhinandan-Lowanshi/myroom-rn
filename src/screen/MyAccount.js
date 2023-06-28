@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     marginLeft: hp(2),
   },
   labelPersonalText: isContaint => ({
-    fontSize: RF(2),
+    fontSize: RF(1.6),
     color: 'black',
     fontWeight: isContaint ? '700' : '600',
   }),
@@ -222,6 +222,7 @@ const styles = StyleSheet.create({
   labelInnerContainer: {
     flexDirection: 'row',
     color: 'black',
+    fontSize: RF(1.6),
   },
   outerContainer: {
     marginTop: hp(5),
