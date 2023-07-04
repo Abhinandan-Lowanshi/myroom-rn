@@ -63,6 +63,7 @@ const RenderRoom2Column = ({
     return message;
   };
   const renderItem = ({item}) => {
+    console.log(item, 'renderItem');
     return (
       <TouchableOpacity
         onPress={() => onPress(item)}
@@ -201,7 +202,7 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     borderRadius: hp(1),
     elevation: hp(0.5),
-    marginHorizontal: hp(0.3),
+    marginHorizontal: hp(0.5),
     paddingBottom: hp(2),
     marginBottom: hp(1),
   },
@@ -270,7 +271,7 @@ const style = StyleSheet.create({
   },
   imageContainer: {
     height: hp(30),
-    borderRadius: 100,
+    margin: hp(0.1),
   },
   labelRent: {
     color: 'green',

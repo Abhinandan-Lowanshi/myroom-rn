@@ -1,4 +1,5 @@
 const EndPoints = {
+  // baseUrl: 'http://localhost:3000/api/',
   baseUrl: 'http://3.220.96.137:3000/api/',
   login: 'login',
   register: 'register',

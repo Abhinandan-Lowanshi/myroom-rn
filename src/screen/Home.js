@@ -52,6 +52,7 @@ import localStorageOp from '../localStorage/LocalData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
 import Geolocation from '@react-native-community/geolocation';
 import GPSDialogue from '../component/GPSDialogue';
+import {logout} from '../component/LogOut';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -386,6 +387,10 @@ const Home = ({route, navigation}) => {
               setIsFailed(true);
             }
           } else {
+            console.log(res?.message, 'Invalid authentication.');
+            if (res?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
             dispatch(setRoomDataHome([]));
             dispatch(setFilteredData([]));
             setIsFailed(true);

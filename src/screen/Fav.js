@@ -16,6 +16,7 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import Header from '../component/Header';
 import Labels from '../common/labels';
+import {logout} from '../component/LogOut';
 
 const Fav = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -59,11 +60,17 @@ const Fav = ({navigation, route}) => {
       'POST',
     )
       .then(res => {
-        setRefreshing(false);
-        setLoading(false);
-        dispatch(startL(false));
-        dispatch(updateHome(false));
-        dispatch(setFavData(res?.data));
+        if (res?.status === true) {
+          setRefreshing(false);
+          setLoading(false);
+          dispatch(startL(false));
+          dispatch(updateHome(false));
+          dispatch(setFavData(res?.data));
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
+        }
       })
       .catch(err => {
         dispatch(startL(false));

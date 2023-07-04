@@ -98,7 +98,9 @@ const EditProfile = ({navigation}) => {
             dispatch(getAccountImfo(accountDataTemp), navigation.goBack());
           } else {
             setEmailApiError(response.message);
-
+            if (response?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
             //go back
           }
         })
@@ -174,6 +176,7 @@ const style = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    marginTop: hp(2),
   },
   textInputContainerStyle: {
     width: '100%',

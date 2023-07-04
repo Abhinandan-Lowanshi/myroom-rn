@@ -129,7 +129,7 @@ const Upload = ({navigation}) => {
 
   const houseNumberOnChange = houseNumber => {
     setHouseNumber(houseNumber);
-    if (houseNumber !== '' && houseNumber.length < 1) {
+    if (houseNumber !== '' && houseNumber.length < 2) {
       setHouseNumberError(true);
     } else {
       setHouseNumberError(false);

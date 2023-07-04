@@ -37,6 +37,7 @@ import images from '../common/images';
 import ScreenName from '../common/ScreenName';
 import {styles} from 'react-native-image-slider-banner/src/style';
 import Icon from '../component/Icon';
+import {logout} from '../component/LogOut';
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
@@ -109,6 +110,9 @@ const DetailsScreen = props => {
             setApiError(
               'Room details not found, may be room has been deleted or de-activated by the owner of the room.',
             );
+            if (response?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
           }
         }
       })
@@ -441,11 +445,14 @@ const DetailsScreen = props => {
             marginHorizontal: hp(2),
             justifyContent: 'center',
           }}
-          label={'Chat with Owner'}
+          label={'Call'}
           labelStyle={{color: Colors.WHITE, marginLeft: hp(1.2)}}
           leftIcon={'phone-call'}
           leftColor={Colors.WHITE}
           iconCommunity={'Feather'}
+          onPress={() => {
+            handleCall(item?.rm_own_mble_num);
+          }}
         />
         <MapButton
           container={{
@@ -460,11 +467,14 @@ const DetailsScreen = props => {
             marginHorizontal: hp(2),
             justifyContent: 'center',
           }}
-          label={'Chat with Owner'}
+          label={'Sms'}
           labelStyle={{color: Colors.WHITE, marginLeft: hp(1.2)}}
           leftIcon={'message-circle'}
           leftColor={Colors.WHITE}
           iconCommunity={'Feather'}
+          onPress={() => {
+            handleMessage(item?.rm_own_mble_num);
+          }}
         />
       </View>
     );

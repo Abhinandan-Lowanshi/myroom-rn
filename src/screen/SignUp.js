@@ -139,7 +139,7 @@ const SignUp = ({navigation}) => {
             onChangeText={nameOnChange}
             outerContainer={style.outerContainerSocial}
             error={nameError}
-            placeholder={'FullName'}
+            placeholder={'Full Name'}
             errorMessage={'Invalid Name'}
           />
           <CustomInputText
@@ -155,8 +155,10 @@ const SignUp = ({navigation}) => {
             onChangeText={onChangeMobile}
             outerContainer={style.outerContainerSocial}
             error={mobileError}
-            placeholder={'mobile number'}
+            placeholder={'Mobile number'}
             errorMessage={'Invalid mobile number'}
+            maxLength={10}
+            isNumeric={true}
           />
           <CustomInputText
             value={password}
@@ -203,6 +205,7 @@ const style = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    marginTop: hp(2),
   },
   textInputContainerStyle: {
     width: '100%',

@@ -34,16 +34,14 @@ const CustomInputText = ({
 
   return (
     <View style={[style.outerContainer, outerContainer]}>
-      {(focus || value) && (
-        <Text style={[style.topLabel, topLabel]}>{placeholder}</Text>
-      )}
-      <View style={[style.containerStyle(error, disabled), containerStyleP]}>
+      <View
+        style={[style.containerStyle(error, disabled, focus), containerStyleP]}>
         <TextInput
           maxLength={maxLength || 50}
           editable={!disabled}
           selectTextOnFocus={!disabled}
           style={[style.InputTextStyle(error), InputTextStyleP]}
-          placeholder={placeholder}
+          placeholder={focus ? null : placeholder}
           value={value}
           placeholderTextColor={Colors.BLACK}
           onChangeText={value => onChangeText(value)}
@@ -74,6 +72,9 @@ const CustomInputText = ({
         ) : null}
       </View>
       {error && <Text style={style.textError}>{errorMessage || 'Error'}</Text>}
+      {(focus || value) && (
+        <Text style={[style.topLabel, topLabel]}>{placeholder}</Text>
+      )}
     </View>
   );
 };
@@ -86,14 +87,19 @@ const style = StyleSheet.create({
     flex: 1,
     borderRadius: hp(1),
   }),
-  containerStyle: (error, disabled) => ({
+  containerStyle: (error, disabled, focus = false) => ({
     flexDirection: 'row',
     width: '90%',
     backgroundColor: Colors.GREY1,
     paddingLeft: hp(2),
     backgroundColor: 'white',
     elevation: 3,
-    borderColor: disabled ? Colors.PRIMARY : error ? Colors.RED : Colors.GREY,
+    borderColor:
+      disabled || (focus && !error)
+        ? Colors.PRIMARY
+        : error
+        ? Colors.RED
+        : Colors.GREY,
     borderRadius: hp(1),
     borderWidth: hp(0.2),
   }),
@@ -108,6 +114,8 @@ const style = StyleSheet.create({
     // elevation: 5,
     borderRadius: hp(1),
     marginTop: hp(2),
+    marginTop: 5,
+    paddingTop: hp(1),
   },
   checkBoxContainerStyle: {
     flexDirection: 'row',
@@ -127,6 +135,11 @@ const style = StyleSheet.create({
   },
   topLabel: {
     color: Colors.BLACK,
-    fontSize: RF(1.4),
+    fontSize: RF(1.8),
+    position: 'absolute',
+    left: hp(2),
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: hp(1),
+    fontWeight: '600',
   },
 });

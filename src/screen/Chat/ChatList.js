@@ -23,6 +23,7 @@ import ScreenName from '../../common/ScreenName';
 import sendRequest from '../../networking/ApiFunctions';
 import EndPoints from '../../networking/EndPoints';
 import images from '../../common/images';
+import {logout} from '../../component/LogOut';
 const ChatList = props => {
   const {navigation} = props;
   const [refreshing, setRefreshing] = useState(false);
@@ -44,6 +45,10 @@ const ChatList = props => {
           if (response?.data?.length > 0) {
             setUserList(response.data);
           }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(() => {
@@ -51,7 +56,6 @@ const ChatList = props => {
         setRefreshing(false);
       });
   };
-
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity

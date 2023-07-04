@@ -14,6 +14,7 @@ import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import {logout} from '../component/LogOut';
 
 const ChangePassword = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -86,6 +87,9 @@ const ChangePassword = ({navigation}) => {
           } else {
             setEmailApiError(response.message);
             //go back
+            if (response?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
           }
         })
         .catch(e => {
@@ -163,6 +167,7 @@ const style = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    marginTop: hp(2),
   },
   textInputContainerStyle: {
     width: '100%',
