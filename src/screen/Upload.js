@@ -239,7 +239,7 @@ const Upload = ({navigation}) => {
       selectionLimit: 0,
     };
     await launchImageLibrary(options, response => {
-      let imageData = response.assets;
+      let imageData = response?.assets;
       let temp = [...image];
       imageData?.forEach(item => {
         if (!image.some(data => data.fileName === item.fileName))
@@ -262,10 +262,10 @@ const Upload = ({navigation}) => {
   const uploadRoom = async () => {
     setIsLoading(true);
     try {
-      if (image.length > 2) {
+      if (image?.length > 2) {
         var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
         const formdata = new FormData();
-        image.forEach(item => {
+        image?.forEach(item => {
           formdata.append('Images', {
             uri: item?.uri,
             name: item?.fileName,
