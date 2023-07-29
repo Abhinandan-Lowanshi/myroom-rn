@@ -25,6 +25,7 @@ export const slice = createSlice({
     gpsStatus: 'true',
     LocationMode: '',
     OwnerData: {},
+    reviews: {},
   },
   reducers: {
     startL: (state, actions) => {
@@ -90,6 +91,9 @@ export const slice = createSlice({
     OwnerData: (state, actions) => {
       state.OwnerData = actions.payload;
     },
+    reviews: (state, actions) => {
+      state.reviews = actions.payload;
+    },
   },
 });
 
@@ -115,6 +119,7 @@ export const {
   gpsStatus,
   LocationMode,
   OwnerData,
+  reviews,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -183,6 +188,9 @@ export const setLocationMode = data => dispatch => {
 };
 export const setOwnerData = data => dispatch => {
   dispatch(OwnerData(data));
+};
+export const setReviews = data => dispatch => {
+  dispatch(reviews(data));
 };
 
 export default slice.reducer;

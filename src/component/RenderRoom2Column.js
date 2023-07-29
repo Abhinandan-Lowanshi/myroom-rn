@@ -13,6 +13,7 @@ import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
 import data from '../common/SpinnerData';
+import RatingView from './RatingView';
 
 const RenderRoom2Column = ({
   myRoomList,
@@ -101,17 +102,13 @@ const RenderRoom2Column = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
-          {/* <View style={style.containerDate}>
-            <LowOpacityText
-              label={item?.rm_size}
-              container={style.containerRent}
-            />
+          <View style={style.containerDate}>
             <LowOpacityText
               label={item?.created_at}
               container={style.containerRent}
               isTime={true}
             />
-          </View> */}
+          </View>
         </View>
         <View style={style.containerInfo}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
@@ -136,6 +133,7 @@ const RenderRoom2Column = ({
             {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
           </View>
         </View>
+        <RatingView rating={item?.reviews?.reviewData?.avg} />
         {!isFromMyPost && (
           <TouchableOpacity
             style={style.favImage}

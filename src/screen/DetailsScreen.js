@@ -38,6 +38,11 @@ import ScreenName from '../common/ScreenName';
 import {styles} from 'react-native-image-slider-banner/src/style';
 import Icon from '../component/Icon';
 import {logout} from '../component/LogOut';
+import RatingView from '../component/RatingView';
+import ReviewRow from '../component/ReviewRow';
+import RatingListView from '../component/RatingListView';
+import {setReviews} from '../redux/Slice';
+
 const DetailsScreen = props => {
   const {navigation} = props;
   const [like, setLike] = useState(false);
@@ -56,11 +61,14 @@ const DetailsScreen = props => {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const data = useSelector(state => state.AllData.locationInfo);
+  const reviews = useSelector(state => state.AllData.reviews);
   const [locationData, setLocationData] = useState({});
+  const [ratingVisible, setRatingVisible] = useState(false);
   const [index, setIndex] = useState(0);
   const flatlistRef = useRef();
   const flatlistRefModal = useRef();
-  const flatlistRefBottom = useRef();
+  const dispatch = useDispatch();
+
   let lastIndex = 0;
   useEffect(() => {
     setLike(propData?.favorite_key);
@@ -75,10 +83,13 @@ const DetailsScreen = props => {
     console.log(item?.images?.length, 'useEffect');
   }, []);
   useEffect(() => {
+    console.log(item, 'useEffect');
+
     if (item?.images) {
       console.log(item, 'useEffect');
       prepareImage(item?.images);
     }
+    if (item?.reviews) dispatch(setReviews(item?.reviews));
   }, [item]);
 
   const prepareImage = data => {
@@ -580,6 +591,62 @@ const DetailsScreen = props => {
       OrRm_longitude: data?.longitude,
     });
   };
+
+  const onPressRating = () => {
+    setRatingVisible(!ratingVisible);
+  };
+
+  const ListFooterComponent = () => {
+    if (
+      reviews?.reviewList?.length <= 5 ||
+      !ratingVisible ||
+      reviews?.reviewList?.length === undefined
+    ) {
+      return <></>;
+    }
+    return (
+      <TouchableOpacity onPress={onPressAllReview}>
+        <Text style={style.labelViewAllReview}>View All Review</Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const onPressAllReview = () => {
+    navigation.navigate(ScreenName.ReviewScreen, {item: item});
+  };
+
+  const showRating = () => {
+    return (
+      <View style={style.reviewContainerMain}>
+        <View style={style.containerRatingView}>
+          <TouchableOpacity onPress={onPressAllReview}>
+            <Text style={style.labelReview}>{`Reviews  (${
+              reviews?.reviewList?.length || 0
+            })`}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onPressRating}>
+            <Icon
+              name={ratingVisible ? 'chevrons-up' : 'chevrons-down'}
+              color={Colors.GREY4}
+              size={hp(3)}
+              iconCommunity={'Feather'}
+            />
+          </TouchableOpacity>
+        </View>
+        <RatingListView
+          data={
+            ratingVisible
+              ? reviews?.reviewList?.length > 5
+                ? reviews?.reviewList?.slice(0, 5)
+                : reviews?.reviewList
+              : reviews?.reviewList?.slice(0, 1)
+          }
+          ListFooterComponent={ListFooterComponent}
+        />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
@@ -606,6 +673,7 @@ const DetailsScreen = props => {
                   {imageCount(item?.images)}
                 </View>
               )}
+              <RatingView rating={reviews?.reviewData?.avg} />
             </View>
             {/* <View style={style.imageContainer}>
               <FlatList
@@ -617,6 +685,7 @@ const DetailsScreen = props => {
             </View> */}
             <View style={style.contentContainer}>
               {shareProperty()}
+
               {rentView()}
               {roomSize()}
               <View
@@ -712,6 +781,8 @@ const DetailsScreen = props => {
                 />
               </View>
               {ownerView()}
+              {showRating()}
+
               <RoomInformation />
             </View>
 
@@ -905,6 +976,26 @@ const style = StyleSheet.create({
   },
   containerMapButton: {},
   labelMap: {},
+  containerRatingView: {
+    flexDirection: 'row',
+    marginBottom: hp(1),
+    justifyContent: 'space-between',
+  },
+  labelReview: {
+    color: Colors.BLACK,
+    fontSize: RF(1.7),
+    fontWeight: '500',
+    marginLeft: hp(1),
+  },
+  labelViewAllReview: {
+    color: Colors.PRIMARY,
+    fontSize: RF(1.5),
+    alignSelf: 'center',
+    marginTop: hp(1),
+  },
+  reviewContainerMain: {
+    // marginBottom: hp(2),
+  },
 });
 
 export const MoreDetails = ({

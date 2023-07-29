@@ -39,4 +39,5 @@ export default Screen = {
   AboutUs: 'AboutUs',
   PrivacyPolicy: 'PrivacyPolicy',
   MapScreen: 'MapScreen',
+  ReviewScreen: 'ReviewScreen',
 };

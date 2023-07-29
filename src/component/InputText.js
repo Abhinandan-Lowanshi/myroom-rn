@@ -9,24 +9,26 @@ import {
 import {hp, RF} from '../common/CommonFunctions';
 import Colors from '../common/Colors';
 import Icon from 'react-native-vector-icons/Entypo';
-const CustomInputText = ({
-  containerStyleP,
-  InputTextStyleP,
-  placeholder,
-  errorMessage,
-  error,
-  onChangeText,
-  value,
-  outerContainer,
-  topLabel,
-  disabled,
-  isEyeVisible,
-  isNumeric,
-  maxLength,
-  multiline,
-}) => {
+const CustomInputText = props => {
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
   const [focus, setFocus] = React.useState(false);
+  const {
+    containerStyleP,
+    InputTextStyleP,
+    placeholder,
+    errorMessage,
+    error,
+    onChangeText,
+    value,
+    outerContainer,
+    topLabel,
+    disabled,
+    isEyeVisible,
+    isNumeric,
+    maxLength,
+    multiline,
+    showLimit,
+  } = props;
 
   const focusChange = value => {
     console.log(value, 'Value');
@@ -37,6 +39,7 @@ const CustomInputText = ({
       <View
         style={[style.containerStyle(error, disabled, focus), containerStyleP]}>
         <TextInput
+          {...props}
           maxLength={maxLength || 50}
           editable={!disabled}
           selectTextOnFocus={!disabled}
@@ -71,7 +74,16 @@ const CustomInputText = ({
           </TouchableOpacity>
         ) : null}
       </View>
-      {error && <Text style={style.textError}>{errorMessage || 'Error'}</Text>}
+      <View style={style.containerError}>
+        {error && (
+          <Text style={style.textError}>{errorMessage || 'Error'}</Text>
+        )}
+        {showLimit && (
+          <Text style={style.labelCount}>{`${value?.length}/${
+            maxLength || 50
+          }`}</Text>
+        )}
+      </View>
       {(focus || value) && (
         <Text style={[style.topLabel, topLabel]}>{placeholder}</Text>
       )}
@@ -107,7 +119,7 @@ const style = StyleSheet.create({
     color: 'red',
     fontSize: RF(1.1),
     marginLeft: 5,
-    marginTop: hp(0.6),
+    marginTop: hp(0.5),
   },
   outerContainer: {
     alignSelf: 'center',
@@ -141,5 +153,16 @@ const style = StyleSheet.create({
     backgroundColor: Colors.WHITE,
     paddingHorizontal: hp(1),
     fontWeight: '600',
+  },
+  labelCount: {
+    color: Colors.BLACK,
+    fontSize: RF(1.3),
+    marginRight: hp(0.5),
+    position: 'absolute',
+    right: hp(0.5),
+  },
+  containerError: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
