@@ -45,7 +45,9 @@ const ReviewScreen = props => {
 
   const RightIcon = () => {
     return (
-      <TouchableOpacity onPress={onPressOpenModal}>
+      <TouchableOpacity
+        onPress={onPressOpenModal}
+        disabled={props?.route?.params?.isFrom === 'MyPost' ? true : false}>
         <Icon
           name={'pluscircleo'}
           size={hp(3)}
@@ -74,9 +76,10 @@ const ReviewScreen = props => {
         let reviewTMP = {
           reviewData: {
             count: 1,
-            rating: data?.rating,
-            avg: data?.rating,
+            rating: data?.ratings,
+            avg: data?.ratings,
             isReviewed: true,
+            room_id: data?.room_id,
           },
           reviewList: tmp,
         };
@@ -89,15 +92,16 @@ const ReviewScreen = props => {
 
         let tmpRate = temp?.reviewData?.rating + data?.ratings;
         console.log(data, 'line91');
-        let tmpcount = temp?.reviewData?.count + 1;
-        let tmpAvg = tmpRate / tmpcount;
-        console.log(tmpRate, tmpcount, tmpRate / tmpcount, 'line94');
+        let tmpCount = temp?.reviewData?.count + 1;
+        let tmpAvg = tmpRate / tmpCount;
+        console.log(tmpRate, tmpCount, tmpRate / tmpCount, 'line94');
 
         let tmpReviewData = {
           count: temp?.reviewData?.count + 1,
           rating: tmpRate,
           avg: tmpAvg,
           isReviewed: true,
+          room_id: data?.room_id,
         };
         console.log(tmpReviewData, 'line102');
 
@@ -106,9 +110,6 @@ const ReviewScreen = props => {
 
         dispatch(setReviews(temp));
       }
-
-      // let tempReview = JSON.parse(JSON.stringify(reviews));
-      // tempReview?.reviewList.push(tempReview)
     }
   };
   const submitReview = async () => {

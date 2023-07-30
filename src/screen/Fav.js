@@ -11,17 +11,19 @@ import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import Colors from '../common/Colors';
-import {RF, hp} from '../common/CommonFunctions';
+import {RF, hp, updateRating} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import Header from '../component/Header';
 import Labels from '../common/labels';
 import {logout} from '../component/LogOut';
+import RenderRoom2Column from '../component/RenderRoom2Column';
 
 const Fav = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const favList = useSelector(state => state.AllData.favData);
   const isHomeUpdate = useSelector(state => state.AllData.isHomeUpdate);
+  const reviews = useSelector(state => state.AllData.reviews);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(false);
@@ -33,6 +35,11 @@ const Fav = ({navigation, route}) => {
       dispatch(updateHome(false));
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    let tmp = updateRating(favList, reviews);
+    dispatch(setFavData(tmp));
+  }, [reviews]);
 
   useEffect(() => {
     setLoading(true);
@@ -147,9 +154,9 @@ const Fav = ({navigation, route}) => {
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels.Favourite} navigation={navigation} />
       {loading ? (
-        <LowOpacityLoader onPress={onPressCancel} cancel={true} />
+        <LowOpacityLoader onPress={onPressCancel} />
       ) : favList?.length > 0 ? (
-        <RenderRoom
+        <RenderRoom2Column
           container={style.container}
           myRoomList={favList}
           onPress={onPressRoom}

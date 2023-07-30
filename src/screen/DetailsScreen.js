@@ -612,7 +612,10 @@ const DetailsScreen = props => {
   };
 
   const onPressAllReview = () => {
-    navigation.navigate(ScreenName.ReviewScreen, {item: item});
+    navigation.navigate(ScreenName.ReviewScreen, {
+      item: item,
+      isFrom: props?.route?.params?.isFrom ? props?.route?.params?.isFrom : '',
+    });
   };
 
   const showRating = () => {

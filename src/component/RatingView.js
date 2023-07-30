@@ -14,7 +14,7 @@ const RatingView = ({
   let startRT = arr[0];
   let last = arr.length > 1 ? arr[1].charAt(0) : 0;
   let checkHalf = true;
-  console.log(rating, 'getStar');
+
   for (let i = 0; i < 5; i++) {
     if (i < startRT) {
       getStar.push(
@@ -65,7 +65,9 @@ const RatingView = ({
     </View>
   );
 };
+
 export default RatingView;
+
 const style = StyleSheet.create({
   container: {
     backgroundColor: Colors.WHITE,

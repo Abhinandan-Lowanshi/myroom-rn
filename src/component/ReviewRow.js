@@ -6,6 +6,7 @@ import {RF, hp} from '../common/CommonFunctions';
 import {symbol} from 'prop-types';
 import RatingView from './RatingView';
 import Colors from '../common/Colors';
+import TimeAgo from 'react-native-timeago';
 
 const ReviewRow = ({data, styleRow}) => {
   return (
@@ -25,6 +26,15 @@ const ReviewRow = ({data, styleRow}) => {
         <Text style={style.labelReview}>
           {data?.review || '- - - - - - - - -'}
         </Text>
+        <TimeAgo
+          style={{
+            alignSelf: 'flex-end',
+            fontSize: RF(1),
+            marginRight: hp(1),
+            color: Colors.GREY2,
+          }}
+          time={data?.created_at}
+        />
       </View>
     </View>
   );

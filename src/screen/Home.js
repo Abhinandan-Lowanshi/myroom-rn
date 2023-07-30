@@ -38,7 +38,7 @@ import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
-import {RF, hp} from '../common/CommonFunctions';
+import {RF, hp, updateRating} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import {LogBox} from 'react-native';
@@ -68,6 +68,8 @@ const Home = ({route, navigation}) => {
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const filteredData = useSelector(state => state.AllData.filteredData);
   const LocationMode = useSelector(state => state.AllData.LocationMode);
+  const reviews = useSelector(state => state.AllData.reviews);
+
   console.log(LocationMode, 'LocationMode');
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
@@ -116,13 +118,10 @@ const Home = ({route, navigation}) => {
       .catch(() => {});
   }, []);
 
-  // useEffect(() => {
-  //   AppState.addEventListener('change', handleChange);
-
-  //   return () => {
-  //     AppState.removeEventListener('change', handleChange);
-  //   };
-  // }, []);
+  useEffect(() => {
+    let tmp = updateRating(roomDataHome, reviews);
+    dispatch(setFilteredData(tmp));
+  }, [reviews]);
 
   const handleChange = value => {
     if (value === 'active') {
