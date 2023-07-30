@@ -24,35 +24,35 @@ import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
+import {logout} from '../component/LogOut';
 
 const EditRoom = props => {
   const {navigation} = props;
-  const roomInfo = props?.route?.params;
+  const {item, onPressEditSuccess} = props?.route?.params;
+  const [temData, setTempData] = useState(item);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [name, setName] = useState(roomInfo?.rm_own_Fullname || '');
+  const [name, setName] = useState(item?.rm_own_Fullname || '');
   const [nameError, setErrorName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState(
-    roomInfo?.rm_own_mble_num || '',
-  );
+  const [mobileNumber, setMobileNumber] = useState(item?.rm_own_mble_num || '');
   const [mobileNumberError, setMobileNumberError] = useState(false);
-  const [roomSize, setRoomSize] = useState(roomInfo?.rm_size || '');
+  const [roomSize, setRoomSize] = useState(item?.rm_size || '');
   const [furnishedStatus, setFurnishedStatus] = useState(
-    roomInfo?.rm_furnisd_status || '',
+    item?.rm_furnisd_status || '',
   );
   const [parkingStatus, setParkingStatus] = useState(
-    roomInfo?.rm_prking_avblity || '',
+    item?.rm_prking_avblity || '',
   );
   const [availableStatus, setAvailableStatus] = useState(
-    roomInfo?.rm_availble || '',
+    item?.rm_availble || '',
   );
   const [dependencyStatus, setDependencyStatus] = useState(
-    roomInfo?.rm_depndecy || '',
+    item?.rm_depndecy || '',
   );
-  const [whichFloor, setWhichFloor] = useState(roomInfo?.rm_flor || '');
+  const [whichFloor, setWhichFloor] = useState(item?.rm_flor || '');
   const [whichFloorError, setWhichFloorError] = useState(false);
-  const [rent, setRent] = useState(roomInfo?.rm_rent || '');
+  const [rent, setRent] = useState(item?.rm_rent || '');
   const [rentError, setRentError] = useState(false);
 
   useEffect(() => {
@@ -94,6 +94,7 @@ const EditRoom = props => {
 
   const rentOnChange = rent => {
     setRent(rent);
+
     if (rent !== '' && rent.length < 3) {
       setRentError(true);
     } else {
@@ -122,36 +123,56 @@ const EditRoom = props => {
       rm_flor: whichFloor,
       rm_rent: rent,
     };
+
+    temData.rm_rent = rent;
+    setTempData({
+      ...temData,
+      rm_own_Fullname: 'name',
+      rm_own_mble_num: 'mobileNumber',
+      rm_size: 'roomSize',
+      rm_furnisd_status: furnishedStatus,
+      rm_availble: availableStatus,
+      rm_prking_avblity: parkingStatus,
+      rm_depndecy: dependencyStatus,
+      rm_flor: whichFloor,
+      rm_rent: rent,
+    });
     let rowData = {
-      room_id: roomInfo?.rm_pkey.toString(),
+      room_id: item?.rm_pkey,
       data: data,
     };
-    updateRoom({
-      room_id: '52',
-      data: {
-        rm_own_fullname: 'vishal',
-      },
-    });
+
+    updateRoom(rowData);
   };
 
   const updateRoom = data => {
     setLoading(true);
-    sendRequest(data, EndPoints.editRoom, 'POST')
-      .then(response => {
-        setLoading(false);
-        if (response.status === true) {
-          // navigation.navigate(ScreenName.Upload);
-        }
-      })
-      .catch(error => {
-        setLoading(false);
-      });
+
+    console.log(temData, 'temData');
+    onPressEditSuccess(temData);
+    navigation.goBack();
+
+    // sendRequest(data, EndPoints.editRoom, 'POST')
+    //   .then(response => {
+    //     setLoading(false);
+    //     if (response.status === true) {
+    //       navigation.navigate(ScreenName.MyPost);
+    //     } else {
+    //   if (response?.message === 'Invalid authentication.') {
+    //     logout(navigation);
+    //   }
+    // }
+    //   })
+    //   .catch(error => {
+    //     setLoading(false);
+    //   });
   };
 
   const mobileNumberOnChange = mobileNumber => {
     setMobileNumber(mobileNumber);
     if (mobileNumber !== '' && mobileNumber.length < 10) {
       setMobileNumberError(true);
+      temData.rm_own_mble_num = mobileNumber;
     } else {
       setMobileNumberError(false);
     }
@@ -168,7 +189,7 @@ const EditRoom = props => {
             maxLength={30}
             error={nameError}
             outerContainer={style.outerContainer}
-            placeholder={'Enter Name'}
+            placeholder={'Name'}
             errorMessage={'Enter valid Name'}
           />
           <CustomInputText
@@ -177,14 +198,17 @@ const EditRoom = props => {
             onChangeText={mobileNumberOnChange}
             value={mobileNumber}
             error={mobileNumberError}
-            placeholder={'Enter Mobile Number'}
+            placeholder={'Mobile Number'}
             errorMessage={'Invalid Mobile Number'}
           />
 
           <CustomPicker
             value={roomSize}
             container={style.pickerstyle}
-            onItemChange={value => setRoomSize(value?.value)}
+            onItemChange={value => {
+              setRoomSize(value?.value);
+              temData.rm_size = value;
+            }}
             placeholder={'Select'}
             labelTop={'Select room size'}
             data={data.ROOM_SIZE}
@@ -195,7 +219,10 @@ const EditRoom = props => {
             labelTop={'Select Furnished status'}
             placeholder={'Select'}
             container={style.pickerstyle}
-            onItemChange={value => setFurnishedStatus(value?.value)}
+            onItemChange={value => {
+              setFurnishedStatus(value?.value);
+              temData.rm_furnisd_status = value;
+            }}
             data={data.ROOM_STATUS_FR}
           />
 
@@ -204,7 +231,10 @@ const EditRoom = props => {
             labelTop={'Select availability of room'}
             placeholder={'Select'}
             container={style.pickerstyle}
-            onItemChange={value => setAvailableStatus(value?.value)}
+            onItemChange={value => {
+              setAvailableStatus(value?.value);
+              temData.rm_availble = value;
+            }}
             data={data.ROOM_AVAILABLE}
           />
 
@@ -213,7 +243,10 @@ const EditRoom = props => {
             container={style.pickerstyle}
             placeholder={'Select'}
             labelTop={'Select parking availability of room'}
-            onItemChange={value => setParkingStatus(value?.value)}
+            onItemChange={value => {
+              setParkingStatus(value?.value);
+              temData.rm_prking_avblity = value;
+            }}
             data={data.ROOM_PARKING_AVAILABILITY}
           />
 
@@ -222,7 +255,10 @@ const EditRoom = props => {
             container={style.pickerstyle}
             placeholder={'Select'}
             labelTop={'Select independency of room'}
-            onItemChange={value => setDependencyStatus(value?.value)}
+            onItemChange={value => {
+              setDependencyStatus(value?.value);
+              temData.rm_depndecy = value;
+            }}
             data={data.ROOM_DEPENDENT_STATUS}
           />
 
@@ -232,7 +268,7 @@ const EditRoom = props => {
             maxLength={20}
             outerContainer={style.outerContainer}
             error={whichFloorError}
-            placeholder={'On which floor'}
+            placeholder={'floor'}
             errorMessage={'Enter floor'}
           />
 
@@ -243,13 +279,13 @@ const EditRoom = props => {
             outerContainer={style.outerContainer}
             error={rentError}
             isNumeric={true}
-            placeholder={'Enter Rent'}
+            placeholder={'Rent'}
             errorMessage={'Enter Rent'}
           />
 
           <C_Button
             isLoading={false}
-            onPress={() => onNextPress()}
+            onPress={onNextPress}
             // outerContainer={style.outerContainer}
             isSubmitDisabled={isSubmitDisabled}
             label={'Next'}

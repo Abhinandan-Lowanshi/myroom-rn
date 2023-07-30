@@ -31,6 +31,7 @@ const DeleteConformation = ({
     <Modal
       backdropOpacity={0.3}
       activeOpacity={0.9}
+      animationType={'slide'}
       // backdropOpacity={1}
       transparent={true}
       style={{

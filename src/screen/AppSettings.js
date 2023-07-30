@@ -85,11 +85,25 @@ const AppSettings = props => {
   }, []);
 
   const onSearch = value => {
-    console.log(value, 'value');
     setAddress(value?.formatted_address);
-
     setRowData(value);
-    setSave(false);
+    if (value !== '') {
+      localStorageOp(true, AsyncKeys.DEFAULT_LOCATION, value);
+      setSave(true);
+      dispatch(
+        setCurrentLocationName({
+          locationName: value?.formatted_address,
+        }),
+      );
+      let Ob = {
+        latitude: value?.geometry?.location?.lat,
+        longitude: value?.geometry?.location?.lng,
+      };
+      dispatch(setLocation(Ob));
+    } else {
+      showToast('Please select location');
+      setSave(false);
+    }
   };
 
   const saveLocation = () => {
@@ -303,8 +317,8 @@ const AppSettings = props => {
         <View
           style={{
             backgroundColor: item.isChecked ? Colors.PRIMARYLITE1 : 'white',
-            height: hp(2.5),
-            width: hp(2.5),
+            height: hp(2.1),
+            width: hp(2.1),
             borderRadius: hp(90),
             borderWidth: hp(0.3),
             borderColor: Colors.PRIMARY,
@@ -316,7 +330,7 @@ const AppSettings = props => {
             color: item.isChecked ? Colors.PRIMARYDARK : 'black',
             marginLeft: hp(1),
             alignSelf: 'center',
-            fontSize: RF(1.8),
+            fontSize: RF(1.5),
           }}>
           {item?.label}
         </Text>
@@ -361,11 +375,12 @@ const AppSettings = props => {
       <GooglePlacesInput
         containerPlaceHolder={style.containerPlaceHolder}
         onSearch={onSearch}
+        placeholder={'Set Default location'}
       />
       {loading && (
         <View style={style.loader}>
           <Text style={style.labelLocationText}>Getting Current Location</Text>
-          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+          <ActivityIndicator size={hp(5)} color={Colors.PRIMARY} />
         </View>
       )}
       <GPSDialogue
@@ -389,9 +404,9 @@ const AppSettings = props => {
         <View style={style.containerSave}>
           <Text style={style.labelDefaultLocation}>Default Location</Text>
           <View style={style.innerSave(save)}>
-            <Text style={style.labelSave(save)}>
+            {/* <Text style={style.labelSave(save)}>
               {save ? 'Saved' : 'Unsaved'}
-            </Text>
+            </Text> */}
           </View>
         </View>
 
@@ -399,15 +414,17 @@ const AppSettings = props => {
           {address || '- - - - - - - - - - - - - - - - -'}
         </Text>
 
-        <C_Button
+        {/* <C_Button
           onPress={saveLocation}
           outerContainer={style.outerContainer}
           // isSubmitDisabled={rowData == '' ? true : false}
           label={
             isHideBack ? 'Save Location' : save ? 'Go to home' : 'Save Location'
           }
-        />
-        <Text style={style.labelDefaultLocation}>Active Location</Text>
+        /> */}
+        <Text style={[style.labelDefaultLocation, {marginTop: hp(3)}]}>
+          Active Location
+        </Text>
         <Text style={style.labelLocation}>
           {currentLocationName?.locationName ||
             '- - - - - - - - - - - - - - - - -'}
@@ -438,8 +455,10 @@ const style = StyleSheet.create({
   },
   labelLocation: {
     color: Colors.BLACK,
+    fontSize: hp(1.6),
   },
   containerPlaceHolder: {
+    fontSize: RF(2),
     position: 'absolute',
     top: hp(7.5),
     borderBottomLeftRadius: 4,
@@ -450,7 +469,7 @@ const style = StyleSheet.create({
   labelDefaultLocation: {
     color: Colors.BLACK,
     fontWeight: '600',
-    fontSize: RF(2),
+    fontSize: RF(1.6),
   },
   outerContainer: {
     height: hp(5),
@@ -505,7 +524,7 @@ const style = StyleSheet.create({
   },
   labelLocationText: {
     color: Colors.BLACK,
-    fontSize: hp(2),
+    fontSize: hp(1.9),
     marginBottom: hp(2),
   },
   buttonHome: {

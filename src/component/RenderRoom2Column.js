@@ -13,6 +13,7 @@ import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
 import data from '../common/SpinnerData';
+import RatingView from './RatingView';
 
 const RenderRoom2Column = ({
   myRoomList,
@@ -63,6 +64,7 @@ const RenderRoom2Column = ({
     return message;
   };
   const renderItem = ({item}) => {
+    console.log(item, 'renderItem');
     return (
       <TouchableOpacity
         onPress={() => onPress(item)}
@@ -100,17 +102,13 @@ const RenderRoom2Column = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
-          {/* <View style={style.containerDate}>
-            <LowOpacityText
-              label={item?.rm_size}
-              container={style.containerRent}
-            />
+          <View style={style.containerDate}>
             <LowOpacityText
               label={item?.created_at}
               container={style.containerRent}
               isTime={true}
             />
-          </View> */}
+          </View>
         </View>
         <View style={style.containerInfo}>
           <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
@@ -135,6 +133,7 @@ const RenderRoom2Column = ({
             {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
           </View>
         </View>
+        <RatingView rating={item?.reviews?.reviewData?.avg} />
         {!isFromMyPost && (
           <TouchableOpacity
             style={style.favImage}
@@ -201,7 +200,7 @@ const style = StyleSheet.create({
     flexDirection: 'column',
     borderRadius: hp(1),
     elevation: hp(0.5),
-    marginHorizontal: hp(0.3),
+    marginHorizontal: hp(0.5),
     paddingBottom: hp(2),
     marginBottom: hp(1),
   },
@@ -270,12 +269,12 @@ const style = StyleSheet.create({
   },
   imageContainer: {
     height: hp(30),
-    borderRadius: 100,
+    margin: hp(0.1),
   },
   labelRent: {
     color: 'green',
-    fontSize: RF(2),
-    fontWeight: '700',
+    fontSize: RF(1.8),
+    fontWeight: '600',
     alignSelf: 'flex-end',
   },
   timestamp: {
@@ -304,6 +303,7 @@ const style = StyleSheet.create({
     borderRadius: 5,
   },
   labelLow: {
+    fontSize: hp(0.4),
     marginHorizontal: 8,
     marginVertical: 2,
     color: 'white',
@@ -315,13 +315,13 @@ const style = StyleSheet.create({
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: 18,
+    fontSize: hp(2),
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
-    color: 'black',
-    fontSize: 13,
+    color: Colors.GREY4,
+    fontSize: hp(1.3),
     fontWeight: '400',
   },
   containerBottom: {
@@ -338,7 +338,7 @@ const style = StyleSheet.create({
   },
   labelAvailable: {
     color: 'black',
-    fontSize: 10,
+    fontSize: hp(1.2),
   },
   containerOptional: {
     backgroundColor: Colors.PRIMARY,

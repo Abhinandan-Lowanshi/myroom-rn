@@ -11,16 +11,19 @@ import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import Colors from '../common/Colors';
-import {RF, hp} from '../common/CommonFunctions';
+import {RF, hp, updateRating} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import Header from '../component/Header';
 import Labels from '../common/labels';
+import {logout} from '../component/LogOut';
+import RenderRoom2Column from '../component/RenderRoom2Column';
 
 const Fav = ({navigation, route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const favList = useSelector(state => state.AllData.favData);
   const isHomeUpdate = useSelector(state => state.AllData.isHomeUpdate);
+  const reviews = useSelector(state => state.AllData.reviews);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const [loading, setLoading] = useState(false);
@@ -34,19 +37,27 @@ const Fav = ({navigation, route}) => {
   }, [isFocused]);
 
   useEffect(() => {
+    let tmp = updateRating(favList, reviews);
+    dispatch(setFavData(tmp));
+  }, [reviews]);
+
+  useEffect(() => {
     setLoading(true);
     getData();
   }, []);
+
   const onRefresh = () => {
     setRefreshing(true);
     getData();
   };
+
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
       item,
       onPressFav,
     });
   };
+
   const getData = () => {
     sendRequest(
       {
@@ -56,11 +67,17 @@ const Fav = ({navigation, route}) => {
       'POST',
     )
       .then(res => {
-        setRefreshing(false);
-        setLoading(false);
-        dispatch(startL(false));
-        dispatch(updateHome(false));
-        dispatch(setFavData(res?.data));
+        if (res?.status === true) {
+          setRefreshing(false);
+          setLoading(false);
+          dispatch(startL(false));
+          dispatch(updateHome(false));
+          dispatch(setFavData(res?.data));
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
+        }
       })
       .catch(err => {
         dispatch(startL(false));
@@ -68,6 +85,7 @@ const Fav = ({navigation, route}) => {
         setRefreshing(false);
       });
   };
+
   const performFavOp = data => {
     let temp = JSON.parse(JSON.stringify(favList));
     temp.map(item => {
@@ -77,6 +95,7 @@ const Fav = ({navigation, route}) => {
     });
     dispatch(setFavData(temp));
   };
+
   const onPressFav = async value1 => {
     let value = {...value1};
     let data = {
@@ -122,16 +141,22 @@ const Fav = ({navigation, route}) => {
       return false;
     }
   };
+
   const showToast = message => {
     Toast.show(message, Toast.LONG);
   };
+
+  const onPressCancel = () => {
+    navigation.goBack();
+  };
+
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels.Favourite} navigation={navigation} />
       {loading ? (
-        <LowOpacityLoader />
+        <LowOpacityLoader onPress={onPressCancel} />
       ) : favList?.length > 0 ? (
-        <RenderRoom
+        <RenderRoom2Column
           container={style.container}
           myRoomList={favList}
           onPress={onPressRoom}

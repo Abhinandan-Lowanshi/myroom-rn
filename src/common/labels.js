@@ -27,5 +27,6 @@ const Labels = {
   Profile: 'Profile',
   AllRooms: 'All Rooms  ',
   defaultLocation: 'Default Location',
+  Review: 'Review',
 };
 export default Labels;

@@ -36,6 +36,7 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import images from '../common/images';
 import ScreenName from '../common/ScreenName';
+import {logout} from '../component/LogOut';
 
 const RoomDetailsOwner = props => {
   const {navigation} = props;
@@ -135,6 +136,10 @@ const RoomDetailsOwner = props => {
               'Room details not found, may be room has been deleted or de-activated by the owner of the room.',
             );
           }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(err => {
@@ -147,6 +152,7 @@ const RoomDetailsOwner = props => {
       <Modal
         // transparent={true}
         visible={visible}
+        animationType={'slide'}
         onRequestClose={() => {
           setVisible(false);
         }}>

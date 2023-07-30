@@ -5,11 +5,13 @@ import {hp, RF} from '../common/CommonFunctions';
 import C_Button from './C_Button';
 const ErrorModal = props => {
   return (
-    <Modal transparent={true} visible={props?.visible}>
+    <Modal transparent={true} visible={props?.visible} animationType={'slide'}>
       <View style={style.lowOpacity(props.hideBackground)}></View>
       <View style={style.parentContainer}>
         <View style={style.container}>
-          <Text style={style.labelHeader}>{'Something went wrong.'}</Text>
+          <Text style={style.labelHeader}>
+            {props?.header || 'Something went wrong.'}
+          </Text>
           <Text style={style.labelContent}>{props?.label}</Text>
           <C_Button
             // isLoading={loading}

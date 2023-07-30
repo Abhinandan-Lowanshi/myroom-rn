@@ -13,6 +13,7 @@ import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
 import data from '../common/SpinnerData';
+import RatingView from './RatingView';
 
 const RenderRoom = ({
   myRoomList,
@@ -97,6 +98,14 @@ const RenderRoom = ({
             uri={item?.images[0]?.img_name}
             container={style.imageContainer}
             imageStyle={style.image}
+          />
+          <RatingView
+            rating={item?.reviews?.reviewData?.avg}
+            containerStyle={{
+              position: 'absolute',
+              bottom: hp(2),
+              top: null,
+            }}
           />
           <View style={style.containerDate}>
             <LowOpacityText
@@ -242,11 +251,10 @@ const style = StyleSheet.create({
   },
   imageContainer: {
     height: hp(25),
-    borderRadius: 100,
   },
   labelRent: {
     color: 'green',
-    fontSize: 20,
+    fontSize: hp(2),
     fontWeight: '700',
     marginLeft: 5,
     position: 'absolute',
@@ -279,6 +287,7 @@ const style = StyleSheet.create({
     borderRadius: 5,
   },
   labelLow: {
+    fontSize: RF(1.2),
     marginHorizontal: 8,
     marginVertical: 2,
     color: 'white',
@@ -290,13 +299,13 @@ const style = StyleSheet.create({
   containerInfo: {marginHorizontal: hp(1.5)},
   labelName: {
     color: 'black',
-    fontSize: 18,
+    fontSize: RF(2),
     fontWeight: '600',
     marginTop: 5,
   },
   labelAddress: {
     color: 'black',
-    fontSize: 13,
+    fontSize: RF(1.6),
     fontWeight: '400',
     marginLeft: 5,
   },

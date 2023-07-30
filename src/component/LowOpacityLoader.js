@@ -1,12 +1,38 @@
 import React from 'react';
-import {ActivityIndicator, Modal, View, StyleSheet} from 'react-native';
+import {
+  ActivityIndicator,
+  Modal,
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import Colors from '../common/Colors';
-import {hp} from '../common/CommonFunctions';
+import {RF, hp} from '../common/CommonFunctions';
 
-const LowOpacityLoader = () => {
+const LowOpacityLoader = ({onPress, cancel}) => {
   return (
     <Modal transparent={true}>
       <View style={style.lowOpacity}></View>
+      {cancel && (
+        <TouchableOpacity
+          onPress={onPress}
+          style={{
+            height: hp(3),
+            width: hp(10),
+            marginTop: hp(7),
+            marginLeft: hp(1),
+          }}>
+          <Text
+            style={{
+              color: Colors.BLACK,
+              fontSize: RF(2),
+              textAlign: 'center',
+            }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      )}
       <View style={style.container}>
         <View style={style.activityContainer}>
           <ActivityIndicator

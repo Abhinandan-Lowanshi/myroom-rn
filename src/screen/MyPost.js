@@ -15,6 +15,7 @@ import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import {hp} from '../common/CommonFunctions';
+import {logout} from '../component/LogOut';
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState('');
@@ -25,6 +26,7 @@ const MyPost = ({navigation}) => {
   const myRoomList = useSelector(state => state.AllData.myposts);
   const dispatch = useDispatch();
 
+  console.log('onPressEditSuccess');
   useEffect(() => {
     setLoading(true);
     getRooms();
@@ -37,10 +39,16 @@ const MyPost = ({navigation}) => {
     setLoading(true);
     sendRequest(data, EndPoints.toRoomStatus, 'POST')
       .then(res => {
-        setLoading(false);
-        setRefreshing(false);
         if (res?.status === true) {
-          updateRoomStatus(data);
+          setLoading(false);
+          setRefreshing(false);
+          if (res?.status === true) {
+            updateRoomStatus(data);
+          }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(e => {
@@ -64,8 +72,13 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressEditSuccess = value => {
+    console.log(value);
+  };
+
   const onPressEdit = item => {
-    navigation.navigate(ScreenName.EditRoom, item);
+    navigation.navigate(ScreenName.EditRoom, {item, onPressEditSuccess});
   };
 
   const onPressDelete = id => {
@@ -88,6 +101,10 @@ const MyPost = ({navigation}) => {
         setRefreshing(false);
         if (res?.status === true) {
           dispatch(getAllMyRooms(res?.data));
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(e => {
@@ -113,6 +130,10 @@ const MyPost = ({navigation}) => {
           removeRoom(roomId);
         } else {
           setError(response?.message);
+
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(error => {
@@ -129,10 +150,15 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressCancel = () => {
+    navigation.goBack();
+  };
+
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
       <Header label={'My Post'} navigation={navigation} />
-      {loading && <LowOpacityLoader />}
+      {loading && <LowOpacityLoader onPress={onPressCancel} />}
 
       <RenderRoom
         container={style.container}

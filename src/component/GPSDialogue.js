@@ -19,6 +19,7 @@ const GPSDialogue = ({
       backdropOpacity={0.3}
       activeOpacity={0.9}
       transparent={true}
+      animationType={'slide'}
       style={{
         flex: 1,
         justifyContent: 'center',

@@ -38,7 +38,7 @@ import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
-import {RF, hp} from '../common/CommonFunctions';
+import {RF, hp, updateRating} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import Toast from 'react-native-simple-toast';
 import {LogBox} from 'react-native';
@@ -52,6 +52,7 @@ import localStorageOp from '../localStorage/LocalData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
 import Geolocation from '@react-native-community/geolocation';
 import GPSDialogue from '../component/GPSDialogue';
+import {logout} from '../component/LogOut';
 
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
@@ -67,6 +68,8 @@ const Home = ({route, navigation}) => {
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const filteredData = useSelector(state => state.AllData.filteredData);
   const LocationMode = useSelector(state => state.AllData.LocationMode);
+  const reviews = useSelector(state => state.AllData.reviews);
+
   console.log(LocationMode, 'LocationMode');
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
@@ -83,16 +86,24 @@ const Home = ({route, navigation}) => {
             dispatch(setLocationMode({locationMode: 'Default'}));
             localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
               .then(value => {
-                dispatch(
-                  setCurrentLocationName({
-                    locationName: value?.formatted_address,
-                  }),
-                );
-                let Ob = {
-                  latitude: value?.geometry?.location?.lat,
-                  longitude: value?.geometry?.location?.lng,
-                };
-                dispatch(setLocation(Ob));
+                if (value) {
+                  dispatch(
+                    setCurrentLocationName({
+                      locationName: value?.formatted_address,
+                    }),
+                  );
+                  let Ob = {
+                    latitude: value?.geometry?.location?.lat,
+                    longitude: value?.geometry?.location?.lng,
+                  };
+                  dispatch(setLocation(Ob));
+                } else {
+                  localStorageOp(true, AsyncKeys.LOCATION_MODE, {
+                    mode: AsyncKeys.CUSTOM,
+                  });
+                  dispatch(setLocationMode({locationMode: 'Live'}));
+                  requestLocationPermission();
+                }
               })
               .catch(() => {});
           } else {
@@ -107,13 +118,10 @@ const Home = ({route, navigation}) => {
       .catch(() => {});
   }, []);
 
-  // useEffect(() => {
-  //   AppState.addEventListener('change', handleChange);
-
-  //   return () => {
-  //     AppState.removeEventListener('change', handleChange);
-  //   };
-  // }, []);
+  useEffect(() => {
+    let tmp = updateRating(roomDataHome, reviews);
+    dispatch(setFilteredData(tmp));
+  }, [reviews]);
 
   const handleChange = value => {
     if (value === 'active') {
@@ -139,6 +147,7 @@ const Home = ({route, navigation}) => {
   useEffect(() => {
     setLoading(true);
     getData();
+    updateUserNotification();
   }, [data]);
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
@@ -153,6 +162,25 @@ const Home = ({route, navigation}) => {
       'Non-serializable values were found in the navigation state',
     ]);
   }, []);
+
+  const updateUserNotification = () => {
+    if (data?.longitude && data?.latitude) {
+      sendRequest(
+        {
+          user_id: '1',
+          usr_latitude: data?.latitude,
+          usr_longitude: data?.longitude,
+          isNotify: true,
+        },
+        EndPoints.updateUserNotificationDetails,
+        'POST',
+      )
+        .then(response => {
+          console.log(response, 'updateUserNotification');
+        })
+        .catch(() => {});
+    }
+  };
 
   const getAddressFromCoordinates = (latitude, longitude) => {
     return new Promise((resolve, reject) => {
@@ -358,6 +386,10 @@ const Home = ({route, navigation}) => {
               setIsFailed(true);
             }
           } else {
+            console.log(res?.message, 'Invalid authentication.');
+            if (res?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
             dispatch(setRoomDataHome([]));
             dispatch(setFilteredData([]));
             setIsFailed(true);
@@ -529,7 +561,11 @@ const Home = ({route, navigation}) => {
             {LocationMode?.locationMode}
           </Text>
           <Text style={style.labelLocation}>
-            {currentLocationName?.locationName}
+            {LocationMode?.locationMode === 'Live'
+              ? loading
+                ? 'Getting location '
+                : currentLocationName?.locationName
+              : currentLocationName?.locationName}
           </Text>
         </View>
       </View>
@@ -628,6 +664,7 @@ const style = StyleSheet.create({
     fontWeight: '600',
   },
   labelLocation: {
+    maxWidth: '85%',
     color: Colors.BLACK,
     fontSize: RF(1.4),
     fontWeight: '600',
@@ -645,13 +682,16 @@ const style = StyleSheet.create({
   },
   containerLocationMode: {
     flexDirection: 'row',
+    marginTop: hp(0.5),
   },
   labelLocationMode: {
+    maxHeight: hp(2.5),
     backgroundColor: Colors.RED,
     color: Colors.WHITE,
     fontSize: RF(1.3),
     paddingHorizontal: hp(1),
     borderRadius: hp(0.5),
     marginRight: hp(0.5),
+    maxWidth: '15%',
   },
 });

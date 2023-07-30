@@ -233,6 +233,7 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const setDestination = data => {
+    console.log(data, 'setDestination');
     let locationData = {
       latitude: parseFloat(data ? data?.rm_latitude : 0.0),
       longitude: parseFloat(data ? data?.rm_longitude : 0.0),
@@ -250,7 +251,7 @@ const MapSearch = ({route, navigation}) => {
     map?.current?.animateToRegion(r, 2000);
   };
 
-  const renderMap = useCallback(() => {
+  const renderMap = () => {
     return (
       <MapView
         ref={map}
@@ -330,7 +331,7 @@ const MapSearch = ({route, navigation}) => {
           : null}
       </MapView>
     );
-  }, [data]);
+  };
 
   const preDataOnMap = data => {
     let temp = JSON.parse(JSON.stringify(roomDataHomeTemp));

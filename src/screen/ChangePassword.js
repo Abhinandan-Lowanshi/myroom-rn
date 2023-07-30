@@ -14,6 +14,7 @@ import ScreenName from '../common/ScreenName';
 import {useSelector, useDispatch} from 'react-redux';
 import {getAccountImfo} from '../redux/Slice';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import {logout} from '../component/LogOut';
 
 const ChangePassword = ({navigation}) => {
   const accountData = useSelector(state => state.AllData.accountData);
@@ -86,6 +87,9 @@ const ChangePassword = ({navigation}) => {
           } else {
             setEmailApiError(response.message);
             //go back
+            if (response?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
           }
         })
         .catch(e => {
@@ -114,7 +118,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={onCurrentPasswordText}
             outerContainer={style.outerContainerSocial}
             error={currentPasswordError}
-            placeholder={'Enter Current Password'}
+            placeholder={'Current Password'}
             errorMessage={'Enter Current Password'}
             isEyeVisible={true}
           />
@@ -123,7 +127,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={passwordOnChange}
             outerContainer={style.outerContainerSocial}
             error={passwordError}
-            placeholder={'Enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />
@@ -132,7 +136,7 @@ const ChangePassword = ({navigation}) => {
             onChangeText={rePasswordOnChange}
             outerContainer={style.outerContainerSocial}
             error={rePasswordError}
-            placeholder={'Re-enter Password'}
+            placeholder={'Password'}
             errorMessage={'Invalid Password'}
             isEyeVisible={true}
           />
@@ -163,6 +167,7 @@ const style = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    marginTop: hp(2),
   },
   textInputContainerStyle: {
     width: '100%',

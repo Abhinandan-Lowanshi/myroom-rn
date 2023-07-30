@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import Colors from '../common/Colors';
-import {hp} from '../common/CommonFunctions';
+import {RF, hp} from '../common/CommonFunctions';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
 const GooglePlacesInput = props => {
@@ -13,6 +13,7 @@ const GooglePlacesInput = props => {
       textInputProps={{
         placeholderTextColor: Colors.BLACK,
         returnKeyType: 'search',
+        fontSize: RF(1.6),
       }}
       keepResultsAfterBlur={true}
       keyboardShouldPersistTaps={'always'}
@@ -34,7 +35,7 @@ const GooglePlacesInput = props => {
         },
         description: {color: Colors.BLACK},
       }}
-      placeholder="Search location"
+      placeholder={props.placeholder || 'Search Location'}
       fetchDetails={true}
       onPress={(data, details = null) => {
         props?.onSearch(details);
