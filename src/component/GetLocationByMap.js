@@ -73,14 +73,16 @@ const GetLocationByMap = props => {
                 ? roomLocation?.longitude
                 : data?.longitude,
             ),
-            latitudeDelta:
-              Object.keys(roomLocation).length !== 0
-                ? roomLocation?.latitudeDelta
-                : 0.005,
-            longitudeDelta:
-              Object.keys(roomLocation).length !== 0
-                ? roomLocation?.longitudeDelta
-                : 0.005,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+            // latitudeDelta:
+            //   Object.keys(roomLocation).length !== 0
+            //     ? roomLocation?.latitudeDelta
+            //     : 0.005,
+            // longitudeDelta:
+            //   Object.keys(roomLocation).length !== 0
+            //     ? roomLocation?.longitudeDelta
+            //     : 0.005,
           }}
           onRegionChangeComplete={coords => {
             setRoomLocationMain(coords);

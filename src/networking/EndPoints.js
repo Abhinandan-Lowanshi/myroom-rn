@@ -2,6 +2,7 @@ const EndPoints = {
   baseUrl: 'http:192.168.119.23:3000/api/',
   // baseUrl: 'http://localhost:3000/api/',
   // baseUrl: 'http://3.220.96.137:3000/api/',
+  // baseUrl: 'http://192.168.182.23:3000/api/',
   login: 'login',
   register: 'register',
   forgetPassword: 'forgetPassword',
@@ -28,5 +29,6 @@ const EndPoints = {
   chatList: 'chatList',
   updateUserNotificationDetails: 'updateUserNotificationDetails',
   addReview: 'addReview',
+  socialLogin: 'socialLogin',
 };
 export default EndPoints;
