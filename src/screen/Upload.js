@@ -17,10 +17,11 @@ import Colors from '../common/Colors';
 import {launchImageLibrary} from 'react-native-image-picker';
 import C_Button from '../component/C_Button';
 import ScreenName from '../common/ScreenName';
-import {useDispatch} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import localStorageOp from '../localStorage/LocalData';
 import {uploadImage} from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
+import {useSelector} from 'react-redux';
 
 const Upload = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -48,10 +49,12 @@ const Upload = ({navigation}) => {
   const [image, setImage] = useState([]);
   const [ownerData, setOwnerData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const accountData = useSelector(state => state.AllData.accountData);
+
   useEffect(() => {
     if (
-      ownerData?.name?.length < 4 ||
-      ownerData?.mobile?.length < 10 ||
+      accountData?.data?.usr_firstName?.length < 4 ||
+      accountData?.data?.usr_phone?.length < 10 ||
       roomSize.length === 0 ||
       furnishedStatus.length === 0 ||
       availableStatus === 0 ||
@@ -65,7 +68,7 @@ const Upload = ({navigation}) => {
       city.length < 2 ||
       description.length < 2 ||
       image?.length < 2 ||
-      isDeposit
+      isDeposit === 'yes'
         ? deposit.length < 2
         : false
     ) {
@@ -273,8 +276,8 @@ const Upload = ({navigation}) => {
           });
         });
         formdata.append('rm_usr_fkey', userData?.data?.usr_id);
-        formdata.append('rm_own_Fullname', ownerData?.name);
-        formdata.append('rm_own_mble_num', ownerData?.mobile);
+        formdata.append('rm_own_Fullname', accountData?.data?.usr_firstName);
+        formdata.append('rm_own_mble_num', accountData?.data?.usr_phone);
         formdata.append('rm_furnisd_status', furnishedStatus);
         formdata.append('rm_availble', availableStatus);
         formdata.append('rm_prking_avblity', parkingStatus);
@@ -286,6 +289,7 @@ const Upload = ({navigation}) => {
         formdata.append('rm_size', roomSize);
         formdata.append('rm_rent', rent);
         formdata.append('rm_flor', whichFloor);
+        formdata.append('deposit', isDeposit === 'Yes' ? deposit : '');
         formdata.append('rm_latitude', roomLocation?.latitude);
         formdata.append('rm_longitude', roomLocation?.longitude);
         formdata.append('rm_description', description);
@@ -346,7 +350,7 @@ const Upload = ({navigation}) => {
         <CustomInputText
           disabled
           onChangeText={nameOnChange}
-          value={ownerData?.name}
+          value={accountData?.data?.usr_firstName}
           maxLength={30}
           outerContainer={style.outerContainer}
           placeholder={'Name'}
@@ -356,7 +360,7 @@ const Upload = ({navigation}) => {
           disabled
           maxLength={10}
           isNumeric={true}
-          value={ownerData?.mobile}
+          value={accountData?.data?.usr_phone}
           placeholder={'Mobile Number'}
           errorMessage={'Invalid Mobile Number'}
         />
@@ -378,17 +382,16 @@ const Upload = ({navigation}) => {
           onItemChange={value => setFurnishedStatus(value?.value)}
           data={data.ROOM_STATUS_FR}
         />
-        {/* <CustomPicker
+        <CustomPicker
           isLoading={isLoading}
           labelTop={'Is deposit applicable'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setIsDeposit(value?.value)}
           data={data.ROOM_PARKING_AVAILABILITY}
-        /> */}
+        />
         {isDeposit === 'Yes' && (
           <CustomInputText
-            disabled
             onChangeText={onChangeDeposit}
             maxLength={10}
             isNumeric={true}

@@ -56,7 +56,9 @@ const Login = ({navigation}) => {
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signIn().then(result => {
-        console.log(result);
+        if (result?.user) {
+          loginSocial(result);
+        }
       });
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -80,6 +82,39 @@ const Login = ({navigation}) => {
       setIsSubmitDisabled(false);
     else setIsSubmitDisabled(true);
   }, [email, password]);
+
+  const loginSocial = user => {
+    SetIsLoading(true);
+    sendRequest(
+      {
+        email: user?.user?.email,
+        name: user?.user?.name,
+        device_token: 'nill',
+        social_token: user?.idToken,
+      },
+      EndPoints.socialLogin,
+      'POST',
+    )
+      .then(response => {
+        SetIsLoading(false);
+        if (response?.status === true) {
+          localStorageOp(true, AsyncKeys.USERDATA, response);
+          dispatch(getAccountImfo(response));
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.TabComponent}],
+            }),
+          );
+        } else {
+          setAuthError(response?.message);
+        }
+      })
+      .catch(error => {
+        SetIsLoading(false);
+        console.log(error, 'error');
+      });
+  };
 
   const onEmailText = email => {
     setEmail(email);
