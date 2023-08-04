@@ -348,6 +348,7 @@ const Upload = ({navigation}) => {
   const navigateToEditProfile = () => {
     navigation.navigate(ScreenName.EditProfile);
   };
+
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
