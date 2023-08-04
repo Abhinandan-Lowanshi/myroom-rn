@@ -113,13 +113,15 @@ const MyAccount = ({navigation}) => {
           label={'Edit Profile'}
           type={ScreenName.EditProfile}
         />
-        <AccountTouchableCom
-          onPress={() => {
-            navigation.navigate(ScreenName.changePassword);
-          }}
-          label={'Change Password'}
-          type={ScreenName.changePassword}
-        />
+        {accountData?.data?.loginType !== 'google' && (
+          <AccountTouchableCom
+            onPress={() => {
+              navigation.navigate(ScreenName.changePassword);
+            }}
+            label={'Change Password'}
+            type={ScreenName.changePassword}
+          />
+        )}
         <AccountTouchableCom
           label={'App Settings'}
           type={ScreenName.Settings}

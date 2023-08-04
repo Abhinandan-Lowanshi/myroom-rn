@@ -553,9 +553,9 @@ const Upload = ({navigation}) => {
         {renderImages()}
 
         <C_Button
-          // isLoading={isLoading}
+          isLoading={isLoading}
           onPress={uploadRoom}
-          // isSubmitDisabled={isSubmitDisabled}
+          isSubmitDisabled={isSubmitDisabled}
           label={'Upload'}
         />
       </View>
