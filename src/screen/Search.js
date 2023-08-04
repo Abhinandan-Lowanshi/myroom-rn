@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import Colors from '../common/Colors';
-import {hp, RF} from '../common/CommonFunctions';
+import {hp, RF, updateRating} from '../common/CommonFunctions';
 import Labels from '../common/labels';
 import StyleGlobel from '../Style/StyleGlobel';
 import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
@@ -31,6 +31,7 @@ import {updateHome, searchUpdate} from '../redux/Slice';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-simple-toast';
 import {filterData, filterRoom, getRoomCount} from '../common/FIlterData';
+import RenderRoom2Column from '../component/RenderRoom2Column';
 
 const Search = ({navigation}) => {
   const [location, setLocation] = useState({});
@@ -43,6 +44,7 @@ const Search = ({navigation}) => {
   const [message, setMessage] = useState('Search rooms around you');
   const [recent, setRecent] = useState([]);
   const dispatch = useDispatch();
+  const reviews = useSelector(state => state.AllData.reviews);
 
   const [data, setData] = React.useState(filterData);
 
@@ -53,6 +55,11 @@ const Search = ({navigation}) => {
       })
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    let tmp = updateRating(roomData, reviews);
+    setRoomData(tmp);
+  }, [reviews]);
 
   const getRooms = (location = null) => {
     setMessage('');
@@ -416,7 +423,7 @@ const Search = ({navigation}) => {
             </View>
             <Text
               style={{
-                fontSize: hp(1.8),
+                fontSize: hp(1.5),
                 paddingVertical: hp(1),
                 color: Colors.BLACK,
                 fontWeight: '600',
@@ -474,7 +481,7 @@ const Search = ({navigation}) => {
               style={{
                 color: Colors.BLACK1,
                 fontWeight: '600',
-                fontSize: RF(2.5),
+                fontSize: RF(2),
               }}>
               Room Categories
             </Text>
@@ -490,7 +497,7 @@ const Search = ({navigation}) => {
           </View>
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity onPress={() => manageFilter({}, Labels.ALL)}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.8)}}>
+              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
                 Select all
               </Text>
             </TouchableOpacity>
@@ -500,7 +507,7 @@ const Search = ({navigation}) => {
                 manageFilter({}, Labels.RESET);
                 getFilteredData(data, false);
               }}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.8)}}>
+              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
                 Reset
               </Text>
             </TouchableOpacity>
@@ -546,13 +553,13 @@ const Search = ({navigation}) => {
             style={{
               color: 'black',
               alignSelf: 'center',
-              fontSize: RF(2.3),
+              fontSize: RF(2),
               marginTop: '50%',
             }}>
             {message}
           </Text>
         )}
-        <RenderRoom
+        <RenderRoom2Column
           flat={style.flat}
           myRoomList={roomData}
           onPress={onPressRoom}

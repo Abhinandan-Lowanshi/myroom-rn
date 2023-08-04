@@ -24,6 +24,7 @@ import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
+import {logout} from '../component/LogOut';
 
 const EditRoom = props => {
   const {navigation} = props;
@@ -156,7 +157,11 @@ const EditRoom = props => {
     //     setLoading(false);
     //     if (response.status === true) {
     //       navigation.navigate(ScreenName.MyPost);
-    //     }
+    //     } else {
+    //   if (response?.message === 'Invalid authentication.') {
+    //     logout(navigation);
+    //   }
+    // }
     //   })
     //   .catch(error => {
     //     setLoading(false);

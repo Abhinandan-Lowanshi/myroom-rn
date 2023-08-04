@@ -37,17 +37,21 @@ const Chat = props => {
   const flatListRef = useRef();
   const [user_id, setUser_id] = useState('');
   const [messages, setMessages] = useState([]);
-  const socket = io.connect('http://3.220.96.137:3000', {reconnect: true});
+  const socket = io.connect('http://localhost:3000', {reconnect: true});
   console.log(item, 'Chat');
 
   useEffect(() => {
     socket.on('receive_message', chatMessage => {
-      console.log(chatMessage, 'ChatMessage');
+      console.log(chatMessage, 'user_id');
       if (chatMessage?.user_id !== user_id) {
         setMessages(prevMessages => [...prevMessages, chatMessage]);
         toBottom();
       }
     });
+    return () => {
+      console.log('>..................');
+      socket.disconnect();
+    };
   }, []);
 
   useEffect(() => {

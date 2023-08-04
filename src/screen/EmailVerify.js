@@ -13,6 +13,9 @@ import localStorageOp from '../localStorage/LocalData';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import {getAccountImfo} from '../redux/Slice';
 import {useDispatch} from 'react-redux';
+import {CommonActions} from '@react-navigation/native';
+import {styles} from 'react-native-image-slider-banner/src/style';
+
 const EmailVerify = ({navigation}) => {
   const signInData = useSelector(state => state.AllData.signInData);
   const [otp, setOtp] = useState('');
@@ -37,7 +40,7 @@ const EmailVerify = ({navigation}) => {
             }),
           );
         } else {
-          setApiError('Something went wrong');
+          setApiError(response?.message);
           setLoading(false);
         }
       })
@@ -103,9 +106,15 @@ const EmailVerify = ({navigation}) => {
         onPress={() => {
           setApiError('');
         }}
+        header={'Opps!'}
         label={apiError}
         visible={apiError ? true : false}></ErrorModal>
-      <CustomInputText value={signInData.email} disabled={true} />
+      <View style={styles.containerStyle} />
+      <CustomInputText
+        value={signInData.email}
+        disabled={true}
+        placeholder={'Email'}
+      />
       <CustomInputText
         error={otpError}
         maxLength={6}

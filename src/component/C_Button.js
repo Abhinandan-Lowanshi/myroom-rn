@@ -44,6 +44,6 @@ const style = StyleSheet.create({
     color: Colors.WHITE,
     alignSelf: 'center',
     fontWeight: '600',
-    fontSize: RF(2),
+    fontSize: RF(1.8),
   },
 });

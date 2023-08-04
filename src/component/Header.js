@@ -16,14 +16,18 @@ const Header = ({label, navigation, container, hideBack, RightIcon}) => {
           <Icon
             style={style.iconStyle}
             name="left"
-            size={hp(3.6)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         </TouchableOpacity>
       )}
       <Text style={style.labelSignUp}>{label}</Text>
-      <Text style={{color: Colors.WHITE}}>kkkk</Text>
-      {RightIcon && <RightIcon />}
+      {!RightIcon && <Text style={{color: Colors.WHITE}}>kkkk</Text>}
+      {RightIcon && (
+        <View style={style.rightIcon}>
+          <RightIcon />
+        </View>
+      )}
     </View>
   );
 };
@@ -38,17 +42,18 @@ const style = StyleSheet.create({
     elevation: 15,
     justifyContent: 'space-between',
     paddingHorizontal: hp(1),
+    alignItems: 'center',
   },
   iconStyle: {
     alignSelf: 'center',
   },
   labelSignUp: {
-    fontSize: hp(3),
     alignSelf: 'center',
     color: Colors.PRIMARY,
-    fontSize: hp(2.6),
+    fontSize: hp(2),
   },
   containerInner: {
     flexDirection: 'row',
   },
+  rightIcon: {marginRight: hp(1)},
 });

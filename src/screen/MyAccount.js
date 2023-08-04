@@ -16,6 +16,7 @@ import LowOpacityLoader from '../component/LowOpacityLoader';
 import Labels from '../common/labels';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../common/images';
+import {logout} from '../component/LogOut';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -29,42 +30,17 @@ const MyAccount = ({navigation}) => {
   //       setLoading(false);
   //       if (res.status === true) {
   //         dispatch(getAccountImfo(res.data));
-  //       }
+  //       } else {
+  // if (response?.message === 'Invalid authentication.') {
+  //   setVisible(false);
+  //   logout(navigation);
+  // }
   //     })
   //     .catch(e => {
   //       setLoading(false);
   //     });
   // }, []);
   // Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
-  const logout = () => {
-    setVisible(false);
-    AsyncStorage.getAllKeys()
-      .then(keys => AsyncStorage.multiRemove(keys))
-      .then(() => {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: ScreenName.Login}],
-          }),
-        );
-        // return true;
-      })
-      .catch(() => {
-        return false;
-      });
-
-    // if (clearAllData()) {
-    // navigation.dispatch(
-    //   CommonActions.reset({
-    //     index: 0,
-    //     routes: [{name: ScreenName.Login}],
-    //   }),
-    // );
-    // } else {
-    //   Alert('Something went wrong');
-    // }
-  };
 
   return (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>
@@ -77,7 +53,10 @@ const MyAccount = ({navigation}) => {
           visible={visible}
           confirmationMessage={'Are you sure you want to  '}
           confirmationMessageHigh={'logout?'}
-          onPressPositive={logout}
+          onPressPositive={() => {
+            setVisible(false);
+            logout(navigation);
+          }}
           closeModal={() => {
             // setError('');
             setVisible(false);
@@ -134,13 +113,15 @@ const MyAccount = ({navigation}) => {
           label={'Edit Profile'}
           type={ScreenName.EditProfile}
         />
-        <AccountTouchableCom
-          onPress={() => {
-            navigation.navigate(ScreenName.changePassword);
-          }}
-          label={'Change Password'}
-          type={ScreenName.changePassword}
-        />
+        {accountData?.data?.loginType !== 'google' && (
+          <AccountTouchableCom
+            onPress={() => {
+              navigation.navigate(ScreenName.changePassword);
+            }}
+            label={'Change Password'}
+            type={ScreenName.changePassword}
+          />
+        )}
         <AccountTouchableCom
           label={'App Settings'}
           type={ScreenName.Settings}
@@ -211,7 +192,7 @@ const styles = StyleSheet.create({
     marginLeft: hp(2),
   },
   labelPersonalText: isContaint => ({
-    fontSize: RF(2),
+    fontSize: RF(1.6),
     color: 'black',
     fontWeight: isContaint ? '700' : '600',
   }),
@@ -222,6 +203,7 @@ const styles = StyleSheet.create({
   labelInnerContainer: {
     flexDirection: 'row',
     color: 'black',
+    fontSize: RF(1.6),
   },
   outerContainer: {
     marginTop: hp(5),

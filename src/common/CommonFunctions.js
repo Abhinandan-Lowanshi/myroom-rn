@@ -34,6 +34,20 @@ const responsiveFontSize = f => {
   );
 };
 
+const updateRating = (dataArray, review) => {
+  console.log(dataArray, review, 'dataArray?.map');
+  if (dataArray?.length > 0) {
+    let temp = dataArray?.map(item => {
+      return item?.rm_pkey === review?.reviewData?.room_id
+        ? {...item, reviews: review}
+        : item;
+    });
+    return temp;
+  } else {
+    return dataArray;
+  }
+};
+
 export {
   moderateScale,
   verticalScale,
@@ -42,4 +56,5 @@ export {
   heightPercentageToDP as hp,
   screenWidth,
   screenHeight,
+  updateRating,
 };

@@ -23,6 +23,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Toast from 'react-native-simple-toast';
 import {setFilteredData, setRoomDataHome} from '../redux/Slice';
 import images from '../common/images';
+import {logout} from '../component/LogOut';
 
 const Notification = ({route, navigation}) => {
   const [notification, setNotification] = useState([]);
@@ -45,10 +46,16 @@ const Notification = ({route, navigation}) => {
       'POST',
     )
       .then(res => {
-        setLoading(false);
         if (res.status === true) {
-          if (res.data.length) {
-            setNotification(res.data);
+          setLoading(false);
+          if (res.status === true) {
+            if (res.data.length) {
+              setNotification(res.data);
+            }
+          }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
           }
         }
       })

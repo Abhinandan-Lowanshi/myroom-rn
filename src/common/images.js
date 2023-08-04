@@ -7,4 +7,9 @@ export default images = {
   search: require('../image/search.png'),
   upload: require('../image/upload.png'),
   profileIcon: require('../image/profileIcon.png'),
+  furnished: require('../image/furnished.png'),
+  independent: require('../image/independent.png'),
+  homeMapIcon: require('../image/homeMapIcon.png'),
+  personIcon: require('../image/personIcon.png'),
+  imagePlaceHolder: require('../image/imagePlaceHolder.png'),
 };

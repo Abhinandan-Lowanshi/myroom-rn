@@ -125,7 +125,7 @@ const style = StyleSheet.create({
   },
   labelButton: {
     color: Colors.WHITE,
-    marginHorizontal: hp(2),
+    marginHorizontal: hp(1),
     marginVertical: hp(0.5),
   },
 });

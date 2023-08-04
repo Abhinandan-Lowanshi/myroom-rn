@@ -90,34 +90,46 @@ const SignUp = ({navigation}) => {
 
   const getOtp = () => {
     navigation.navigate(ScreenName.EmailVerify);
-    if (email) {
-      setLoading(true);
-      sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
-        .then(response => {
-          setLoading(false);
-          if (response.status === true) {
-            dispatch(
-              setSignUp({
-                firstName: name,
-                lastName: '',
-                email: email,
-                phone: mobile,
-                currentAdrs: '',
-                prmntAddress: '',
-                password: password,
-                device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
-              }),
-            );
-            navigation.navigate(ScreenName.EmailVerify);
-          } else {
-            setEmailApiError(response.message);
-            //go back
-          }
-        })
-        .catch(e => {
-          setLoading(false);
-        });
-    }
+    dispatch(
+      setSignUp({
+        firstName: name,
+        lastName: '',
+        email: email,
+        phone: mobile,
+        currentAdrs: '',
+        prmntAddress: '',
+        password: password,
+        device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
+      }),
+    );
+    // if (email) {
+    //   setLoading(true);
+    //   sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
+    //     .then(response => {
+    //       setLoading(false);
+    //       if (response.status === true) {
+    //         dispatch(
+    //           setSignUp({
+    //             firstName: name,
+    //             lastName: '',
+    //             email: email,
+    //             phone: mobile,
+    //             currentAdrs: '',
+    //             prmntAddress: '',
+    //             password: password,
+    //             device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
+    //           }),
+    //         );
+    //         navigation.navigate(ScreenName.EmailVerify);
+    //       } else {
+    //         setEmailApiError(response.message);
+    //         //go back
+    //       }
+    //     })
+    //     .catch(e => {
+    //       setLoading(false);
+    //     });
+    // }
   };
 
   const onPressDismiss = () => {
@@ -139,7 +151,7 @@ const SignUp = ({navigation}) => {
             onChangeText={nameOnChange}
             outerContainer={style.outerContainerSocial}
             error={nameError}
-            placeholder={'FullName'}
+            placeholder={'Full Name'}
             errorMessage={'Invalid Name'}
           />
           <CustomInputText
@@ -155,8 +167,10 @@ const SignUp = ({navigation}) => {
             onChangeText={onChangeMobile}
             outerContainer={style.outerContainerSocial}
             error={mobileError}
-            placeholder={'mobile number'}
+            placeholder={'Mobile number'}
             errorMessage={'Invalid mobile number'}
+            maxLength={10}
+            isNumeric={true}
           />
           <CustomInputText
             value={password}
@@ -203,6 +217,7 @@ const style = StyleSheet.create({
   },
   contentContainerStyle: {
     flex: 1,
+    marginTop: hp(2),
   },
   textInputContainerStyle: {
     width: '100%',

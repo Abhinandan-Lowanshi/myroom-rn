@@ -9,7 +9,9 @@ const ErrorModal = props => {
       <View style={style.lowOpacity(props.hideBackground)}></View>
       <View style={style.parentContainer}>
         <View style={style.container}>
-          <Text style={style.labelHeader}>{'Something went wrong.'}</Text>
+          <Text style={style.labelHeader}>
+            {props?.header || 'Something went wrong.'}
+          </Text>
           <Text style={style.labelContent}>{props?.label}</Text>
           <C_Button
             // isLoading={loading}

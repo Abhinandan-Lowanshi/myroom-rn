@@ -17,10 +17,12 @@ import Colors from '../common/Colors';
 import {launchImageLibrary} from 'react-native-image-picker';
 import C_Button from '../component/C_Button';
 import ScreenName from '../common/ScreenName';
-import {useDispatch} from 'react-redux';
 import {useIsFocused} from '@react-navigation/native';
 import localStorageOp from '../localStorage/LocalData';
 import {uploadImage} from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
+import {useSelector} from 'react-redux';
+import Toast from 'react-native-simple-toast';
 
 const Upload = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -48,10 +50,12 @@ const Upload = ({navigation}) => {
   const [image, setImage] = useState([]);
   const [ownerData, setOwnerData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const accountData = useSelector(state => state.AllData.accountData);
+
   useEffect(() => {
     if (
-      ownerData?.name?.length < 4 ||
-      ownerData?.mobile?.length < 10 ||
+      accountData?.data?.usr_firstName?.length < 4 ||
+      accountData?.data?.usr_phone?.length < 10 ||
       roomSize.length === 0 ||
       furnishedStatus.length === 0 ||
       availableStatus === 0 ||
@@ -64,8 +68,8 @@ const Upload = ({navigation}) => {
       colony.length < 2 ||
       city.length < 2 ||
       description.length < 2 ||
-      image?.length < 2 ||
-      isDeposit
+      image?.length < 1 ||
+      isDeposit === 'yes'
         ? deposit.length < 2
         : false
     ) {
@@ -129,7 +133,7 @@ const Upload = ({navigation}) => {
 
   const houseNumberOnChange = houseNumber => {
     setHouseNumber(houseNumber);
-    if (houseNumber !== '' && houseNumber.length < 1) {
+    if (houseNumber !== '' && houseNumber.length < 2) {
       setHouseNumberError(true);
     } else {
       setHouseNumberError(false);
@@ -239,7 +243,7 @@ const Upload = ({navigation}) => {
       selectionLimit: 0,
     };
     await launchImageLibrary(options, response => {
-      let imageData = response.assets;
+      let imageData = response?.assets;
       let temp = [...image];
       imageData?.forEach(item => {
         if (!image.some(data => data.fileName === item.fileName))
@@ -260,12 +264,11 @@ const Upload = ({navigation}) => {
   };
 
   const uploadRoom = async () => {
-    setIsLoading(true);
     try {
-      if (image.length > 2) {
+      if (image?.length > 1) {
         var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
         const formdata = new FormData();
-        image.forEach(item => {
+        image?.forEach(item => {
           formdata.append('Images', {
             uri: item?.uri,
             name: item?.fileName,
@@ -273,8 +276,8 @@ const Upload = ({navigation}) => {
           });
         });
         formdata.append('rm_usr_fkey', userData?.data?.usr_id);
-        formdata.append('rm_own_Fullname', ownerData?.name);
-        formdata.append('rm_own_mble_num', ownerData?.mobile);
+        formdata.append('rm_own_Fullname', accountData?.data?.usr_firstName);
+        formdata.append('rm_own_mble_num', accountData?.data?.usr_phone);
         formdata.append('rm_furnisd_status', furnishedStatus);
         formdata.append('rm_availble', availableStatus);
         formdata.append('rm_prking_avblity', parkingStatus);
@@ -286,9 +289,11 @@ const Upload = ({navigation}) => {
         formdata.append('rm_size', roomSize);
         formdata.append('rm_rent', rent);
         formdata.append('rm_flor', whichFloor);
+        formdata.append('deposit', isDeposit === 'Yes' ? deposit : '');
         formdata.append('rm_latitude', roomLocation?.latitude);
         formdata.append('rm_longitude', roomLocation?.longitude);
         formdata.append('rm_description', description);
+        setIsLoading(true);
 
         uploadImage(formdata, EndPoints.addRoom, 'POST')
           .then(response => {
@@ -340,13 +345,17 @@ const Upload = ({navigation}) => {
     );
   };
 
+  const navigateToEditProfile = () => {
+    navigation.navigate(ScreenName.EditProfile);
+  };
+
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
         <CustomInputText
           disabled
           onChangeText={nameOnChange}
-          value={ownerData?.name}
+          value={accountData?.data?.usr_firstName}
           maxLength={30}
           outerContainer={style.outerContainer}
           placeholder={'Name'}
@@ -356,9 +365,12 @@ const Upload = ({navigation}) => {
           disabled
           maxLength={10}
           isNumeric={true}
-          value={ownerData?.mobile}
+          value={accountData?.data?.usr_phone}
           placeholder={'Mobile Number'}
-          errorMessage={'Invalid Mobile Number'}
+          errorMessage={'Please add phone number to profile, tab to add'}
+          error={accountData?.data?.usr_phone ? false : true}
+          onPress={navigateToEditProfile}
+          onPressEnable
         />
 
         <CustomPicker
@@ -378,17 +390,16 @@ const Upload = ({navigation}) => {
           onItemChange={value => setFurnishedStatus(value?.value)}
           data={data.ROOM_STATUS_FR}
         />
-        {/* <CustomPicker
+        <CustomPicker
           isLoading={isLoading}
           labelTop={'Is deposit applicable'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setIsDeposit(value?.value)}
           data={data.ROOM_PARKING_AVAILABILITY}
-        /> */}
+        />
         {isDeposit === 'Yes' && (
           <CustomInputText
-            disabled
             onChangeText={onChangeDeposit}
             maxLength={10}
             isNumeric={true}

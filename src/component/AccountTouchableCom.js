@@ -21,7 +21,7 @@ const AccountTouchableCom = ({
           <Icon
             style={style.iconStyle}
             name={'setting'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -31,7 +31,7 @@ const AccountTouchableCom = ({
           <Icon1
             style={style.iconStyle}
             name={'edit'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -41,7 +41,7 @@ const AccountTouchableCom = ({
           <Icon2
             style={style.iconStyle}
             name={'key-change'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -61,7 +61,7 @@ const AccountTouchableCom = ({
           <Icon3
             style={style.iconStyle}
             name={'privacy-tip'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -71,7 +71,7 @@ const AccountTouchableCom = ({
           <Icon
             style={style.iconStyle}
             name={'logout'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -81,7 +81,7 @@ const AccountTouchableCom = ({
           <Icon2
             style={style.iconStyle}
             name={'post-outline'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -91,7 +91,7 @@ const AccountTouchableCom = ({
           <Icon3
             style={style.iconStyle}
             name={'favorite-border'}
-            size={hp(4)}
+            size={hp(3)}
             color={Colors.PRIMARY}
           />
         );
@@ -108,7 +108,7 @@ const AccountTouchableCom = ({
       <Icon
         style={{alignSelf: 'center', position: 'absolute', right: hp(2)}}
         name={'right'}
-        size={hp(4)}
+        size={hp(3)}
         color={Colors.PRIMARY}
       />
     </TouchableOpacity>
@@ -132,7 +132,7 @@ const style = StyleSheet.create({
     color: Colors.BLACK,
     alignSelf: 'center',
     fontWeight: '500',
-    fontSize: RF(2),
+    fontSize: RF(1.7),
     marginLeft: hp(3),
   },
   iconStyle: {alignSelf: 'center', marginLeft: hp(3)},

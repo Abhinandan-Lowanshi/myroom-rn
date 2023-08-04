@@ -25,6 +25,7 @@ import AppSettings from './src/screen/AppSettings';
 import AboutUs from './src/screen/AboutUs';
 import PrivacyPolicy from './src/screen/PrivacyPolicy';
 import Fav from './src/screen/Fav';
+import ReviewScreen from './src/screen/ReviewScreen';
 import Chat from './src/screen/Chat/Chat';
 import UserProfile from './src/screen/Chat/UserProfile';
 import RoomDetailsOwner from './src/screen/RoomDetailsOwner';
@@ -33,6 +34,8 @@ import {getFCMToken} from './src/Utils/PushNotification';
 import {Alert} from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import {notificationListener} from './src/Utils/PushNotification';
+import MapScreen from './src/component/MapScreen';
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -59,6 +62,11 @@ const App = () => {
           <Stack.Screen name={ScreenName.MoreRooms} component={MoreRooms} />
           <Stack.Screen name={ScreenName.AppSettings} component={AppSettings} />
           <Stack.Screen name={ScreenName.AboutUs} component={AboutUs} />
+          <Stack.Screen name={ScreenName.MapScreen} component={MapScreen} />
+          <Stack.Screen
+            name={ScreenName.ReviewScreen}
+            component={ReviewScreen}
+          />
           <Stack.Screen
             name={ScreenName.PrivacyPolicy}
             component={PrivacyPolicy}

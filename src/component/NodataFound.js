@@ -15,7 +15,7 @@ const NodataFound = props => {
       }}>
       <MaterialCommunityIcons
         name={'message-alert-outline'}
-        size={hp(20)}
+        size={hp(15)}
         color={Colors.PRIMARY}
       />
       <Text style={style.labelHeader}>
@@ -39,12 +39,12 @@ export default NodataFound;
 const style = StyleSheet.create({
   labelHeader: {
     color: Colors.PRIMARY,
-    fontSize: RF(3),
+    fontSize: RF(2.5),
     fontWeight: '600',
   },
   labelError: {
     color: Colors.PRIMARY,
-    fontSize: RF(2),
+    fontSize: RF(1.8),
     textAlign: 'center',
     fontWeight: '600',
   },

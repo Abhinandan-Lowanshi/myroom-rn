@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  alert,
 } from 'react-native';
 import AppLogo from '../component/applogo/AppLogo';
 import {hp, RF} from '../common/CommonFunctions';
@@ -25,6 +26,11 @@ import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import {getAccountImfo} from '../redux/Slice';
 import {useDispatch} from 'react-redux';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+
 const Login = ({navigation}) => {
   // const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
   const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
@@ -37,12 +43,79 @@ const Login = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [apiError, setApiError] = useState(false);
   const dispatch = useDispatch(dispatch);
+
+  React.useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        '523979153716-pq0g7d6sjhc2f7d46nla6ugq4drk7m55.apps.googleusercontent.com',
+      offlineAccess: true,
+    });
+  }, []);
+
+  const GoogleSingUp = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signIn().then(result => {
+        console.log(result, 'hasPlayServices');
+        if (result?.user) {
+          loginSocial(result);
+        }
+      });
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        alert('User cancelled the login flow !');
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        alert('Signin in progress');
+        // operation (f.e. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        alert('Google play services not available or outdated !');
+        // play services not available or outdated
+      } else {
+        console.log(error);
+      }
+    }
+  };
+
   React.useEffect(() => {
     setAuthError('');
     if (validateEmail(email) && password.length >= 6)
       setIsSubmitDisabled(false);
     else setIsSubmitDisabled(true);
   }, [email, password]);
+
+  const loginSocial = user => {
+    SetIsLoading(true);
+    sendRequest(
+      {
+        email: user?.user?.email,
+        name: user?.user?.name,
+        device_token: 'nill',
+        social_token: user?.idToken,
+      },
+      EndPoints.socialLogin,
+      'POST',
+    )
+      .then(response => {
+        SetIsLoading(false);
+        if (response?.status === true) {
+          localStorageOp(true, AsyncKeys.USERDATA, response);
+          dispatch(getAccountImfo(response));
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.TabComponent}],
+            }),
+          );
+        } else {
+          setAuthError(response?.message);
+        }
+      })
+      .catch(error => {
+        SetIsLoading(false);
+        console.log(error, 'error');
+      });
+  };
 
   const onEmailText = email => {
     setEmail(email);
@@ -110,7 +183,7 @@ const Login = ({navigation}) => {
             value={email}
             onChangeText={onEmailText}
             error={emailError}
-            placeholder={'email'}
+            placeholder={'Email'}
             errorMessage={'Invalid Email'}
           />
           <CustomInputText
@@ -118,7 +191,7 @@ const Login = ({navigation}) => {
             onChangeText={onPasswordText}
             outerContainer={style.inputContainerStyle}
             error={passwordError}
-            placeholder={'password'}
+            placeholder={'Password'}
             errorMessage={'Invalid password'}
             isPassworHidden={true}
             isEyeVisible={true}
@@ -140,20 +213,18 @@ const Login = ({navigation}) => {
           </TouchableOpacity>
           <Text style={style.labelOr}>Or</Text>
           <SocialLoginBt
-            onPress={() => {
-              setApiError('Login with Google will available soon');
-            }}
+            onPress={GoogleSingUp}
             icon={images.googleIcon}
             label={'Login with Google'}
           />
-          <SocialLoginBt
+          {/* <SocialLoginBt
             onPress={() => {
               setApiError('Login with Facebook will available soon');
             }}
             labelStyle={style.fbLabelStyle}
             icon={images.Facebook}
             label={'Login with Facebook'}
-          />
+          /> */}
           <TouchableOpacity
             onPress={() => {
               navigation.navigate(ScreenName.SignUp);
