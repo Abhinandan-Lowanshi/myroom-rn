@@ -449,7 +449,6 @@ const style = StyleSheet.create({
   imageContainer: {
     width: '100%',
     height: hp(20),
-    borderRadius: 100,
   },
   labelRent: {
     color: 'green',

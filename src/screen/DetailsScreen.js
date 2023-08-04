@@ -649,7 +649,43 @@ const DetailsScreen = props => {
       </View>
     );
   };
-
+  const openInstagram = () => {
+    Linking.openURL(
+      `https://instagram.com/impactservices_pvt.ltd?igshid=MzRlODBiNWFlZA==`,
+    );
+  };
+  const PackerContact = ({phone}) => {
+    return (
+      <TouchableOpacity style={style.containerName} onPress={openInstagram}>
+        <Icon
+          name={'instagram'}
+          color={Colors.RED}
+          size={hp(2)}
+          iconCommunity={'Feather'}
+          style={style.phone}
+        />
+        <Text style={style.labelPackerPhone}>{phone}</Text>
+      </TouchableOpacity>
+    );
+  };
+  const packerMoverDetails = () => {
+    return (
+      <View style={style.containerPacker}>
+        <Text style={style.labelCompanyName}>
+          Instant Mover And Commercial Transportation Services Indore
+        </Text>
+        <View style={style.containerContact}>
+          <TouchableOpacity onPress={() => handleCall(8135178283)}>
+            <Text style={style.labelPackerPhone}>{8135178283}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleCall(8823072388)}>
+            <Text style={style.labelPackerPhone}>{`,  ${8823072388}`}</Text>
+          </TouchableOpacity>
+          <PackerContact phone={'impactservices_pvt.ltd'} />
+        </View>
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
@@ -785,7 +821,7 @@ const DetailsScreen = props => {
               </View>
               {ownerView()}
               {showRating()}
-
+              {packerMoverDetails()}
               <RoomInformation />
             </View>
 
@@ -998,6 +1034,45 @@ const style = StyleSheet.create({
   },
   reviewContainerMain: {
     // marginBottom: hp(2),
+  },
+  containerPacker: {
+    backgroundColor: Colors.GREY5,
+    paddingHorizontal: hp(3),
+    paddingVertical: hp(1.5),
+    marginHorizontal: hp(1.1),
+  },
+  containerName: {
+    flex: 1,
+    flexDirection: 'row',
+    // marginTop: hp(0.5),
+    marginLeft: hp(1),
+  },
+  labelPackerPhone: {
+    color: Colors.GREY3,
+    fontSize: RF(1.4),
+    marginLeft: hp(0.5),
+  },
+  packerShare: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+  },
+  labelCompanyName: {
+    color: Colors.BLACK,
+    fontSize: RF(1.5),
+    fontWeight: '500',
+    textAlign: 'center',
+    alignSelf: 'center',
+  },
+  phone: {
+    marginLeft: hp(1),
+  },
+  whatsApp: {
+    marginLeft: hp(1),
+  },
+  containerContact: {
+    flexDirection: 'row',
+    marginLeft: hp(1),
+    marginTop: hp(0.8),
   },
 });
 

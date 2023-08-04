@@ -56,6 +56,7 @@ const Login = ({navigation}) => {
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signIn().then(result => {
+        console.log(result, 'hasPlayServices');
         if (result?.user) {
           loginSocial(result);
         }
@@ -210,14 +211,14 @@ const Login = ({navigation}) => {
             icon={images.googleIcon}
             label={'Login with Google'}
           />
-          <SocialLoginBt
+          {/* <SocialLoginBt
             onPress={() => {
               setApiError('Login with Facebook will available soon');
             }}
             labelStyle={style.fbLabelStyle}
             icon={images.Facebook}
             label={'Login with Facebook'}
-          />
+          /> */}
           <TouchableOpacity
             onPress={() => {
               navigation.navigate(ScreenName.SignUp);

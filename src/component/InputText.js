@@ -28,6 +28,7 @@ const CustomInputText = props => {
     maxLength,
     multiline,
     showLimit,
+    onPressEnable,
   } = props;
 
   const focusChange = value => {
@@ -36,7 +37,9 @@ const CustomInputText = props => {
 
   return (
     <View style={[style.outerContainer, outerContainer]}>
-      <View
+      <TouchableOpacity
+        disabled={!onPressEnable}
+        onPress={props?.onPress}
         style={[style.containerStyle(error, disabled, focus), containerStyleP]}>
         <TextInput
           {...props}
@@ -73,7 +76,7 @@ const CustomInputText = props => {
             />
           </TouchableOpacity>
         ) : null}
-      </View>
+      </TouchableOpacity>
       <View style={style.containerError}>
         {error && (
           <Text style={style.textError}>{errorMessage || 'Error'}</Text>

@@ -30,7 +30,7 @@ export const uploadImage = async (payload, endPoint, method) => {
     // if (payload?.user_id) {
     //   temp = {...temp, user_id: userData?.data?.usr_id};
     // }
-    console.log(payload, 'payload');
+    console.log(EndPoints.baseUrl + endPoint, 'payload');
     var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
 
     const response = await fetch(EndPoints.baseUrl + endPoint, {

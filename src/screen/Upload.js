@@ -22,6 +22,7 @@ import localStorageOp from '../localStorage/LocalData';
 import {uploadImage} from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import {useSelector} from 'react-redux';
+import Toast from 'react-native-simple-toast';
 
 const Upload = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -67,7 +68,7 @@ const Upload = ({navigation}) => {
       colony.length < 2 ||
       city.length < 2 ||
       description.length < 2 ||
-      image?.length < 2 ||
+      image?.length < 1 ||
       isDeposit === 'yes'
         ? deposit.length < 2
         : false
@@ -263,9 +264,8 @@ const Upload = ({navigation}) => {
   };
 
   const uploadRoom = async () => {
-    setIsLoading(true);
     try {
-      if (image?.length > 2) {
+      if (image?.length > 1) {
         var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
         const formdata = new FormData();
         image?.forEach(item => {
@@ -293,6 +293,7 @@ const Upload = ({navigation}) => {
         formdata.append('rm_latitude', roomLocation?.latitude);
         formdata.append('rm_longitude', roomLocation?.longitude);
         formdata.append('rm_description', description);
+        setIsLoading(true);
 
         uploadImage(formdata, EndPoints.addRoom, 'POST')
           .then(response => {
@@ -344,6 +345,9 @@ const Upload = ({navigation}) => {
     );
   };
 
+  const navigateToEditProfile = () => {
+    navigation.navigate(ScreenName.EditProfile);
+  };
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
@@ -362,7 +366,10 @@ const Upload = ({navigation}) => {
           isNumeric={true}
           value={accountData?.data?.usr_phone}
           placeholder={'Mobile Number'}
-          errorMessage={'Invalid Mobile Number'}
+          errorMessage={'Please add phone number to profile, tab to add'}
+          error={accountData?.data?.usr_phone ? false : true}
+          onPress={navigateToEditProfile}
+          onPressEnable
         />
 
         <CustomPicker
@@ -545,9 +552,9 @@ const Upload = ({navigation}) => {
         {renderImages()}
 
         <C_Button
-          isLoading={isLoading}
+          // isLoading={isLoading}
           onPress={uploadRoom}
-          isSubmitDisabled={isSubmitDisabled}
+          // isSubmitDisabled={isSubmitDisabled}
           label={'Upload'}
         />
       </View>
