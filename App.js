@@ -41,11 +41,9 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   useEffect(() => {
     notificationListener();
-  }, []);
-
-  useEffect(() => {
     getFCMToken();
   }, []);
+
   return (
     <Provider store={store}>
       <NavigationContainer>

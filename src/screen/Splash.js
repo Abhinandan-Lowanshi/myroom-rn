@@ -5,19 +5,25 @@ import StyleGlobel from '../Style/StyleGlobel';
 import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import {CommonActions} from '@react-navigation/native';
-import {getAccountImfo} from '../redux/Slice';
+import {getAccountImfo, setDevice_token} from '../redux/Slice';
 import {useDispatch} from 'react-redux';
-import {getFCMToken} from '../Utils/PushNotification';
+
 const Splash = ({navigation}) => {
   const dispatch = useDispatch();
+
   useEffect(() => {
-    getFCMToken();
+    localStorageOp('', AsyncKeys.FCMToken, '').then(response => {
+      if (response) {
+        dispatch(setDevice_token(response?.token));
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
       localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
         if (res?.data?.usr_id) {
           dispatch(getAccountImfo(res));
-          console.log(res, 'navigation.navigate splash');
-
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
