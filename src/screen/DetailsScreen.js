@@ -68,7 +68,9 @@ const DetailsScreen = props => {
   const flatlistRef = useRef();
   const flatlistRefModal = useRef();
   const dispatch = useDispatch();
-
+  const currentLocationName = useSelector(
+    state => state.AllData.currentLocationName,
+  );
   let lastIndex = 0;
   useEffect(() => {
     setLike(propData?.favorite_key);
@@ -77,10 +79,6 @@ const DetailsScreen = props => {
       setLoading(true);
       getRoomFromServer(roomInfo?.roomId);
     } else setCheck(true);
-  }, []);
-
-  useEffect(() => {
-    console.log(item?.images?.length, 'useEffect');
   }, []);
   useEffect(() => {
     console.log(item, 'useEffect');
@@ -654,6 +652,11 @@ const DetailsScreen = props => {
       `https://instagram.com/impactservices_pvt.ltd?igshid=MzRlODBiNWFlZA==`,
     );
   };
+
+  const checkIsLocal = () => {
+    return currentLocationName?.locationName?.includes('Indore', 'indore');
+  };
+
   const PackerContact = ({phone}) => {
     return (
       <TouchableOpacity style={style.containerName} onPress={openInstagram}>
@@ -669,7 +672,7 @@ const DetailsScreen = props => {
     );
   };
   const packerMoverDetails = () => {
-    return (
+    return checkIsLocal() ? (
       <View style={style.containerPacker}>
         <Text style={style.labelCompanyName}>
           Instant Mover And Commercial Transportation Services Indore
@@ -684,7 +687,7 @@ const DetailsScreen = props => {
           <PackerContact phone={'impactservices_pvt.ltd'} />
         </View>
       </View>
-    );
+    ) : null;
   };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>

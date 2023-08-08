@@ -27,12 +27,13 @@ import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import GooglePlacesInput from '../component/GooglePlacesInput';
-import {updateHome, searchUpdate} from '../redux/Slice';
+import {updateHome, searchUpdate, setFilterData} from '../redux/Slice';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-simple-toast';
-import {filterData, filterRoom, getRoomCount} from '../common/FIlterData';
+import {filterDataAll, filterRoom, getRoomCount} from '../common/FIlterData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
-
+import RenderFilter from '../component/RenderFilter';
+import row_filter_data from '../common/FilterRowData';
 const Search = ({navigation}) => {
   const [location, setLocation] = useState({});
   const [filter, setFilter] = useState(false);
@@ -46,7 +47,7 @@ const Search = ({navigation}) => {
   const dispatch = useDispatch();
   const reviews = useSelector(state => state.AllData.reviews);
 
-  const [data, setData] = React.useState(filterData);
+  const [data, setData] = React.useState(filterDataAll);
 
   useEffect(() => {
     localStorageOp('', AsyncKeys.RECENT_SERCHES, '')
@@ -54,6 +55,7 @@ const Search = ({navigation}) => {
         setRecent(data);
       })
       .catch(() => {});
+    dispatch(setFilterData(row_filter_data));
   }, []);
 
   useEffect(() => {
@@ -449,89 +451,6 @@ const Search = ({navigation}) => {
       </TouchableOpacity>
     );
   };
-  const RenderFilter = () => {
-    return (
-      <Modal
-        transparent={true}
-        animationType={'slide'}
-        style={{
-          flex: 1,
-        }}
-        visible={filter}>
-        <View style={{flex: 1, backgroundColor: 'grey', opacity: 0.5}}></View>
-        <View
-          style={{
-            width: '100%',
-            position: 'absolute',
-            bottom: hp(0),
-            alignSelf: 'center',
-            backgroundColor: Colors.WHITE,
-            borderRadius: hp(1),
-            elevation: 10,
-            paddingVertical: hp(3),
-            paddingHorizontal: hp(2),
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: hp(1),
-            }}>
-            <Text
-              style={{
-                color: Colors.BLACK1,
-                fontWeight: '600',
-                fontSize: RF(2),
-              }}>
-              Room Categories
-            </Text>
-            <TouchableOpacity
-              style={style.closeIcon}
-              onPress={() => setFilter(false)}>
-              <MaterialCommunityIcons
-                name={'close'}
-                size={hp(3)}
-                color={Colors.BLACK}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={{flexDirection: 'row'}}>
-            <TouchableOpacity onPress={() => manageFilter({}, Labels.ALL)}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
-                Select all
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{marginLeft: hp(2)}}
-              onPress={() => {
-                manageFilter({}, Labels.RESET);
-                getFilteredData(data, false);
-              }}>
-              <Text style={{color: Colors.PRIMARY, fontSize: RF(1.6)}}>
-                Reset
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={item => item.id}
-          />
-          <Text
-            style={{
-              color: Colors.BLACK1,
-              fontWeight: '600',
-              fontSize: RF(2.1),
-              marginTop: hp(0.5),
-            }}>
-            {`View ${
-              checkFilterApplied() ? totalRoom : totalMain
-            } out of ${totalMain}`}
-          </Text>
-        </View>
-      </Modal>
-    );
-  };
 
   const onSearch = details => {
     setLocation(details?.geometry?.location);
@@ -539,13 +458,16 @@ const Search = ({navigation}) => {
     handleRecent(details);
   };
 
+  const onPressClose = () => {
+    setFilter(false);
+  };
   return (
     <View style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Search} navigation={navigation} />
       {/* <ScrollView> */}
       {loading && <LowOpacityLoader />}
       <GooglePlacesInput onSearch={onSearch} />
-      {filter && RenderFilter()}
+      <RenderFilter visible={filter} onPressClose={onPressClose} />
       <View style={style.containerList}>
         <RenderRecentSearch data={recent} onPress={handleRecentAPI} />
         {message && (

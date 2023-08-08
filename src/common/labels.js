@@ -28,5 +28,6 @@ const Labels = {
   AllRooms: 'All Rooms  ',
   defaultLocation: 'Default Location',
   Review: 'Review',
+  Route: 'Route',
 };
 export default Labels;

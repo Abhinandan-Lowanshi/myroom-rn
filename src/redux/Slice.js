@@ -26,6 +26,7 @@ export const slice = createSlice({
     LocationMode: '',
     OwnerData: {},
     reviews: {},
+    filterData: [],
   },
   reducers: {
     startL: (state, actions) => {
@@ -94,6 +95,9 @@ export const slice = createSlice({
     reviews: (state, actions) => {
       state.reviews = actions.payload;
     },
+    filterData: (state, actions) => {
+      state.filterData = actions.payload;
+    },
   },
 });
 
@@ -120,6 +124,7 @@ export const {
   LocationMode,
   OwnerData,
   reviews,
+  filterData,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -191,6 +196,9 @@ export const setOwnerData = data => dispatch => {
 };
 export const setReviews = data => dispatch => {
   dispatch(reviews(data));
+};
+export const setFilterData = data => dispatch => {
+  dispatch(filterData(data));
 };
 
 export default slice.reducer;

@@ -31,10 +31,6 @@ const CustomInputText = props => {
     onPressEnable,
   } = props;
 
-  const focusChange = value => {
-    console.log(value, 'Value');
-  };
-
   return (
     <View style={[style.outerContainer, outerContainer]}>
       <TouchableOpacity
