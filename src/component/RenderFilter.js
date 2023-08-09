@@ -17,7 +17,6 @@ const RenderFilter = ({visible, onPressClose}) => {
   const filterData = useSelector(state => state.AllData.filterData);
 
   const renderItem = ({item}) => {
-    console.log('item', item);
     return <FilterComponent item={item} />;
   };
 

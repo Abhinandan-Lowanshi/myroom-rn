@@ -303,7 +303,7 @@ const style = StyleSheet.create({
     borderRadius: 5,
   },
   labelLow: {
-    fontSize: hp(0.4),
+    fontSize: hp(1.2),
     marginHorizontal: 8,
     marginVertical: 2,
     color: 'white',

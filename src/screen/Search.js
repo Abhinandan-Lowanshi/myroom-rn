@@ -13,15 +13,12 @@ import Colors from '../common/Colors';
 import {hp, RF, updateRating} from '../common/CommonFunctions';
 import Labels from '../common/labels';
 import StyleGlobel from '../Style/StyleGlobel';
-import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
-import RenderRoom from '../component/RenderRoom';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import Filter from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/AntDesign';
-import MaterialCommunityIcons from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import RenderRecentSearch from '../component/RenderRecentSearch';
 import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
@@ -30,15 +27,13 @@ import GooglePlacesInput from '../component/GooglePlacesInput';
 import {updateHome, searchUpdate, setFilterData} from '../redux/Slice';
 import {useSelector, useDispatch} from 'react-redux';
 import Toast from 'react-native-simple-toast';
-import {filterDataAll, filterRoom, getRoomCount} from '../common/FIlterData';
+import {applyFilter, filterDataAll} from '../common/FIlterData';
 import RenderRoom2Column from '../component/RenderRoom2Column';
 import RenderFilter from '../component/RenderFilter';
 import row_filter_data from '../common/FilterRowData';
 const Search = ({navigation}) => {
-  const [location, setLocation] = useState({});
   const [filter, setFilter] = useState(false);
-  const [totalRoom, setTotalRoom] = useState(0);
-  const [totalMain, setTotalMain] = useState(0);
+  const [totalFilter, setTotalFilter] = useState(0);
   const [loading, setLoading] = useState(false);
   const [roomData, setRoomData] = useState([]);
   const [actualData, setActualData] = useState({});
@@ -46,8 +41,7 @@ const Search = ({navigation}) => {
   const [recent, setRecent] = useState([]);
   const dispatch = useDispatch();
   const reviews = useSelector(state => state.AllData.reviews);
-
-  const [data, setData] = React.useState(filterDataAll);
+  const filterData = useSelector(state => state.AllData.filterData);
 
   useEffect(() => {
     localStorageOp('', AsyncKeys.RECENT_SERCHES, '')
@@ -62,6 +56,16 @@ const Search = ({navigation}) => {
     let tmp = updateRating(roomData, reviews);
     setRoomData(tmp);
   }, [reviews]);
+
+  useEffect(() => {
+    let count = 0;
+    filterData?.map(item => {
+      if (item?.data?.some(item => item?.isApplied === true)) {
+        count = count + 1;
+      }
+      setTotalFilter(count);
+    });
+  }, [filterData]);
 
   const getRooms = (location = null) => {
     setMessage('');
@@ -80,9 +84,8 @@ const Search = ({navigation}) => {
         .then(res => {
           setLoading(false);
           if (res.status === true) {
-            setTotalMain(res?.data?.length);
+            dispatch(setFilterData(row_filter_data));
             setActualData(res?.data);
-            calculateRoomCount(res?.data);
             setRoomData(res?.data);
             if (res.data?.length > 0) {
             } else {
@@ -103,14 +106,6 @@ const Search = ({navigation}) => {
     }
   };
 
-  const calculateRoomCount = rooms => {
-    let temp = getRoomCount(data, rooms);
-    if (temp) {
-      setData(temp);
-      removeFilter();
-    }
-  };
-
   const Header = ({label, navigation}) => {
     return (
       <View style={style.container}>
@@ -127,65 +122,21 @@ const Search = ({navigation}) => {
           />
         </TouchableOpacity>
         <Text style={style.labelSignUp}>{label}</Text>
+
         <TouchableOpacity
           style={style.containerFilter}
           onPress={() => setFilter(!filter)}>
           <Filter
             style={style.iconStyle}
-            name={checkFilterApplied() ? 'filter-check' : 'filter'}
+            name={'filter'}
             size={hp(3.6)}
             color={Colors.PRIMARY}
           />
+          <Text style={style.filterCount}>{totalFilter}</Text>
         </TouchableOpacity>
       </View>
     );
   };
-
-  // const GooglePlacesInput = () => {
-  //   return (
-  //     <GooglePlacesAutocomplete
-  //       style={style.containerPlaceHolder}
-  //       onFail={error => {}}
-  //       onTimeout={error => {}}
-  //       textInputProps={{
-  //         placeholderTextColor: Colors.BLACK,
-  //         returnKeyType: 'search',
-  //       }}
-  //       keepResultsAfterBlur={true}
-  //       keyboardShouldPersistTaps={'always'}
-  //       styles={{
-  //         textInputContainer: {},
-  //         textInput: {
-  //           height: hp(6),
-  //           color: Colors.BLACK,
-  //           fontSize: 16,
-  //           elevation: hp(2),
-  //           borderColor: Colors.GREY,
-  //           borderWidth: hp(0.25),
-  //           borderRadius: hp(1),
-  //           marginHorizontal: hp(1),
-  //           marginTop: hp(1),
-  //         },
-  //         predefinedPlacesDescription: {
-  //           color: '#1faadb',
-  //         },
-  //         description: {color: Colors.BLACK},
-  //       }}
-  //       placeholder="Search location"
-  //       fetchDetails={true}
-  //       onPress={(data, details = null) => {
-  //         setLocation(details?.geometry?.location);
-  //         getRooms(details?.geometry?.location);
-  //         handleRecent(details);
-  //       }}
-  //       getCurrentLocation={data => {}}
-  //       query={{
-  //         key: 'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
-  //         language: 'en',
-  //       }}
-  //     />
-  //   );
-  // };
 
   const handleRecent = data => {
     let ob = {
@@ -304,162 +255,18 @@ const Search = ({navigation}) => {
       return false;
     }
   };
-  const removeFilter = () => {
-    let temp = JSON.parse(JSON.stringify(data));
-    temp?.map(item1 => {
-      item1.isApplied = false;
-      return item1;
-    });
-    setData(temp);
-  };
-
-  const getFilteredData = (temp, filterA) => {
-    if (filterA) {
-      let tempRoomData = JSON.parse(JSON.stringify(actualData));
-      let tempSearchRoom = [];
-      if (tempRoomData.length > 0) {
-        tempSearchRoom = filterRoom(temp, tempRoomData);
-        setRoomData(tempSearchRoom);
-      }
-    } else {
-      setRoomData(actualData);
-    }
-  };
-
-  const checkFilterApplied = () => {
-    return data?.some(item => {
-      return item?.isApplied === true;
-    });
-  };
-  const calculateTotalAvailableRoom = value => {
-    let totalRoom = 0;
-    value?.map(item => {
-      if (item?.isApplied === true) {
-        totalRoom = totalRoom + item?.availableRooms;
-      }
-    });
-    setTotalRoom(totalRoom);
-  };
-
-  const manageFilter = (item, isFrom) => {
-    let temp = JSON.parse(JSON.stringify(data));
-    switch (isFrom) {
-      case Labels.FILTER:
-        {
-          temp?.map(item1 => {
-            if (item1?.id === item?.id) {
-              item1.isApplied = !item1?.isApplied;
-            }
-            return item1;
-          });
-        }
-        break;
-      case Labels.RESET:
-        {
-          temp?.map(item1 => {
-            item1.isApplied = false;
-            return item1;
-          });
-        }
-        break;
-      case Labels.ALL:
-        {
-          temp?.map(item1 => {
-            item1.isApplied = true;
-            return item1;
-          });
-        }
-        break;
-      default: {
-        {
-          temp?.map(item1 => {
-            item1.isApplied = false;
-            return item1;
-          });
-        }
-      }
-    }
-    calculateTotalAvailableRoom(temp);
-    setData(temp);
-    let check = temp?.some(item => {
-      return item?.isApplied === true;
-    });
-    getFilteredData(temp, check);
-  };
-  const renderItem = ({item}) => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          manageFilter(item, Labels.FILTER);
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <View
-            style={{
-              flexDirection: 'row',
-            }}>
-            <View
-              style={{
-                width: hp(2),
-                height: hp(2),
-                borderWidth: hp(0.1),
-                alignSelf: 'center',
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderRadius: hp(0.4),
-                backgroundColor: item?.isApplied
-                  ? Colors.PRIMARYLITE
-                  : Colors.WHITE,
-                borderColor: Colors.PRIMARY,
-              }}>
-              {item?.isApplied && (
-                <MaterialCommunityIcons
-                  name={'check'}
-                  size={hp(1.5)}
-                  color={Colors.WHITE}
-                />
-              )}
-            </View>
-            <Text
-              style={{
-                fontSize: hp(1.5),
-                paddingVertical: hp(1),
-                color: Colors.BLACK,
-                fontWeight: '600',
-                marginLeft: hp(1),
-              }}>
-              {item?.value}
-            </Text>
-          </View>
-          <Text
-            style={[
-              {
-                fontSize: hp(1.8),
-                paddingVertical: hp(1),
-                color: Colors.BLACK,
-                fontWeight: '600',
-                marginLeft: hp(1),
-              },
-              {alignSelf: 'flex-end'},
-            ]}>
-            {item?.availableRooms}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
 
   const onSearch = details => {
-    setLocation(details?.geometry?.location);
     getRooms(details?.geometry?.location);
     handleRecent(details);
   };
 
   const onPressClose = () => {
     setFilter(false);
+    if (actualData?.length > 0) {
+      let filerData1 = applyFilter(actualData, filterData);
+      setRoomData(filerData1);
+    }
   };
   return (
     <View style={StyleGlobel.containerStyle}>
@@ -470,17 +277,7 @@ const Search = ({navigation}) => {
       <RenderFilter visible={filter} onPressClose={onPressClose} />
       <View style={style.containerList}>
         <RenderRecentSearch data={recent} onPress={handleRecentAPI} />
-        {message && (
-          <Text
-            style={{
-              color: 'black',
-              alignSelf: 'center',
-              fontSize: RF(2),
-              marginTop: '50%',
-            }}>
-            {message}
-          </Text>
-        )}
+        {message && <Text style={style.message}>{message}</Text>}
         <RenderRoom2Column
           flat={style.flat}
           myRoomList={roomData}
@@ -575,5 +372,21 @@ const style = StyleSheet.create({
     height: '85%',
     marginHorizontal: hp(1),
     marginTop: hp(1),
+  },
+  filterCount: {
+    color: Colors.BLACK,
+    position: 'absolute',
+    backgroundColor: Colors.WHITE,
+    borderRadius: hp(90),
+    fontSize: RF(1),
+    padding: hp(0.3),
+    elevation: hp(1),
+    right: hp(0.2),
+  },
+  message: {
+    color: 'black',
+    alignSelf: 'center',
+    fontSize: RF(2),
+    marginTop: '50%',
   },
 });

@@ -14,7 +14,6 @@ const FilterComponent = ({item}) => {
   const dispatch = useDispatch();
 
   const calculateTotalAvailableRoom = value => {
-    console.log('calculateTotalAvailableRoom', value);
     let totalRoom = 0;
     value?.map(item => {
       if (item?.isApplied === true) {
@@ -63,19 +62,17 @@ const FilterComponent = ({item}) => {
   };
   return (
     <View style={style.container}>
-      <View style={style.container1}>
+      <TouchableOpacity onPress={openFilter} style={style.container1}>
         <Text style={style.label}>{`${item?.label}  (${
           item?.data?.length
         }/${calculateTotalAvailableRoom(item?.data)} )`}</Text>
-        <TouchableOpacity onPress={openFilter}>
-          <Icon
-            name={item?.isOpen ? 'chevrons-up' : 'chevrons-down'}
-            size={hp(4)}
-            color={Colors.GREY3}
-            iconCommunity={'Feather'}
-          />
-        </TouchableOpacity>
-      </View>
+        <Icon
+          name={item?.isOpen ? 'chevrons-up' : 'chevrons-down'}
+          size={hp(4)}
+          color={Colors.GREY3}
+          iconCommunity={'Feather'}
+        />
+      </TouchableOpacity>
 
       {item?.isOpen && (
         <View style={style.contentContainer}>
