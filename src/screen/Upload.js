@@ -29,12 +29,16 @@ const Upload = ({navigation}) => {
   const [roomSize, setRoomSize] = useState('');
   const [furnishedStatus, setFurnishedStatus] = useState('');
   const [deposit, setDeposit] = useState('');
+  const [maintenance, setMaintenance] = useState('');
   const [isDeposit, setIsDeposit] = useState('No');
+  const [isMaintenance, setIsisMaintenance] = useState('No');
   const [parkingStatus, setParkingStatus] = useState('');
   const [availableStatus, setAvailableStatus] = useState('');
   const [dependencyStatus, setDependencyStatus] = useState('');
   const [whichFloor, setWhichFloor] = useState('');
   const [whichFloorError, setWhichFloorError] = useState(false);
+  const [depositError, setDepositError] = useState(false);
+  const [maintenanceError, setMaintenanceError] = useState(false);
   const [roomLocation, setRoomLocation] = useState({});
   const [houseNumber, setHouseNumber] = useState('');
   const [houseNumberError, setHouseNumberError] = useState(false);
@@ -51,7 +55,7 @@ const Upload = ({navigation}) => {
   const [ownerData, setOwnerData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
-
+  console.log('accountData', accountData);
   useEffect(() => {
     if (
       accountData?.data?.usr_firstName?.length < 4 ||
@@ -69,14 +73,19 @@ const Upload = ({navigation}) => {
       city.length < 2 ||
       description.length < 2 ||
       image?.length < 1 ||
-      isDeposit === 'yes'
-        ? deposit.length < 2
-        : false
+      (isDeposit === 'Yes' ? deposit.length < 2 : false) ||
+      (isMaintenance === 'Yes' ? maintenance.length < 2 : false)
     ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
+    console.log(
+      isDeposit,
+      deposit.length < 2,
+      isMaintenance,
+      maintenance.length < 2,
+    );
   }, [
     roomSize,
     furnishedStatus,
@@ -93,6 +102,10 @@ const Upload = ({navigation}) => {
     image,
     deposit,
     isDeposit,
+    maintenance,
+    isMaintenance,
+    accountData?.data?.usr_firstName,
+    accountData?.data?.usr_phone,
   ]);
 
   useEffect(() => {
@@ -188,9 +201,18 @@ const Upload = ({navigation}) => {
   const onChangeDeposit = deposit => {
     setDeposit(deposit);
     if (deposit !== '' && deposit.length < 2) {
-      setWhichFloorError(true);
+      setDepositError(true);
     } else {
-      setWhichFloorError(false);
+      setDepositError(false);
+    }
+  };
+
+  const onChangeMaintenance = maintenance => {
+    setMaintenance(maintenance);
+    if (maintenance !== '' && maintenance.length < 2) {
+      setMaintenanceError(true);
+    } else {
+      setMaintenanceError(false);
     }
   };
 
@@ -324,6 +346,7 @@ const Upload = ({navigation}) => {
     return (
       <FlatList
         data={image}
+        contentContainerStyle={{paddingBottom: hp(2)}}
         renderItem={({item}) => {
           return (
             <View style={style.containerImage}>
@@ -378,19 +401,20 @@ const Upload = ({navigation}) => {
           container={style.pickerstyle}
           onItemChange={value => setRoomSize(value?.value)}
           placeholder={'Select'}
-          labelTop={'Select room size'}
+          labelTop={'Room size'}
           data={data.ROOM_SIZE}
         />
 
         <CustomPicker
           isLoading={isLoading}
-          labelTop={'Select Furnished status'}
+          labelTop={'Furnished status'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setFurnishedStatus(value?.value)}
           data={data.ROOM_STATUS_FR}
         />
         <CustomPicker
+          value={isDeposit}
           isLoading={isLoading}
           labelTop={'Is deposit applicable'}
           placeholder={'Select'}
@@ -404,13 +428,34 @@ const Upload = ({navigation}) => {
             maxLength={10}
             isNumeric={true}
             value={deposit}
-            placeholder={'Enter Deposit Amount'}
+            placeholder={'Deposit Amount'}
             errorMessage={'Invalid Deposit Amount'}
+            error={depositError}
+          />
+        )}
+        <CustomPicker
+          value={isMaintenance}
+          isLoading={isLoading}
+          labelTop={'Is monthly isMaintenance applicable'}
+          placeholder={'Select'}
+          container={style.pickerstyle}
+          onItemChange={value => setIsisMaintenance(value?.value)}
+          data={data.ROOM_PARKING_AVAILABILITY}
+        />
+        {isMaintenance === 'Yes' && (
+          <CustomInputText
+            onChangeText={onChangeMaintenance}
+            maxLength={10}
+            isNumeric={true}
+            value={maintenance}
+            placeholder={'Maintenance Amount'}
+            errorMessage={'Invalid Maintenance Amount'}
+            error={maintenanceError}
           />
         )}
         <CustomPicker
           isLoading={isLoading}
-          labelTop={'Select availability of room'}
+          labelTop={'Availability of room'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setAvailableStatus(value?.value)}
@@ -421,7 +466,7 @@ const Upload = ({navigation}) => {
           isLoading={isLoading}
           container={style.pickerstyle}
           placeholder={'Select'}
-          labelTop={'Select parking availability of room'}
+          labelTop={'Parking availability of room'}
           onItemChange={value => setParkingStatus(value?.value)}
           data={data.ROOM_PARKING_AVAILABILITY}
         />
@@ -430,7 +475,7 @@ const Upload = ({navigation}) => {
           isLoading={isLoading}
           container={style.pickerstyle}
           placeholder={'Select'}
-          labelTop={'Select independency of room'}
+          labelTop={'Independency of room'}
           onItemChange={value => setDependencyStatus(value?.value)}
           data={data.ROOM_DEPENDENT_STATUS}
         />
@@ -635,11 +680,11 @@ const style = StyleSheet.create({
   containerImage: {
     backgroundColor: Colors.WHITE,
     marginTop: 5,
-    elevation: 10,
+    elevation: 5,
     paddingVertical: 5,
     marginHorizontal: hp(3),
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom: 2,
+    marginBottom: hp(0.2),
   },
 });

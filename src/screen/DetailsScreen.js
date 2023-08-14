@@ -72,6 +72,7 @@ const DetailsScreen = props => {
     state => state.AllData.currentLocationName,
   );
   let lastIndex = 0;
+
   useEffect(() => {
     setLike(propData?.favorite_key);
     setItem(propData);
@@ -80,6 +81,7 @@ const DetailsScreen = props => {
       getRoomFromServer(roomInfo?.roomId);
     } else setCheck(true);
   }, []);
+
   useEffect(() => {
     console.log(item, 'useEffect');
 
@@ -143,6 +145,7 @@ const DetailsScreen = props => {
       </View>
     );
   };
+
   const ShowFullImage = () => {
     return (
       <Modal
@@ -350,7 +353,10 @@ const DetailsScreen = props => {
       <View style={style.containerRent}>
         <Text style={style.rent}>
           {`\u20B9 ${item?.rm_rent}`}
-          <Text style={style.month}>{` / Month (\u20B9 36000 Deposit)`}</Text>
+          <Text
+            style={
+              style.month
+            }>{` / Month (\u20B9 ${item?.deposit} Deposit)`}</Text>
         </Text>
       </View>
     );
@@ -689,6 +695,18 @@ const DetailsScreen = props => {
       </View>
     ) : null;
   };
+
+  const getDeposit = () => {
+    let str = '';
+    if (item?.monthly_maintain) {
+      str = `\u20B9 ${item?.monthly_maintain}/month maintenance`;
+    }
+    if (item?.deposit) {
+      str = str + `, \u20B9 ${item?.deposit} fix deposit`;
+    }
+    return str;
+  };
+
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <ShowFullImage />
@@ -818,7 +836,7 @@ const DetailsScreen = props => {
                   color={Colors.GREY}
                   size={hp(3.2)}
                   header={'maintenance, Deposit'}
-                  data={`1000/month maintenance, 15000 fix deposite`}
+                  data={getDeposit()}
                   iconCommunity={'MaterialCommunityIcons'}
                 />
               </View>
