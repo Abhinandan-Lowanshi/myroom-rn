@@ -210,7 +210,7 @@ const EditRoom = props => {
               temData.rm_size = value;
             }}
             placeholder={'Select'}
-            labelTop={'Select room size'}
+            labelTop={'Room size'}
             data={data.ROOM_SIZE}
           />
 

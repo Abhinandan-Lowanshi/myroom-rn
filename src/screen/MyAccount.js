@@ -17,6 +17,7 @@ import Labels from '../common/labels';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import images from '../common/images';
 import {logout} from '../component/LogOut';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
@@ -41,7 +42,14 @@ const MyAccount = ({navigation}) => {
   //     });
   // }, []);
   // Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>
       {loading && <LowOpacityLoader />}
@@ -54,8 +62,9 @@ const MyAccount = ({navigation}) => {
           confirmationMessage={'Are you sure you want to  '}
           confirmationMessageHigh={'logout?'}
           onPressPositive={() => {
-            setVisible(false);
+            signOut();
             logout(navigation);
+            setVisible(false);
           }}
           closeModal={() => {
             // setError('');
@@ -113,13 +122,15 @@ const MyAccount = ({navigation}) => {
           label={'Edit Profile'}
           type={ScreenName.EditProfile}
         />
-        <AccountTouchableCom
-          onPress={() => {
-            navigation.navigate(ScreenName.changePassword);
-          }}
-          label={'Change Password'}
-          type={ScreenName.changePassword}
-        />
+        {accountData?.data?.loginType !== 'google' && (
+          <AccountTouchableCom
+            onPress={() => {
+              navigation.navigate(ScreenName.changePassword);
+            }}
+            label={'Change Password'}
+            type={ScreenName.changePassword}
+          />
+        )}
         <AccountTouchableCom
           label={'App Settings'}
           type={ScreenName.Settings}

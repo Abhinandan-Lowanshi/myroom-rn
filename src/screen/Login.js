@@ -24,18 +24,17 @@ import localStorageOp from '../localStorage/LocalData';
 import ErrorModal from '../component/ErrorModal';
 import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
-import {getAccountImfo} from '../redux/Slice';
-import {useDispatch} from 'react-redux';
+import {getAccountImfo, setDevice_token} from '../redux/Slice';
+import {useDispatch, useSelector} from 'react-redux';
+import {getFCMToken} from '../Utils/PushNotification';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 
 const Login = ({navigation}) => {
-  // const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
   const [email, setEmail] = useState('');
   const [loading, SetIsLoading] = useState(false);
-  // const [password, setPassword] = useState('Abhi@7049');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [authError, setAuthError] = useState('');
@@ -43,6 +42,7 @@ const Login = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [apiError, setApiError] = useState(false);
   const dispatch = useDispatch(dispatch);
+  const device_token = useSelector(state => state.AllData.device_token);
 
   React.useEffect(() => {
     GoogleSignin.configure({
@@ -53,9 +53,16 @@ const Login = ({navigation}) => {
   }, []);
 
   const GoogleSingUp = async () => {
+    getFCMToken();
+    localStorageOp('', AsyncKeys.FCMToken, '').then(response => {
+      if (response) {
+        dispatch(setDevice_token(response?.token));
+      }
+    });
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signIn().then(result => {
+        console.log(result, 'hasPlayServices');
         if (result?.user) {
           loginSocial(result);
         }
@@ -83,13 +90,13 @@ const Login = ({navigation}) => {
     else setIsSubmitDisabled(true);
   }, [email, password]);
 
-  const loginSocial = user => {
+  const loginSocial = async user => {
     SetIsLoading(true);
     sendRequest(
       {
         email: user?.user?.email,
         name: user?.user?.name,
-        device_token: 'nill',
+        device_token: device_token,
         social_token: user?.idToken,
       },
       EndPoints.socialLogin,
@@ -134,6 +141,7 @@ const Login = ({navigation}) => {
       {
         email: email,
         password: password,
+        device_token: device_token,
       },
       EndPoints.login,
       'POST',
@@ -144,7 +152,6 @@ const Login = ({navigation}) => {
           setApiError(response?.message);
           localStorageOp(true, AsyncKeys.USERDATA, response);
           dispatch(getAccountImfo(response));
-          // navigation.navigate(ScreenName.TabComponent);
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
@@ -210,14 +217,14 @@ const Login = ({navigation}) => {
             icon={images.googleIcon}
             label={'Login with Google'}
           />
-          <SocialLoginBt
+          {/* <SocialLoginBt
             onPress={() => {
               setApiError('Login with Facebook will available soon');
             }}
             labelStyle={style.fbLabelStyle}
             icon={images.Facebook}
             label={'Login with Facebook'}
-          />
+          /> */}
           <TouchableOpacity
             onPress={() => {
               navigation.navigate(ScreenName.SignUp);

@@ -98,6 +98,7 @@ const EditProfile = ({navigation}) => {
             dispatch(getAccountImfo(accountDataTemp), navigation.goBack());
           } else {
             setEmailApiError(response.message);
+            showToast(response.message);
             if (response?.message === 'Invalid authentication.') {
               logout(navigation);
             }
@@ -106,6 +107,7 @@ const EditProfile = ({navigation}) => {
         })
         .catch(e => {
           setLoading(false);
+          showToast(`${e} error`);
         });
     }
   };
