@@ -45,6 +45,7 @@ const MyAccount = ({navigation}) => {
   const signOut = async () => {
     try {
       await GoogleSignin.signOut();
+      // Remember to remove the user from your app's state as well
     } catch (error) {
       console.error(error);
     }

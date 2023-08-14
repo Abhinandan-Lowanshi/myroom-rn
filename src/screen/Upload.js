@@ -55,7 +55,6 @@ const Upload = ({navigation}) => {
   const [ownerData, setOwnerData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
-  console.log('accountData', accountData);
   useEffect(() => {
     if (
       accountData?.data?.usr_firstName?.length < 4 ||

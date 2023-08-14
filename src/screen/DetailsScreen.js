@@ -83,10 +83,7 @@ const DetailsScreen = props => {
   }, []);
 
   useEffect(() => {
-    console.log(item, 'useEffect');
-
     if (item?.images) {
-      console.log(item, 'useEffect');
       prepareImage(item?.images);
     }
     if (item?.reviews) dispatch(setReviews(item?.reviews));
@@ -145,7 +142,6 @@ const DetailsScreen = props => {
       </View>
     );
   };
-
   const ShowFullImage = () => {
     return (
       <Modal

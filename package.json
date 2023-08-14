@@ -16,6 +16,8 @@
     "@react-native-community/checkbox": "^0.5.14",
     "@react-native-community/cli-platform-android": "^11.3.6",
     "@react-native-community/geolocation": "^3.0.4",
+    "@react-native-firebase/app": "^18.0.0",
+    "@react-native-firebase/messaging": "^18.0.0",
     "@react-native-google-signin/google-signin": "^10.0.1",
     "@react-navigation/bottom-tabs": "^6.5.2",
     "@react-navigation/native": "^6.1.1",
