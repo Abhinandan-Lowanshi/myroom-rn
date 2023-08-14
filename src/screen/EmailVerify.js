@@ -55,7 +55,7 @@ const EmailVerify = ({navigation}) => {
               setLoading(false);
             });
         } else {
-          setApiError('Something went wrong');
+          setApiError(response?.message);
           setLoading(false);
         }
       })

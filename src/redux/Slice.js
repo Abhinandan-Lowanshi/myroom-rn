@@ -27,6 +27,7 @@ export const slice = createSlice({
     OwnerData: {},
     reviews: {},
     device_token: '',
+    filterData: [],
   },
   reducers: {
     startL: (state, actions) => {
@@ -98,6 +99,9 @@ export const slice = createSlice({
     device_token: (state, actions) => {
       state.device_token = actions.payload;
     },
+    filterData: (state, actions) => {
+      state.filterData = actions.payload;
+    },
   },
 });
 
@@ -125,6 +129,7 @@ export const {
   OwnerData,
   reviews,
   device_token,
+  filterData,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -199,6 +204,9 @@ export const setReviews = data => dispatch => {
 };
 export const setDevice_token = data => dispatch => {
   dispatch(device_token(data));
+};
+export const setFilterData = data => dispatch => {
+  dispatch(filterData(data));
 };
 
 export default slice.reducer;

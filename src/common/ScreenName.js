@@ -40,4 +40,5 @@ export default Screen = {
   PrivacyPolicy: 'PrivacyPolicy',
   MapScreen: 'MapScreen',
   ReviewScreen: 'ReviewScreen',
+  RenderFilter: 'RenderFilter',
 };

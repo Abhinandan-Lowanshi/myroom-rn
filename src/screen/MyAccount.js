@@ -62,9 +62,9 @@ const MyAccount = ({navigation}) => {
           confirmationMessage={'Are you sure you want to  '}
           confirmationMessageHigh={'logout?'}
           onPressPositive={() => {
-            setVisible(false);
             signOut();
             logout(navigation);
+            setVisible(false);
           }}
           closeModal={() => {
             // setError('');

@@ -2,21 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, TouchableOpacity, Image, Text} from 'react-native';
 import MapView, {Marker} from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
-import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
 import {RF, hp} from '../common/CommonFunctions';
 import {MoreDetails} from '../screen/DetailsScreen';
 import images from '../common/images';
 import Colors from '../common/Colors';
 import Labels from '../common/labels';
 import Icon from './Icon';
+import Header from './Header';
 const MapScreen = props => {
-  // console.log(
-  //   props?.route?.params.desRm_latitude,
-  //   props?.route?.params.desRm_longitude,
-  //   props?.route?.params?.OrRm_latitude,
-  //   props?.route?.params?.OrRm_longitude,
-  //   'MapScreen',
-  // );
+  const {navigation} = props;
 
   const [open, setOpen] = useState(false);
   const [locationInfoData, setLocationInfoData] = useState({});
@@ -111,6 +105,7 @@ const MapScreen = props => {
 
   return (
     <View style={{flex: 1}}>
+      <Header label={Labels?.Route} navigation={navigation} />
       {props?.route?.params.desRm_latitude &&
         props?.route?.params.desRm_longitude &&
         props?.route?.params?.OrRm_latitude &&

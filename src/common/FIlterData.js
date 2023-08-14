@@ -41,4 +41,65 @@ const filterRoom = (temp, tempRoomData) => {
   });
   return tempSearchRoom;
 };
-export {filterData, getRoomCount, filterRoom, filterDataAll};
+
+const getSizeVer = (type, item, label) => {
+  if (type === 'Room size') {
+    return item?.rm_size === label;
+  }
+  if (type === 'Furnished Status') {
+    return item?.rm_furnisd_status === label;
+  }
+  if (type === 'Prefered banat type') {
+    return item?.rm_availble === label;
+  }
+  if (type === 'Parking availability') {
+    return item?.rm_prking_avblity === label;
+  }
+  if (type === 'Independent') {
+    return item?.rm_depndecy === label;
+  }
+  if (type === 'Rent range') {
+    let limitArray = label.split('-');
+    let rent = Number(item?.rm_rent);
+    let lowerLMT = Number(limitArray[0]);
+    let upperLMT = Number(limitArray[1]);
+
+    return lowerLMT <= rent && upperLMT >= rent;
+  }
+  // if (type === 'Furnished Status') {
+  //   return item?.rm_furnisd_status === label;
+  // }
+  // if (type === 'Furnished Status') {
+  //   return item?.rm_furnisd_status === label;
+  // }
+  // if (type === 'Furnished Status') {
+  //   return item?.rm_furnisd_status === label;
+  // }
+};
+const applyFilter = (rooms, filter) => {
+  console.log('rooms>>>>>>>>>>>>>>>', rooms, filter);
+  let tmp = [...rooms];
+  filter?.map(item => {
+    let type = item.label;
+    let tmp1 = [];
+    let check = false;
+    item.data?.map(item => {
+      if (item.isApplied) {
+        check = true;
+        tmp.map(item1 => {
+          if (getSizeVer(type, item1, item.label)) {
+            if (tmp1.indexOf(item1)) {
+              tmp1.push(item1);
+            }
+          }
+        });
+      }
+    });
+    if (check) {
+      //   const
+      tmp = [...tmp1];
+    }
+  });
+  return tmp;
+};
+export {filterData, getRoomCount, filterRoom, filterDataAll, applyFilter};
