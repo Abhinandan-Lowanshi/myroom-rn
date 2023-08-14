@@ -90,48 +90,34 @@ const SignUp = ({navigation}) => {
   };
 
   const getOtp = () => {
-    dispatch(
-      setSignUp({
-        firstName: name,
-        lastName: '',
-        email: email,
-        phone: mobile,
-        currentAdrs: '',
-        prmntAddress: '',
-        password: password,
-        device_token: device_token,
-      }),
-    );
-    navigation.navigate(ScreenName.EmailVerify);
-
-    // if (email) {
-    //   setLoading(true);
-    //   sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
-    //     .then(response => {
-    //       setLoading(false);
-    //       if (response.status === true) {
-    //         dispatch(
-    //           setSignUp({
-    //             firstName: name,
-    //             lastName: '',
-    //             email: email,
-    //             phone: mobile,
-    //             currentAdrs: '',
-    //             prmntAddress: '',
-    //             password: password,
-    //             device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
-    //           }),
-    //         );
-    //         navigation.navigate(ScreenName.EmailVerify);
-    //       } else {
-    //         setEmailApiError(response.message);
-    //         //go back
-    //       }
-    //     })
-    //     .catch(e => {
-    //       setLoading(false);
-    //     });
-    // }
+    if (email) {
+      setLoading(true);
+      sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
+        .then(response => {
+          setLoading(false);
+          if (response.status === true) {
+            dispatch(
+              setSignUp({
+                firstName: name,
+                lastName: '',
+                email: email,
+                phone: mobile,
+                currentAdrs: '',
+                prmntAddress: '',
+                password: password,
+                device_token: device_token,
+              }),
+            );
+            navigation.navigate(ScreenName.EmailVerify);
+          } else {
+            setEmailApiError(response.message);
+            //go back
+          }
+        })
+        .catch(e => {
+          setLoading(false);
+        });
+    }
   };
 
   const onPressDismiss = () => {

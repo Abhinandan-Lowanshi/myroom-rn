@@ -33,11 +33,9 @@ import {
 } from '@react-native-google-signin/google-signin';
 
 const Login = ({navigation}) => {
-  // const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
-  const [email, setEmail] = useState('abhinandanlowanshi@gmail.com');
+  const [email, setEmail] = useState('');
   const [loading, SetIsLoading] = useState(false);
-  // const [password, setPassword] = useState('Abhi@7049');
-  const [password, setPassword] = useState('Abhi@7049');
+  const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState(false);
   const [authError, setAuthError] = useState('');
   const [passwordError, setPasswordError] = useState(false);
