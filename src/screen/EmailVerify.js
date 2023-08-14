@@ -27,18 +27,33 @@ const EmailVerify = ({navigation}) => {
   const dispatch = useDispatch();
   const SignUp = () => {
     setLoading(true);
-    sendRequest(signInData, EndPoints.register, 'POST')
+    sendRequest(
+      {email: signInData?.email, otp: otp},
+      EndPoints.verifyEmailOtp,
+      'POST',
+    )
       .then(response => {
-        setLoading(false);
         if (response.status === true) {
-          localStorageOp(true, AsyncKeys.USERDATA, response);
-          dispatch(getAccountImfo(response));
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{name: ScreenName.TabComponent}],
-            }),
-          );
+          sendRequest(signInData, EndPoints.register, 'POST')
+            .then(response => {
+              setLoading(false);
+              if (response.status === true) {
+                localStorageOp(true, AsyncKeys.USERDATA, response);
+                dispatch(getAccountImfo(response));
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: ScreenName.TabComponent}],
+                  }),
+                );
+              } else {
+                setApiError('Something went wrong');
+                setLoading(false);
+              }
+            })
+            .catch(e => {
+              setLoading(false);
+            });
         } else {
           setApiError(response?.message);
           setLoading(false);
@@ -47,42 +62,6 @@ const EmailVerify = ({navigation}) => {
       .catch(e => {
         setLoading(false);
       });
-    // sendRequest(
-    //   {email: signInData?.email, otp: otp},
-    //   EndPoints.verifyEmailOtp,
-    //   'POST',
-    // )
-    //   .then(response => {
-    //     if (response.status === true) {
-    //       sendRequest(signInData, EndPoints.register, 'POST')
-    //         .then(response => {
-    //           setLoading(false);
-    //           if (response.status === true) {
-    //             localStorageOp(true, AsyncKeys.USERDATA, response);
-    //             dispatch(getAccountImfo(response));
-    //             console.log(response, 'navigation.navigate Signup');
-    //             navigation.dispatch(
-    //               CommonActions.reset({
-    //                 index: 0,
-    //                 routes: [{name: ScreenName.TabComponent}],
-    //               }),
-    //             );
-    //           } else {
-    //             setApiError('Something went wrong');
-    //             setLoading(false);
-    //           }
-    //         })
-    //         .catch(e => {
-    //           setLoading(false);
-    //         });
-    //     } else {
-    //       setApiError('Something went wrong');
-    //       setLoading(false);
-    //     }
-    //   })
-    //   .catch(e => {
-    //     setLoading(false);
-    //   });
   };
 
   const otpOnChange = otp => {

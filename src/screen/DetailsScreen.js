@@ -68,8 +68,11 @@ const DetailsScreen = props => {
   const flatlistRef = useRef();
   const flatlistRefModal = useRef();
   const dispatch = useDispatch();
-
+  const currentLocationName = useSelector(
+    state => state.AllData.currentLocationName,
+  );
   let lastIndex = 0;
+
   useEffect(() => {
     setLike(propData?.favorite_key);
     setItem(propData);
@@ -80,13 +83,7 @@ const DetailsScreen = props => {
   }, []);
 
   useEffect(() => {
-    console.log(item?.images?.length, 'useEffect');
-  }, []);
-  useEffect(() => {
-    console.log(item, 'useEffect');
-
     if (item?.images) {
-      console.log(item, 'useEffect');
       prepareImage(item?.images);
     }
     if (item?.reviews) dispatch(setReviews(item?.reviews));
@@ -352,7 +349,10 @@ const DetailsScreen = props => {
       <View style={style.containerRent}>
         <Text style={style.rent}>
           {`\u20B9 ${item?.rm_rent}`}
-          <Text style={style.month}>{` / Month (\u20B9 36000 Deposit)`}</Text>
+          <Text
+            style={
+              style.month
+            }>{` / Month (\u20B9 ${item?.deposit} Deposit)`}</Text>
         </Text>
       </View>
     );
@@ -649,6 +649,59 @@ const DetailsScreen = props => {
       </View>
     );
   };
+  const openInstagram = () => {
+    Linking.openURL(
+      `https://instagram.com/impactservices_pvt.ltd?igshid=MzRlODBiNWFlZA==`,
+    );
+  };
+
+  const checkIsLocal = () => {
+    return currentLocationName?.locationName?.includes('Indore', 'indore');
+  };
+
+  const PackerContact = ({phone}) => {
+    return (
+      <TouchableOpacity style={style.containerName} onPress={openInstagram}>
+        <Icon
+          name={'instagram'}
+          color={Colors.RED}
+          size={hp(2)}
+          iconCommunity={'Feather'}
+          style={style.phone}
+        />
+        <Text style={style.labelPackerPhone}>{phone}</Text>
+      </TouchableOpacity>
+    );
+  };
+  const packerMoverDetails = () => {
+    return checkIsLocal() ? (
+      <View style={style.containerPacker}>
+        <Text style={style.labelCompanyName}>
+          Instant Mover And Commercial Transportation Services Indore
+        </Text>
+        <View style={style.containerContact}>
+          <TouchableOpacity onPress={() => handleCall(8135178283)}>
+            <Text style={style.labelPackerPhone}>{8135178283}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleCall(8823072388)}>
+            <Text style={style.labelPackerPhone}>{`,  ${8823072388}`}</Text>
+          </TouchableOpacity>
+          <PackerContact phone={'impactservices_pvt.ltd'} />
+        </View>
+      </View>
+    ) : null;
+  };
+
+  const getDeposit = () => {
+    let str = '';
+    if (item?.monthly_maintain) {
+      str = `\u20B9 ${item?.monthly_maintain}/month maintenance`;
+    }
+    if (item?.deposit) {
+      str = str + `, \u20B9 ${item?.deposit} fix deposit`;
+    }
+    return str;
+  };
 
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
@@ -779,13 +832,13 @@ const DetailsScreen = props => {
                   color={Colors.GREY}
                   size={hp(3.2)}
                   header={'maintenance, Deposit'}
-                  data={`1000/month maintenance, 15000 fix deposite`}
+                  data={getDeposit()}
                   iconCommunity={'MaterialCommunityIcons'}
                 />
               </View>
               {ownerView()}
               {showRating()}
-
+              {packerMoverDetails()}
               <RoomInformation />
             </View>
 
@@ -998,6 +1051,45 @@ const style = StyleSheet.create({
   },
   reviewContainerMain: {
     // marginBottom: hp(2),
+  },
+  containerPacker: {
+    backgroundColor: Colors.GREY5,
+    paddingHorizontal: hp(3),
+    paddingVertical: hp(1.5),
+    marginHorizontal: hp(1.1),
+  },
+  containerName: {
+    flex: 1,
+    flexDirection: 'row',
+    // marginTop: hp(0.5),
+    marginLeft: hp(1),
+  },
+  labelPackerPhone: {
+    color: Colors.GREY3,
+    fontSize: RF(1.4),
+    marginLeft: hp(0.5),
+  },
+  packerShare: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+  },
+  labelCompanyName: {
+    color: Colors.BLACK,
+    fontSize: RF(1.5),
+    fontWeight: '500',
+    textAlign: 'center',
+    alignSelf: 'center',
+  },
+  phone: {
+    marginLeft: hp(1),
+  },
+  whatsApp: {
+    marginLeft: hp(1),
+  },
+  containerContact: {
+    flexDirection: 'row',
+    marginLeft: hp(1),
+    marginTop: hp(0.8),
   },
 });
 

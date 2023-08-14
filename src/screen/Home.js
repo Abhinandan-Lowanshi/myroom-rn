@@ -12,6 +12,7 @@ import {
   Linking,
   ActivityIndicator,
   AppState,
+  FlatList,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
@@ -483,11 +484,11 @@ const Home = ({route, navigation}) => {
               Toast.show(`No room Available for filter ${item?.value}`);
             }
           }}>
-          <Text style={style.labelFilter}>{item?.value}</Text>
+          <Text
+            style={
+              style.labelFilter
+            }>{`${item?.value} (${item?.availableRooms})`}</Text>
         </TouchableOpacity>
-        <View style={style.containerCount}>
-          <Text style={style.labelCount}>{item?.availableRooms}</Text>
-        </View>
       </>
     );
   };
@@ -578,14 +579,14 @@ const Home = ({route, navigation}) => {
           gotoSearch();
         }}
       />
-      {/* {filteredData?.length > 0 && !isFailed ? (
+      {filteredData?.length > 0 && !isFailed ? (
         <FlatList
           horizontal
           data={filterList}
           renderItem={filterRender}
           style={style.filterFlatlist}
         />
-      ) : null} */}
+      ) : null}
       {loading ? (
         <View style={style.loader}>
           <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
@@ -619,25 +620,29 @@ const Home = ({route, navigation}) => {
 export default Home;
 const style = StyleSheet.create({
   containerFilter: isApplied => ({
-    backgroundColor: isApplied ? Colors.PRIMARY : Colors.PRIMARYLITE,
-    height: hp(7),
-    width: hp(7),
-    borderRadius: hp(90),
+    flexDirection: 'row',
+    backgroundColor: isApplied ? Colors.WHITE : Colors.GREY5,
+    borderRadius: hp(1.5),
     marginHorizontal: hp(0.4),
-    justifyContent: 'center',
     marginVertical: hp(1),
+    elevation: hp(1),
+    paddingHorizontal: hp(1),
+    paddingVertical: hp(0.3),
+    maxHeight: hp(3.8),
   }),
   labelFilter: {
-    color: Colors.WHITE,
+    color: Colors.BLACK,
     alignSelf: 'center',
-    fontSize: RF(1.3),
+    fontSize: RF(1.6),
+    marginHorizontal: hp(1),
+    marginVertical: hp(0.5),
   },
   labelCount: {
     color: Colors.BLACK,
     alignSelf: 'center',
-    marginHorizontal: hp(0.7),
+    marginLeft: hp(0.4),
     marginVertical: hp(0.3),
-    fontSize: RF(1.3),
+    fontSize: RF(1.6),
   },
   containerCount: {
     borderRadius: hp(90),
@@ -652,6 +657,7 @@ const style = StyleSheet.create({
   filterFlatlist: {
     maxHeight: hp(9),
     marginHorizontal: hp(1),
+    marginTop: hp(3),
   },
   locationNameContainer: {
     marginHorizontal: hp(1.2),

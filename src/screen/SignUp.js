@@ -9,7 +9,7 @@ import LabelComponent from '../component/LabelComponent';
 import {validateEmail, validatePassword} from '../common/Validations';
 import sendRequest from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import ErrorModal from '../component/ErrorModal';
 import LowOpacityLoader from '../component/LowOpacityLoader';
 import {setSignUp} from '../redux/Slice';
@@ -29,6 +29,7 @@ const SignUp = ({navigation}) => {
   const [isPasswordMatch, setIsPasswordMatch] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [emailApiError, setEmailApiError] = useState('');
+  const device_token = useSelector(state => state.AllData.device_token);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -89,47 +90,34 @@ const SignUp = ({navigation}) => {
   };
 
   const getOtp = () => {
-    navigation.navigate(ScreenName.EmailVerify);
-    dispatch(
-      setSignUp({
-        firstName: name,
-        lastName: '',
-        email: email,
-        phone: mobile,
-        currentAdrs: '',
-        prmntAddress: '',
-        password: password,
-        device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
-      }),
-    );
-    // if (email) {
-    //   setLoading(true);
-    //   sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
-    //     .then(response => {
-    //       setLoading(false);
-    //       if (response.status === true) {
-    //         dispatch(
-    //           setSignUp({
-    //             firstName: name,
-    //             lastName: '',
-    //             email: email,
-    //             phone: mobile,
-    //             currentAdrs: '',
-    //             prmntAddress: '',
-    //             password: password,
-    //             device_token: 'sdftgyuiopoiuytrewe6787654ewertyhjhytre',
-    //           }),
-    //         );
-    //         navigation.navigate(ScreenName.EmailVerify);
-    //       } else {
-    //         setEmailApiError(response.message);
-    //         //go back
-    //       }
-    //     })
-    //     .catch(e => {
-    //       setLoading(false);
-    //     });
-    // }
+    if (email) {
+      setLoading(true);
+      sendRequest({email: email}, EndPoints.sendEmailOtp, 'POST')
+        .then(response => {
+          setLoading(false);
+          if (response.status === true) {
+            dispatch(
+              setSignUp({
+                firstName: name,
+                lastName: '',
+                email: email,
+                phone: mobile,
+                currentAdrs: '',
+                prmntAddress: '',
+                password: password,
+                device_token: device_token,
+              }),
+            );
+            navigation.navigate(ScreenName.EmailVerify);
+          } else {
+            setEmailApiError(response.message);
+            //go back
+          }
+        })
+        .catch(e => {
+          setLoading(false);
+        });
+    }
   };
 
   const onPressDismiss = () => {
