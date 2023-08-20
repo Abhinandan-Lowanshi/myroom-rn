@@ -23,6 +23,7 @@ import {uploadImage} from '../networking/ApiFunctions';
 import EndPoints from '../networking/EndPoints';
 import {useSelector} from 'react-redux';
 import Toast from 'react-native-simple-toast';
+import {CommonActions} from '@react-navigation/native';
 
 const Upload = ({navigation}) => {
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
@@ -311,6 +312,10 @@ const Upload = ({navigation}) => {
         formdata.append('rm_rent', rent);
         formdata.append('rm_flor', whichFloor);
         formdata.append('deposit', isDeposit === 'Yes' ? deposit : '');
+        formdata.append(
+          'monthly_maintain',
+          isMaintenance === 'Yes' ? maintenance : '',
+        );
         formdata.append('rm_latitude', roomLocation?.latitude);
         formdata.append('rm_longitude', roomLocation?.longitude);
         formdata.append('rm_description', description);
@@ -320,14 +325,15 @@ const Upload = ({navigation}) => {
           .then(response => {
             setIsLoading(false);
             showToast(response?.message);
-            if (response.status === true) {
+            console.log(response?.status === true);
+            if (response?.status === true) {
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
                   routes: [{name: ScreenName.TabComponent}],
                 }),
               );
-              console.log(response, 'Response');
+              console.log('Response', response);
             } else {
               console.log(response, 'error');
             }

@@ -26,7 +26,6 @@ const MyPost = ({navigation}) => {
   const myRoomList = useSelector(state => state.AllData.myposts);
   const dispatch = useDispatch();
 
-  console.log('onPressEditSuccess');
   useEffect(() => {
     setLoading(true);
     getRooms();
@@ -74,7 +73,10 @@ const MyPost = ({navigation}) => {
   };
 
   const onPressEditSuccess = value => {
-    console.log(value);
+    let tmp = myRoomList?.map(data => {
+      return data?.rm_pkey === value?.rm_pkey ? value : data;
+    });
+    dispatch(getAllMyRooms(tmp));
   };
 
   const onPressEdit = item => {

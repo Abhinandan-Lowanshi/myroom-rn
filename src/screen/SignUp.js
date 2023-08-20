@@ -102,10 +102,12 @@ const SignUp = ({navigation}) => {
                 lastName: '',
                 email: email,
                 phone: mobile,
-                currentAdrs: '',
-                prmntAddress: '',
+                currentAdrs: 'nill',
+                prmntAddress: 'nill',
                 password: password,
                 device_token: device_token,
+                loginType: 'manual',
+                social_token: 'nill',
               }),
             );
             navigation.navigate(ScreenName.EmailVerify);

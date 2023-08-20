@@ -124,12 +124,9 @@ const EditRoom = props => {
       rm_rent: rent,
     };
 
-    temData.rm_rent = rent;
     setTempData({
       ...temData,
-      rm_own_Fullname: 'name',
-      rm_own_mble_num: 'mobileNumber',
-      rm_size: 'roomSize',
+      rm_size: roomSize,
       rm_furnisd_status: furnishedStatus,
       rm_availble: availableStatus,
       rm_prking_avblity: parkingStatus,
@@ -147,25 +144,32 @@ const EditRoom = props => {
 
   const updateRoom = data => {
     setLoading(true);
+    let data1 = {
+      ...item,
+      rm_size: roomSize,
+      rm_furnisd_status: furnishedStatus,
+      rm_availble: availableStatus,
+      rm_prking_avblity: parkingStatus,
+      rm_depndecy: dependencyStatus,
+      rm_flor: whichFloor,
+      rm_rent: rent,
+    };
 
-    console.log(temData, 'temData');
-    onPressEditSuccess(temData);
-    navigation.goBack();
-
-    // sendRequest(data, EndPoints.editRoom, 'POST')
-    //   .then(response => {
-    //     setLoading(false);
-    //     if (response.status === true) {
-    //       navigation.navigate(ScreenName.MyPost);
-    //     } else {
-    //   if (response?.message === 'Invalid authentication.') {
-    //     logout(navigation);
-    //   }
-    // }
-    //   })
-    //   .catch(error => {
-    //     setLoading(false);
-    //   });
+    sendRequest(data, EndPoints.editRoom, 'POST')
+      .then(response => {
+        setLoading(false);
+        if (response.status === true) {
+          onPressEditSuccess(data1);
+          navigation.goBack();
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+      });
   };
 
   const mobileNumberOnChange = mobileNumber => {
@@ -191,6 +195,7 @@ const EditRoom = props => {
             outerContainer={style.outerContainer}
             placeholder={'Name'}
             errorMessage={'Enter valid Name'}
+            disabled={true}
           />
           <CustomInputText
             maxLength={10}
@@ -200,6 +205,7 @@ const EditRoom = props => {
             error={mobileNumberError}
             placeholder={'Mobile Number'}
             errorMessage={'Invalid Mobile Number'}
+            disabled={true}
           />
 
           <CustomPicker
@@ -207,7 +213,6 @@ const EditRoom = props => {
             container={style.pickerstyle}
             onItemChange={value => {
               setRoomSize(value?.value);
-              temData.rm_size = value;
             }}
             placeholder={'Select'}
             labelTop={'Room size'}
@@ -220,8 +225,8 @@ const EditRoom = props => {
             placeholder={'Select'}
             container={style.pickerstyle}
             onItemChange={value => {
+              console.log('value', value);
               setFurnishedStatus(value?.value);
-              temData.rm_furnisd_status = value;
             }}
             data={data.ROOM_STATUS_FR}
           />
@@ -233,7 +238,6 @@ const EditRoom = props => {
             container={style.pickerstyle}
             onItemChange={value => {
               setAvailableStatus(value?.value);
-              temData.rm_availble = value;
             }}
             data={data.ROOM_AVAILABLE}
           />
@@ -245,7 +249,6 @@ const EditRoom = props => {
             labelTop={'Select parking availability of room'}
             onItemChange={value => {
               setParkingStatus(value?.value);
-              temData.rm_prking_avblity = value;
             }}
             data={data.ROOM_PARKING_AVAILABILITY}
           />
@@ -257,7 +260,6 @@ const EditRoom = props => {
             labelTop={'Select independency of room'}
             onItemChange={value => {
               setDependencyStatus(value?.value);
-              temData.rm_depndecy = value;
             }}
             data={data.ROOM_DEPENDENT_STATUS}
           />

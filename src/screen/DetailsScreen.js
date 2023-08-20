@@ -349,10 +349,12 @@ const DetailsScreen = props => {
       <View style={style.containerRent}>
         <Text style={style.rent}>
           {`\u20B9 ${item?.rm_rent}`}
-          <Text
-            style={
-              style.month
-            }>{` / Month (\u20B9 ${item?.deposit} Deposit)`}</Text>
+          {item?.deposit && (
+            <Text
+              style={
+                style.month
+              }>{` / Month (\u20B9 ${item?.deposit} Deposit)`}</Text>
+          )}
         </Text>
       </View>
     );
@@ -695,7 +697,7 @@ const DetailsScreen = props => {
   const getDeposit = () => {
     let str = '';
     if (item?.monthly_maintain) {
-      str = `\u20B9 ${item?.monthly_maintain}/month maintenance`;
+      str = `\u20B9 ${item?.monthly_maintain}/monthly maintenance`;
     }
     if (item?.deposit) {
       str = str + `, \u20B9 ${item?.deposit} fix deposit`;
@@ -831,7 +833,9 @@ const DetailsScreen = props => {
                   name={'iobroker'}
                   color={Colors.GREY}
                   size={hp(3.2)}
-                  header={'maintenance, Deposit'}
+                  header={`${item?.monthly_maintain ? 'maintenance' : ''} ${
+                    item?.deposit ? 'Deposit' : ''
+                  }`}
                   data={getDeposit()}
                   iconCommunity={'MaterialCommunityIcons'}
                 />

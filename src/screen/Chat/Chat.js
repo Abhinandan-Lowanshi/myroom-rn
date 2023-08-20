@@ -23,26 +23,32 @@ import sendRequest from '../../networking/ApiFunctions';
 import EndPoints from '../../networking/EndPoints';
 import ProfileIcon from 'react-native-vector-icons/dist/MaterialCommunityIcons';
 import ScreenName from '../../common/ScreenName';
+import {useSelector} from 'react-redux';
 
 const Chat = props => {
   const {navigation} = props;
   const {item} = props?.route?.params;
   const [passwordSend, setpasswordSend] = useState(false);
   const [user, setUser] = useState('');
+  const accountData = useSelector(state => state.AllData.accountData);
   const [height, setHeight] = useState(hp(5.5));
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [pageCount, setPageCount] = useState(1);
   const [stop, setStop] = useState(false);
   const flatListRef = useRef();
-  const [user_id, setUser_id] = useState('');
+  const [user_id, setUser_id] = useState(accountData?.data?.usr_id);
   const [messages, setMessages] = useState([]);
-  const socket = io.connect('http://localhost:3000', {reconnect: true});
+
+  const socket = io.connect('http://192.168.154.23:3000', {reconnect: true});
   console.log(item, 'Chat');
 
   useEffect(() => {
+    getMessageList();
+  }, []);
+
+  useEffect(() => {
     socket.on('receive_message', chatMessage => {
-      console.log(chatMessage, 'user_id');
       if (chatMessage?.user_id !== user_id) {
         setMessages(prevMessages => [...prevMessages, chatMessage]);
         toBottom();
@@ -54,15 +60,10 @@ const Chat = props => {
     };
   }, []);
 
-  useEffect(() => {
-    getMessageList();
-  }, []);
-
   const getMessageList = async () => {
     setLoading(true);
     localStorageOp(false, AsyncKeys.USERDATA, '')
       .then(userData => {
-        setUser_id(userData?.data?.usr_id);
         socket.emit('join_room', {
           user_id: userData?.data?.usr_id,
           buddy_id: item?.user_id,
@@ -86,7 +87,7 @@ const Chat = props => {
           }
         });
       })
-      .catch(() => {
+      .catch(error => {
         setLoading(false);
       });
   };
@@ -125,7 +126,7 @@ const Chat = props => {
       let data = {
         user_id,
         buddy_id: item?.user_id,
-        message,
+        message: message?.trim(),
         created_date,
         message_type: 'sent',
       };
@@ -133,7 +134,7 @@ const Chat = props => {
       socket.emit('send_message', {
         user_id,
         buddy_id: item?.user_id,
-        message,
+        message: message?.trim(),
       });
       setMessage('');
       toBottom();
@@ -210,7 +211,7 @@ const Chat = props => {
               data={messages}
               style={style.flatList}
               renderItem={renderItem}
-              onScroll={e => onReactTop(e.nativeEvent.contentOffset.y)}
+              // onScroll={e => onReactTop(e.nativeEvent.contentOffset.y)}
             />
             <View style={style.sendMessageContainer(height)}>
               <TextInput
@@ -221,6 +222,9 @@ const Chat = props => {
                   setMessage(value);
                 }}
                 onFocus={value => {
+                  toBottom();
+                }}
+                onBlur={value => {
                   toBottom();
                 }}
                 placeholder={'Type a message'}

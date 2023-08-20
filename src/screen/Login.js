@@ -50,8 +50,17 @@ const Login = ({navigation}) => {
         '523979153716-pq0g7d6sjhc2f7d46nla6ugq4drk7m55.apps.googleusercontent.com',
       offlineAccess: true,
     });
+    signOut();
   }, []);
 
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      // Remember to remove the user from your app's state as well
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const GoogleSingUp = async () => {
     getFCMToken();
     localStorageOp('', AsyncKeys.FCMToken, '').then(response => {
