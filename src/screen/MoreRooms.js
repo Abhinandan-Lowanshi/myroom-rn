@@ -73,7 +73,6 @@ const MoreRooms = ({navigation, route}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,

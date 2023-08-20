@@ -11,7 +11,6 @@ const RatingListView = ({
   styleRow,
 }) => {
   const renderItem = ({item}) => {
-    console.log(item, 'renderItem');
     return <ReviewRow data={item} styleRow={styleRow} />;
   };
   return (

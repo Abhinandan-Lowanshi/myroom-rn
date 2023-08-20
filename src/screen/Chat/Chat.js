@@ -41,7 +41,6 @@ const Chat = props => {
   const [messages, setMessages] = useState([]);
 
   const socket = io.connect('http://192.168.154.23:3000', {reconnect: true});
-  console.log(item, 'Chat');
 
   useEffect(() => {
     getMessageList();
@@ -55,7 +54,6 @@ const Chat = props => {
       }
     });
     return () => {
-      console.log('>..................');
       socket.disconnect();
     };
   }, []);
@@ -121,7 +119,6 @@ const Chat = props => {
 
   const sendMessage = () => {
     const created_date = new Date().toISOString();
-    // console.log(messages);
     if (message !== '') {
       let data = {
         user_id,
@@ -157,7 +154,6 @@ const Chat = props => {
       setLoading(true);
       let pageNumber = pageCount;
 
-      console.log(pageNumber + 1, 'pageNumber');
       let tempOb = {
         user_id: user_id,
         buddy_id: item?.user_id,
@@ -172,7 +168,6 @@ const Chat = props => {
             }
             if (response?.data?.length > 0) {
               setPageCount(previousValue => previousValue + 1);
-              console.log(response.data.reverse());
               setMessages(previousValue => [
                 ...response.data.reverse(),
                 ...previousValue,

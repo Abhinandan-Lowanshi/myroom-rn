@@ -76,7 +76,6 @@ const UserProfile = props => {
     );
   };
   const handleChat = () => {
-    console.log(item);
     if (item?.rm_usr_fkey && item?.rm_own_Fullname) {
       let ob = {
         user_id: item?.rm_usr_fkey,
@@ -138,7 +137,6 @@ const UserProfile = props => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,

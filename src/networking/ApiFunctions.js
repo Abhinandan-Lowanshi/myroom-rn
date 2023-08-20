@@ -9,7 +9,6 @@ const sendRequest = async (payload, endPoint, method) => {
     if (payload?.user_id) {
       temp = {...temp, user_id: userData?.data?.usr_id};
     }
-    console.log(payload, 'payload');
     const response = await fetch(EndPoints.baseUrl + endPoint, {
       method: method,
       headers: {
@@ -31,7 +30,6 @@ export const uploadImage = async (payload, endPoint, method) => {
     // if (payload?.user_id) {
     //   temp = {...temp, user_id: userData?.data?.usr_id};
     // }
-    console.log(EndPoints.baseUrl + endPoint, 'payload');
     var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
 
     const response = await fetch(EndPoints.baseUrl + endPoint, {
@@ -44,8 +42,6 @@ export const uploadImage = async (payload, endPoint, method) => {
     });
     const data = await response.json();
     return data;
-  } catch (e) {
-    console.log(e, 'error');
-  }
+  } catch (e) {}
 };
 export default sendRequest;

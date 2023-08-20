@@ -77,7 +77,6 @@ const getSizeVer = (type, item, label) => {
   // }
 };
 const applyFilter = (rooms, filter) => {
-  console.log('rooms>>>>>>>>>>>>>>>', rooms, filter);
   let tmp = [...rooms];
   filter?.map(item => {
     let type = item.label;

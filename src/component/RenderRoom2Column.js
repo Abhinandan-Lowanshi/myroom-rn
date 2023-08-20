@@ -64,7 +64,6 @@ const RenderRoom2Column = ({
     return message;
   };
   const renderItem = ({item}) => {
-    console.log(item, 'renderItem');
     return (
       <TouchableOpacity
         onPress={() => onPress(item)}

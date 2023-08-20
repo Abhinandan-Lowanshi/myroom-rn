@@ -80,12 +80,6 @@ const Upload = ({navigation}) => {
     } else {
       setIsSubmitDisabled(false);
     }
-    console.log(
-      isDeposit,
-      deposit.length < 2,
-      isMaintenance,
-      maintenance.length < 2,
-    );
   }, [
     roomSize,
     furnishedStatus,
@@ -325,7 +319,6 @@ const Upload = ({navigation}) => {
           .then(response => {
             setIsLoading(false);
             showToast(response?.message);
-            console.log(response?.status === true);
             if (response?.status === true) {
               navigation.dispatch(
                 CommonActions.reset({
@@ -333,9 +326,7 @@ const Upload = ({navigation}) => {
                   routes: [{name: ScreenName.TabComponent}],
                 }),
               );
-              console.log('Response', response);
             } else {
-              console.log(response, 'error');
             }
           })
           .catch(error => {

@@ -41,17 +41,9 @@ const MapScreen = props => {
   };
 
   const getOneTimeLocation = () => {
-    console.log('position.coords');
-
     Geolocation.getCurrentPosition(
-      position => {
-        console.log(position.coords, 'position.coords');
-      },
-      error => {
-        console.log(error, 'position.coords');
-
-        // setVisible(true);
-      },
+      position => {},
+      error => {},
       {
         enableHighAccuracy: false,
         timeout: 30000,
@@ -126,7 +118,6 @@ const MapScreen = props => {
             <MapViewDirections
               onReady={item => {
                 setLocationInfoData(item?.legs[0]);
-                console.log('item?.legs', item?.legs[0]);
               }}
               optimizeWaypoints={true}
               splitWaypoints={true}

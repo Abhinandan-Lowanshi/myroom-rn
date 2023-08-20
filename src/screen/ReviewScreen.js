@@ -86,16 +86,10 @@ const ReviewScreen = props => {
         dispatch(setReviews(reviewTMP));
       } else {
         let temp = JSON.parse(JSON.stringify(reviews));
-        console.log(temp, 'line86');
         temp?.reviewList.push({...data, isReviewed: true});
-        console.log(temp, 'line88');
-
         let tmpRate = temp?.reviewData?.rating + data?.ratings;
-        console.log(data, 'line91');
         let tmpCount = temp?.reviewData?.count + 1;
         let tmpAvg = tmpRate / tmpCount;
-        console.log(tmpRate, tmpCount, tmpRate / tmpCount, 'line94');
-
         let tmpReviewData = {
           count: temp?.reviewData?.count + 1,
           rating: tmpRate,
@@ -103,10 +97,8 @@ const ReviewScreen = props => {
           isReviewed: true,
           room_id: data?.room_id,
         };
-        console.log(tmpReviewData, 'line102');
 
         temp.reviewData = {...tmpReviewData};
-        console.log(temp, 'line105');
 
         dispatch(setReviews(temp));
       }
@@ -187,7 +179,6 @@ const ReviewScreen = props => {
               ratingTextColor={Colors.PRIMARY}
               onFinishRating={onRatingChange}
               // onSwipeRating={e => {
-              //   console.log(e, 'ratingTextColor');
               // }}
               // selectedColor={'red'}
               // ratingContainerStyle={{backgroundColor: 'red'}}

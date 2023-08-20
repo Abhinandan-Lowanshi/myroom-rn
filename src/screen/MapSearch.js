@@ -36,11 +36,8 @@ const MapSearch = ({route, navigation}) => {
   const isFocused = useIsFocused();
   const [locationData, setLocationData] = useState({});
   const map = useRef();
-  console.log(data, 'Map Search');
   useEffect(() => {
     setRoomDataHomeTP(prepareData(roomDataHomeTemp));
-
-    console.log('setSelectedRoom');
   }, [roomDataHomeTemp]);
 
   useEffect(() => {
@@ -116,8 +113,6 @@ const MapSearch = ({route, navigation}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
-
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,
@@ -233,7 +228,6 @@ const MapSearch = ({route, navigation}) => {
   };
 
   const setDestination = data => {
-    console.log(data, 'setDestination');
     let locationData = {
       latitude: parseFloat(data ? data?.rm_latitude : 0.0),
       longitude: parseFloat(data ? data?.rm_longitude : 0.0),

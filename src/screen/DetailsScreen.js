@@ -94,7 +94,6 @@ const DetailsScreen = props => {
     temp = data?.map((item, index) => {
       return {...item, active: index === 0 ? true : false};
     });
-    console.log(temp, 'setImageBottomData');
     setImageBottomData(temp);
   };
 
@@ -131,7 +130,6 @@ const DetailsScreen = props => {
   };
 
   const renderFullImages = ({item}) => {
-    console.log(item, 'renderFullImages');
     return (
       <View style={{}}>
         <Custom_Image
@@ -186,7 +184,6 @@ const DetailsScreen = props => {
   };
 
   const handleChat = () => {
-    console.log(item);
     if (item?.rm_usr_fkey && item?.rm_own_Fullname) {
       let ob = {
         user_id: item?.rm_usr_fkey,
@@ -288,7 +285,6 @@ const DetailsScreen = props => {
     temp = imageBottomData?.map((item, index) => {
       return {...item, active: index === indexF ? true : false};
     });
-    console.log(temp, 'indexF === index');
     setImageBottomData(temp);
   };
 
@@ -551,7 +547,6 @@ const DetailsScreen = props => {
     );
   };
   const RoomInformation = () => {
-    console.log(locationData, 'locationData');
     return (
       <View
         style={{

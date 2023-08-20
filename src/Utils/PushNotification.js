@@ -9,7 +9,6 @@ async function requestUserPermission() {
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
   if (enabled) {
-    console.log('Authorization status:', authStatus);
   }
 }
 
@@ -24,25 +23,17 @@ export const getFCMToken = async () => {
           })
           .catch(() => {});
       } else {
-        console.log(data, 'getFCMToken');
       }
     })
-    .catch(error => {
-      console.log(error, 'error');
-    });
+    .catch(error => {});
 };
 
 export const notificationListener = async () => {
-  messaging().onNotificationOpenedApp(async remoteMessage => {
-    console.log(remoteMessage, 'onNotificationOpenedApp');
-  });
-  messaging().onMessage(async remoteMessage => {
-    console.log(remoteMessage, 'onMessage');
-  });
+  messaging().onNotificationOpenedApp(async remoteMessage => {});
+
+  messaging().onMessage(async remoteMessage => {});
 
   messaging()
     .getInitialNotification()
-    .then(remoteMessage => {
-      console.log(remoteMessage, 'getInitialNotification');
-    });
+    .then(remoteMessage => {});
 };

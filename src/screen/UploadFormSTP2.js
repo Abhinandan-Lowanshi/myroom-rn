@@ -128,9 +128,7 @@ const UploadFormSTP2 = ({navigation}) => {
                 routes: [{name: ScreenName.TabComponent}],
               }),
             );
-            console.log(response, 'Response');
           } else {
-            console.log(response, 'error');
           }
         })
         .catch(error => {

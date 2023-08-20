@@ -3,7 +3,6 @@ import {CommonActions} from '@react-navigation/native';
 import ScreenName from '../common/ScreenName';
 
 export const logout = navigation => {
-  console.log('logout');
   AsyncStorage.getAllKeys()
     .then(keys => AsyncStorage.multiRemove(keys))
     .then(() => {
@@ -16,8 +15,6 @@ export const logout = navigation => {
       // return true;
     })
     .catch(error => {
-      console.log('logoutcatch', error);
-
       return false;
     });
 };

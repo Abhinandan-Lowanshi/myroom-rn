@@ -71,7 +71,6 @@ const Home = ({route, navigation}) => {
   const LocationMode = useSelector(state => state.AllData.LocationMode);
   const reviews = useSelector(state => state.AllData.reviews);
 
-  console.log(LocationMode, 'LocationMode');
   const currentLocationName = useSelector(
     state => state.AllData.currentLocationName,
   );
@@ -176,9 +175,7 @@ const Home = ({route, navigation}) => {
         EndPoints.updateUserNotificationDetails,
         'POST',
       )
-        .then(response => {
-          console.log(response, 'updateUserNotification');
-        })
+        .then(response => {})
         .catch(() => {});
     }
   };
@@ -337,7 +334,6 @@ const Home = ({route, navigation}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,
@@ -387,7 +383,6 @@ const Home = ({route, navigation}) => {
               setIsFailed(true);
             }
           } else {
-            console.log(res?.message, 'Invalid authentication.');
             if (res?.message === 'Invalid authentication.') {
               logout(navigation);
             }

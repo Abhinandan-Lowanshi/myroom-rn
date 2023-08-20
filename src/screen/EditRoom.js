@@ -225,7 +225,6 @@ const EditRoom = props => {
             placeholder={'Select'}
             container={style.pickerstyle}
             onItemChange={value => {
-              console.log('value', value);
               setFurnishedStatus(value?.value);
             }}
             data={data.ROOM_STATUS_FR}

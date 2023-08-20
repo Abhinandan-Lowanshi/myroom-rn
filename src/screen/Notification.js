@@ -31,6 +31,7 @@ const Notification = ({route, navigation}) => {
   const dispatch = useDispatch();
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
   const filteredData = useSelector(state => state.AllData.filteredData);
+  const accountData = useSelector(state => state.AllData.accountData);
 
   useEffect(() => {
     getNotification();
@@ -40,7 +41,7 @@ const Notification = ({route, navigation}) => {
     setLoading(true);
     sendRequest(
       {
-        id: 4,
+        id: accountData?.data?.usr_id,
       },
       EndPoints.getNotification,
       'POST',
@@ -129,7 +130,6 @@ const Notification = ({route, navigation}) => {
           showToast(response?.message);
           return true;
         } else {
-          console.log('Fav else');
           performFavOp({
             ...value,
             like: value?.like === true ? false : true,
@@ -137,8 +137,6 @@ const Notification = ({route, navigation}) => {
           return false;
         }
       } else {
-        console.log('Fav else2');
-
         performFavOp({
           ...value,
           like: value?.like === true ? false : true,
@@ -147,7 +145,6 @@ const Notification = ({route, navigation}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,

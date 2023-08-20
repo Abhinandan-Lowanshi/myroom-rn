@@ -18,12 +18,10 @@ const AboutUs = ({navigation}) => {
   const onPress = item => {
     if (item?.type === 'GM') {
       if (item?.value) {
-        console.log(item?.value);
         Linking.openURL(`mailto:${item?.value}`);
       }
     } else {
       if (item?.value) {
-        console.log(item?.value, 'value');
         Linking.openURL(`https://www.instagram.com/${item?.value}/`);
       }
     }

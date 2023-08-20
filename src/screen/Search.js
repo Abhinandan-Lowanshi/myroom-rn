@@ -98,7 +98,6 @@ const Search = ({navigation}) => {
           }
         })
         .catch(err => {
-          console.log(err, 'location.lat && location.lon 55');
           setLoading(false);
           setMessage('Something went wrong');
           setActualData({});
@@ -247,7 +246,6 @@ const Search = ({navigation}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,

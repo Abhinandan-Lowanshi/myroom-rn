@@ -46,9 +46,7 @@ const MyAccount = ({navigation}) => {
     try {
       await GoogleSignin.signOut();
       // Remember to remove the user from your app's state as well
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   };
   return (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>

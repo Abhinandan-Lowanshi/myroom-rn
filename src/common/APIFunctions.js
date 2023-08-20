@@ -5,7 +5,5 @@ export const favFunction = async data => {
   try {
     const response = await sendRequest(data, EndPoints.toFavorite, 'POST');
     return response;
-  } catch (error) {
-    console.log('error');
-  }
+  } catch (error) {}
 };

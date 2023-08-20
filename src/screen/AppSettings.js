@@ -197,7 +197,6 @@ const AppSettings = props => {
   };
 
   const requestLocationPermission = async item => {
-    console.log('requestLocationPermission 140');
     if (Platform.OS === 'ios') {
       getOneTimeLocation(item);
     } else {
@@ -223,7 +222,6 @@ const AppSettings = props => {
   };
 
   const getOneTimeLocation = item => {
-    console.log('getOneTimeLocation');
     Geolocation.getCurrentPosition(
       position => {
         setLoading(false);
@@ -284,7 +282,6 @@ const AppSettings = props => {
     temp.map(value => {
       return (value.isChecked = value?.id === item?.id ? true : false);
     });
-    console.log('temp', temp);
     dispatch(
       setLocationMode({locationMode: item?.id === '1' ? 'Live' : 'Default'}),
     );

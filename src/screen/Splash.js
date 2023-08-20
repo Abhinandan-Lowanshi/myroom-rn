@@ -58,8 +58,6 @@ export default Splash;
 //           localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
 //             if (res?.data?.usr_id) {
 //               dispatch(getAccountImfo(res));
-//               console.log(res, 'navigation.navigate splash');
-
 //               navigation.dispatch(
 //                 CommonActions.reset({
 //                   index: 0,

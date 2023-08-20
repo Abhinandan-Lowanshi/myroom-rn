@@ -57,9 +57,7 @@ const Login = ({navigation}) => {
     try {
       await GoogleSignin.signOut();
       // Remember to remove the user from your app's state as well
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   };
   const GoogleSingUp = async () => {
     getFCMToken();
@@ -71,7 +69,6 @@ const Login = ({navigation}) => {
     try {
       await GoogleSignin.hasPlayServices();
       await GoogleSignin.signIn().then(result => {
-        console.log(result, 'hasPlayServices');
         if (result?.user) {
           loginSocial(result);
         }
@@ -87,7 +84,6 @@ const Login = ({navigation}) => {
         alert('Google play services not available or outdated !');
         // play services not available or outdated
       } else {
-        console.log(error);
       }
     }
   };
@@ -128,7 +124,6 @@ const Login = ({navigation}) => {
       })
       .catch(error => {
         SetIsLoading(false);
-        console.log(error, 'error');
       });
   };
 
