@@ -12,6 +12,9 @@ import Colors from '../common/Colors';
 import Custom_Image from './Custom_Image';
 import Icon1 from 'react-native-vector-icons/FontAwesome';
 import TimeAgo from 'react-native-timeago';
+import data from '../common/SpinnerData';
+import RatingView from './RatingView';
+
 const RenderRoom = ({
   myRoomList,
   isFromMyPost,
@@ -24,7 +27,40 @@ const RenderRoom = ({
   onPressEdit,
   container,
   flat,
+  horizontal,
 }) => {
+  const LowOpacityText = ({
+    label,
+    container,
+    textLabel,
+    lowOpacityContainer,
+    isTime,
+  }) => {
+    return (
+      <View style={container}>
+        <View style={[[style.lowOpacityContainer, lowOpacityContainer]]}></View>
+        {isTime ? (
+          <TimeAgo style={style.labelLow} time={label} />
+        ) : (
+          <Text style={[style.labelLow, textLabel]}>{label}</Text>
+        )}
+      </View>
+    );
+  };
+
+  const getText = item => {
+    let message = '';
+    if (item?.rm_prking_avblity === data.ROOM_PARKING_AVAILABILITY[0]?.label) {
+      message = 'Parking available';
+    } else if (item?.rm_depndecy === data.ROOM_PARKING_AVAILABILITY[0]?.label) {
+      message = 'Independent Room';
+    } else if (
+      item?.ROOM_STATUS_FR === data.ROOM_PARKING_AVAILABILITY[1]?.label
+    ) {
+      message = item?.ROOM_STATUS_FR;
+    }
+    return message;
+  };
   const renderItem = ({item}) => {
     return (
       <TouchableOpacity
@@ -63,6 +99,48 @@ const RenderRoom = ({
             container={style.imageContainer}
             imageStyle={style.image}
           />
+          <RatingView
+            rating={item?.reviews?.reviewData?.avg}
+            containerStyle={{
+              position: 'absolute',
+              bottom: hp(2),
+              top: null,
+            }}
+          />
+          <View style={style.containerDate}>
+            <LowOpacityText
+              label={item?.rm_size}
+              container={style.containerRent}
+            />
+            <LowOpacityText
+              label={item?.created_at}
+              container={style.containerRent}
+              isTime={true}
+            />
+          </View>
+        </View>
+        <View style={style.containerInfo}>
+          <Text style={style.labelName}>{item?.rm_own_Fullname}</Text>
+          <Text style={style.labelAddress}>
+            {`${item?.rm_house_no} ${item?.rm_colny} ${item?.rm_city}`}
+          </Text>
+          <View style={style.containerBottom}>
+            <LowOpacityText
+              label={item?.rm_availble}
+              lowOpacityContainer={style.containerAvailable}
+              container={style.containerAvailable2}
+              textLabel={style.labelAvailable}
+            />
+            {getText(item) === '' ? null : (
+              <LowOpacityText
+                label={getText(item)}
+                lowOpacityContainer={style.containerOptional}
+                container={style.containerOptional2}
+                textLabel={style.labelAvailable}
+              />
+            )}
+            {true && <Text style={style.labelRent}>₹{item?.rm_rent}</Text>}
+          </View>
         </View>
         {!isFromMyPost && (
           <TouchableOpacity
@@ -78,34 +156,18 @@ const RenderRoom = ({
             />
           </TouchableOpacity>
         )}
-
-        <View style={style.bottomContainer}>
-          <View style={style.rentContainer}>
-            <Text style={style.labelAddress}>
-              {'Address  ' +
-                item?.rm_house_no +
-                ' ' +
-                item?.rm_colny +
-                ' ' +
-                item?.rm_city}
-            </Text>
-            <Text style={style.labelRent}>{`\u20B9${item?.rm_rent}/m`}</Text>
-          </View>
-          <View style={style.containerTime}>
-            <TimeAgo style={style.timestamp} time={item?.created_at} />
-          </View>
-        </View>
       </TouchableOpacity>
     );
   };
   return (
-    <View>
+    <View style={container || {paddingBottom: hp(2)}}>
       <FlatList
         style={flat || {width: '100%'}}
         refreshing={refreshing || false}
         onRefresh={onRefresh}
         data={myRoomList}
         renderItem={renderItem}
+        horizontal={horizontal}
       />
     </View>
   );
@@ -119,28 +181,15 @@ const style = StyleSheet.create({
     marginTop: hp(0.5),
     flexDirection: 'column',
     borderRadius: hp(1),
-    elevation: hp(1),
+    elevation: hp(0.5),
     marginHorizontal: hp(0.2),
     paddingBottom: hp(2),
     marginBottom: hp(1),
-  },
-  rentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  lableRow: {
-    fontSize: RF(1.2),
-    color: Colors.BLACK,
   },
   favImage: {
     right: hp(2),
     top: hp(2),
     position: 'absolute',
-  },
-  containerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: hp(1.1),
   },
   innerContainer: {
     position: 'absolute',
@@ -202,20 +251,15 @@ const style = StyleSheet.create({
   },
   imageContainer: {
     height: hp(25),
-    borderRadius: 100,
-  },
-  bottomContainer: {
-    marginHorizontal: hp(2),
-    // marginTop: hp(1),
-  },
-  labelAddress: {
-    fontSize: RF(1.6),
-    color: 'black',
-    maxWidth: '70%',
   },
   labelRent: {
-    fontSize: RF(2),
     color: 'green',
+    fontSize: hp(2),
+    fontWeight: '700',
+    marginLeft: 5,
+    position: 'absolute',
+    right: 10,
+    alignSelf: 'center',
   },
   timestamp: {
     color: Colors.BLACK,
@@ -231,7 +275,68 @@ const style = StyleSheet.create({
     flex: 1,
     borderTopEndRadius: 7,
     borderTopLeftRadius: 7,
-    borderBottomLeftRadius: hp(3),
-    borderBottomRightRadius: hp(3),
+    borderBottomLeftRadius: hp(1),
+    borderBottomRightRadius: hp(1),
+  },
+  lowOpacityContainer: {
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    backgroundColor: Colors.PRIMARY,
+    opacity: 0.7,
+    borderRadius: 5,
+  },
+  labelLow: {
+    fontSize: RF(1.2),
+    marginHorizontal: 8,
+    marginVertical: 2,
+    color: 'white',
+  },
+  containerRent: {
+    borderRadius: 25,
+    marginLeft: hp(1),
+  },
+  containerInfo: {marginHorizontal: hp(1.5)},
+  labelName: {
+    color: 'black',
+    fontSize: RF(2),
+    fontWeight: '600',
+    marginTop: 5,
+  },
+  labelAddress: {
+    color: 'black',
+    fontSize: RF(1.6),
+    fontWeight: '400',
+    marginLeft: 5,
+  },
+  containerBottom: {
+    width: '100%',
+    flexDirection: 'row',
+    marginTop: 10,
+  },
+  containerAvailable: {
+    backgroundColor: Colors.PRIMARY,
+    opacity: 0.2,
+  },
+  containerAvailable2: {
+    borderRadius: 10,
+  },
+  labelAvailable: {
+    color: 'black',
+    fontSize: 10,
+  },
+  containerOptional: {
+    backgroundColor: Colors.PRIMARY,
+    opacity: 0.2,
+  },
+  containerOptional2: {
+    borderRadius: 10,
+    marginLeft: 20,
+  },
+  containerDate: {
+    position: 'absolute',
+    bottom: hp(2),
+    right: hp(2),
+    flexDirection: 'row',
   },
 });

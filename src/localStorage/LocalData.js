@@ -8,14 +8,14 @@ const setData = async (key, value) => {
   }
 };
 export const clearAllData = () => {
-  AsyncStorage.getAllKeys()
-    .then(keys => AsyncStorage.multiRemove(keys))
-    .then(() => {
-      return true;
-    })
-    .catch(() => {
-      return false;
-    });
+  // AsyncStorage.getAllKeys()
+  //   .then(keys => AsyncStorage.multiRemove(keys))
+  //   .then(() => {
+  //     return true;
+  //   })
+  //   .catch(() => {
+  //     return false;
+  //   });
 };
 const getData = async key => {
   try {
@@ -26,11 +26,11 @@ const getData = async key => {
   }
 };
 
-const localStorageOp = (isSet = false, key, value) => {
+const localStorageOp = async (isSet = false, key, value) => {
   if (isSet) {
     setData(key, value);
   } else {
-    return getData(key);
+    return await getData(key);
   }
 };
 export default localStorageOp;

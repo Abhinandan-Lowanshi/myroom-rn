@@ -1,65 +1,80 @@
 # OSX
+
 #
+
 .DS_Store
 
 # Xcode
+
 #
+
 build/
-*.pbxuser
+_.pbxuser
 !default.pbxuser
-*.mode1v3
+_.mode1v3
 !default.mode1v3
-*.mode2v3
+_.mode2v3
 !default.mode2v3
-*.perspectivev3
+_.perspectivev3
 !default.perspectivev3
 xcuserdata
-*.xccheckout
-*.moved-aside
+_.xccheckout
+_.moved-aside
 DerivedData
-*.hmap
-*.ipa
-*.xcuserstate
-*.pbxproj
+_.hmap
+_.ipa
+_.xcuserstate
+_.pbxproj
 
 # Android/IntelliJ
+
 #
+
 build/
 .idea
 .gradle
 local.properties
-*.iml
+\*.iml
 
 # node.js
+
 #
+
 node_modules/
 npm-debug.log
 yarn-error.log
 .vscode/
 
 # BUCK
+
 buck-out/
 \.buckd/
-*.keystore
+\*.keystore
 !debug.keystore
-!xanaliaKeystore.keystore
-
+!my_release_key.keystore
 
 # fastlane
+
 #
+
 # It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+
 # screenshots whenever they are needed.
+
 # For more information about the recommended setup visit:
+
 # https://docs.fastlane.tools/best-practices/source-control/
 
-*/fastlane/report.xml
-*/fastlane/Preview.html
-*/fastlane/screenshots
+_/fastlane/report.xml
+_/fastlane/Preview.html
+\*/fastlane/screenshots
 
 # Bundle artifact
-*.jsbundle
+
+\*.jsbundle
 
 # CocoaPods
+
 /ios/Pods/
 /yarn.lock
 /package-lock.json

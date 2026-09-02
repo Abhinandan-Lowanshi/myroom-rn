@@ -5,11 +5,12 @@ import UploadNavigator from './Upload';
 import Fav from './Fav';
 import MyAccount from './MyAccount';
 import MapSearch from './MapSearch';
+import ChatList from './Chat/ChatList';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Icon1 from 'react-native-vector-icons/MaterialIcons';
 import Icon2 from 'react-native-vector-icons/MaterialCommunityIcons';
 import Colors from '../common/Colors';
-import {hp} from '../common/CommonFunctions';
+import {RF, hp} from '../common/CommonFunctions';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -22,6 +23,7 @@ import AppLogo from '../component/applogo/AppLogo';
 import {useDispatch, useSelector} from 'react-redux';
 const Tab = createBottomTabNavigator();
 import {setHomeNavigation} from '../redux/Slice';
+import Labels from '../common/labels';
 const TabComponent = ({navigation}) => {
   const loading = useSelector(state => state.AllData.loading);
 
@@ -69,13 +71,17 @@ const TabComponent = ({navigation}) => {
         }}>
         <Tab.Screen
           options={{
-            tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Home',
+            tabBarLabelStyle: {
+              paddingBottom: hp(0.5),
+              justifyContent: 'center',
+              fontSize: RF(1.2),
+            },
+            tabBarLabel: Labels.Home,
             tabBarIcon: ({color, size, focused}) => (
               <Icon
                 name="home"
                 color={focused ? Colors.PRIMARY : Colors.PRIMARYLITE1}
-                size={size}
+                size={hp(3)}
               />
             ),
           }}
@@ -84,13 +90,13 @@ const TabComponent = ({navigation}) => {
         />
         <Tab.Screen
           options={{
-            tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Map',
+            tabBarLabelStyle: {paddingBottom: hp(0.5), fontSize: RF(1.2)},
+            tabBarLabel: Labels.Map,
             tabBarIcon: ({color, size, focused}) => (
               <Icon2
                 name="map-legend"
                 color={focused ? Colors.PRIMARY : Colors.PRIMARYLITE1}
-                size={size}
+                size={hp(3)}
               />
             ),
           }}
@@ -99,13 +105,13 @@ const TabComponent = ({navigation}) => {
         />
         <Tab.Screen
           options={{
-            tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'Upload',
+            tabBarLabelStyle: {paddingBottom: hp(0.5), fontSize: RF(1.2)},
+            tabBarLabel: Labels.Upload,
             tabBarIcon: ({color, size, focused}) => (
               <Icon1
                 name="cloud-upload"
                 color={focused ? Colors.PRIMARYDARK : Colors.PRIMARYLITE1}
-                size={size}
+                size={hp(3)}
               />
             ),
           }}
@@ -127,7 +133,7 @@ const TabComponent = ({navigation}) => {
           name={ScreenName.MyPost}
           component={MyPost}
         /> */}
-        <Tab.Screen
+        {/* <Tab.Screen
           options={{
             tabBarLabelStyle: {paddingBottom: hp(0.5)},
             tabBarLabel: 'Favorite',
@@ -141,16 +147,31 @@ const TabComponent = ({navigation}) => {
           }}
           name={ScreenName.Fav}
           component={Fav}
+        /> */}
+        <Tab.Screen
+          options={{
+            tabBarLabelStyle: {paddingBottom: hp(0.5), fontSize: RF(1.2)},
+            tabBarLabel: Labels.Chat,
+            tabBarIcon: ({color, size, focused}) => (
+              <Icon
+                name="message1"
+                color={focused ? Colors.PRIMARYDARK : Colors.PRIMARYLITE1}
+                size={hp(3)}
+              />
+            ),
+          }}
+          name={ScreenName.ChatList}
+          component={ChatList}
         />
         <Tab.Screen
           options={{
-            tabBarLabelStyle: {paddingBottom: hp(0.5)},
-            tabBarLabel: 'My Account',
+            tabBarLabelStyle: {paddingBottom: hp(0.5), fontSize: RF(1.2)},
+            tabBarLabel: Labels.MyAccount,
             tabBarIcon: ({color, size, focused}) => (
               <Icon2
                 name="account-circle-outline"
                 color={focused ? Colors.PRIMARYDARK : Colors.PRIMARYLITE1}
-                size={size}
+                size={hp(3)}
               />
             ),
           }}

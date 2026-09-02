@@ -19,13 +19,13 @@ import FastImage from 'react-native-fast-image';
 // import Modal from "react-native-modal";
 
 const PopupRoomView = props => {
-  console.log(props?.data);
   const [loading, setLoading] = useState(true);
   return (
     <Modal
       backdropOpacity={0.3}
       activeOpacity={0.9}
       transparent={true}
+      animationType={'slide'}
       style={style.outerContainer}
       visible={props?.visible}>
       <View style={style.parentContainer}>

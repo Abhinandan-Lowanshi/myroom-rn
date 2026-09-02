@@ -5,21 +5,42 @@ import StyleGlobel from '../Style/StyleGlobel';
 import localStorageOp from '../localStorage/LocalData';
 import AsyncKeys from '../localStorage/AsyncKeys';
 import {CommonActions} from '@react-navigation/native';
+import {getAccountImfo, setDevice_token} from '../redux/Slice';
+import {useDispatch} from 'react-redux';
+
 const Splash = ({navigation}) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    localStorageOp('', AsyncKeys.FCMToken, '').then(response => {
+      if (response) {
+        dispatch(setDevice_token(response?.token));
+      }
+    });
+  }, []);
+
   useEffect(() => {
     setTimeout(() => {
       localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
-        if (res?.data?.usr_id)
+        if (res?.data?.usr_id) {
+          dispatch(getAccountImfo(res));
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
               routes: [{name: ScreenName.TabComponent}],
             }),
           );
-        else navigation.navigate(ScreenName.Login);
+        } else {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.Login}],
+            }),
+          );
+        }
       });
     }, 2000);
-  });
+  }, []);
   return (
     <View style={StyleGlobel.containerStyle}>
       <Text style={{fontSize: 20}}>Splash</Text>
@@ -28,3 +49,46 @@ const Splash = ({navigation}) => {
 };
 
 export default Splash;
+
+// useEffect(() => {
+//   localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+//     .then(value => {
+//       if (value) {
+//         setTimeout(() => {
+//           localStorageOp('', AsyncKeys.USERDATA, '').then(res => {
+//             if (res?.data?.usr_id) {
+//               dispatch(getAccountImfo(res));
+//               navigation.dispatch(
+//                 CommonActions.reset({
+//                   index: 0,
+//                   routes: [{name: ScreenName.TabComponent}],
+//                 }),
+//               );
+//             } else {
+//               navigation.dispatch(
+//                 CommonActions.reset({
+//                   index: 0,
+//                   routes: [{name: ScreenName.Login}],
+//                 }),
+//               );
+//             }
+//           });
+//         }, 2000);
+//       } else {
+//         navigation.dispatch(
+//           CommonActions.reset({
+//             index: 0,
+//             routes: [{name: ScreenName.AppSettings}],
+//           }),
+//         );
+//       }
+//     })
+//     .catch(() => {
+//       navigation.dispatch(
+//         CommonActions.reset({
+//           index: 0,
+//           routes: [{name: ScreenName.AppSettings}],
+//         }),
+//       );
+//     });
+// }, []);

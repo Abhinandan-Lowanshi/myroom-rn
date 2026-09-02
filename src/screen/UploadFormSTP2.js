@@ -20,6 +20,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+
 const UploadFormSTP2 = ({navigation}) => {
   const [image, setImage] = React.useState([]);
   const [loading, setIsLoading] = React.useState(false);
@@ -56,6 +58,11 @@ const UploadFormSTP2 = ({navigation}) => {
     });
     setImage(temp);
   };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
   const renderImages = () => {
     return (
       <FlatList
@@ -106,18 +113,22 @@ const UploadFormSTP2 = ({navigation}) => {
       formdata.append('rm_size', uploadData?.rm_size);
       formdata.append('rm_rent', uploadData?.rm_rent);
       formdata.append('rm_flor', uploadData?.rm_flor);
-      formdata.append('rm_latitude', '22.7149');
-      formdata.append('rm_longitude', '75.8899');
+      formdata.append('rm_latitude', uploadData?.rm_latitude);
+      formdata.append('rm_longitude', uploadData?.rm_longitude);
       formdata.append('rm_description', uploadData?.rm_description);
 
       uploadImage(formdata, EndPoints.addRoom, 'POST')
         .then(response => {
           setIsLoading(false);
+          showToast(response?.message);
           if (response.status === true) {
-            navigation.navigate(ScreenName.Upload);
-            console.log(response, 'Response');
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: ScreenName.TabComponent}],
+              }),
+            );
           } else {
-            console.log(response, 'error');
           }
         })
         .catch(error => {

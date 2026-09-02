@@ -14,52 +14,33 @@ import {hp, RF} from '../common/CommonFunctions';
 import data from '../common/SpinnerData';
 import StyleGlobel from '../Style/StyleGlobel';
 import Colors from '../common/Colors';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import C_Button from '../component/C_Button';
 import ScreenName from '../common/ScreenName';
-import {useSelector, useDispatch} from 'react-redux';
-import UploadFormSTP2 from './UploadFormSTP2';
-import Stapper from '../component/Stapper';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {setUploadData} from '../redux/Slice';
-import GetLocationByMap from '../component/GetLocationByMap';
-const Stack = createNativeStackNavigator();
+import {useIsFocused} from '@react-navigation/native';
+import localStorageOp from '../localStorage/LocalData';
+import {uploadImage} from '../networking/ApiFunctions';
+import EndPoints from '../networking/EndPoints';
+import {useSelector} from 'react-redux';
+import Toast from 'react-native-simple-toast';
+import {CommonActions} from '@react-navigation/native';
 
-const UploadNavigator = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}>
-      <Stack.Screen name={ScreenName.Upload} component={Upload} />
-      <Stack.Screen
-        name={ScreenName.UploadFormSTP2}
-        component={UploadFormSTP2}
-      />
-    </Stack.Navigator>
-  );
-};
 const Upload = ({navigation}) => {
-  const dispatch = useDispatch();
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
-  const [name, setName] = useState('');
-  const [nameError, setErrorName] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [mobileNumberError, setMobileNumberError] = useState(false);
   const [roomSize, setRoomSize] = useState('');
-  const [roomSizeError, setRoomSizeError] = useState(false);
   const [furnishedStatus, setFurnishedStatus] = useState('');
-  const [furnishedStatusError, setFurnishedStatusError] = useState(false);
+  const [deposit, setDeposit] = useState('');
+  const [maintenance, setMaintenance] = useState('');
+  const [isDeposit, setIsDeposit] = useState('No');
+  const [isMaintenance, setIsisMaintenance] = useState('No');
   const [parkingStatus, setParkingStatus] = useState('');
-  const [parkingStatusError, setParkingStatusError] = useState(false);
   const [availableStatus, setAvailableStatus] = useState('');
-  const [availableStatusError, etAvailableStatusError] = useState(false);
   const [dependencyStatus, setDependencyStatus] = useState('');
-  const [dependencyStatusError, setDependencyStatusError] = useState(false);
   const [whichFloor, setWhichFloor] = useState('');
   const [whichFloorError, setWhichFloorError] = useState(false);
-  const [roomLocation, setRoomLocation] = useState('');
-  const [roomLocationError, setRoomLocationError] = useState(false);
+  const [depositError, setDepositError] = useState(false);
+  const [maintenanceError, setMaintenanceError] = useState(false);
+  const [roomLocation, setRoomLocation] = useState({});
   const [houseNumber, setHouseNumber] = useState('');
   const [houseNumberError, setHouseNumberError] = useState(false);
   const [rent, setRent] = useState('');
@@ -70,31 +51,36 @@ const Upload = ({navigation}) => {
   const [cityError, setCityError] = useState(false);
   const [description, setDescription] = useState('');
   const [descriptionError, setDescriptionError] = useState(false);
-
+  const isFocused = useIsFocused();
+  const [image, setImage] = useState([]);
+  const [ownerData, setOwnerData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const accountData = useSelector(state => state.AllData.accountData);
   useEffect(() => {
     if (
-      name.length < 4 ||
-      mobileNumber.length < 10 ||
+      accountData?.data?.usr_firstName?.length < 4 ||
+      accountData?.data?.usr_phone?.length < 10 ||
       roomSize.length === 0 ||
       furnishedStatus.length === 0 ||
       availableStatus === 0 ||
       parkingStatus.length === 0 ||
       dependencyStatus.length === 0 ||
       whichFloor.length < 2 ||
-      roomLocation.length < 2 ||
+      Object.keys(roomLocation).length === 0 ||
       rent.length < 3 ||
       houseNumber.length < 1 ||
       colony.length < 2 ||
       city.length < 2 ||
-      description.length < 2
+      description.length < 2 ||
+      image?.length < 1 ||
+      (isDeposit === 'Yes' ? deposit.length < 2 : false) ||
+      (isMaintenance === 'Yes' ? maintenance.length < 2 : false)
     ) {
       setIsSubmitDisabled(true);
     } else {
       setIsSubmitDisabled(false);
     }
   }, [
-    name,
-    mobileNumber,
     roomSize,
     furnishedStatus,
     availableStatus,
@@ -107,32 +93,60 @@ const Upload = ({navigation}) => {
     colony,
     city,
     description,
+    image,
+    deposit,
+    isDeposit,
+    maintenance,
+    isMaintenance,
+    accountData?.data?.usr_firstName,
+    accountData?.data?.usr_phone,
   ]);
 
+  useEffect(() => {
+    if (!isFocused) setRoomLocation({});
+  }, [isFocused]);
+
+  useEffect(() => {
+    localStorageOp('', AsyncKeys.USERDATA, '')
+      .then(data => {
+        if (data?.data) {
+          setOwnerData({
+            name: data?.data?.usr_firstName,
+            mobile: data?.data?.usr_phone,
+          });
+          // setName(data?.data?.usr_firstName);
+          // setMobileNumber(data?.data?.usr_phone);
+        }
+      })
+      .catch(() => {});
+  }, []);
   const nameOnChange = name => {
-    setName(name);
-    if (name !== '' && name.length < 4) {
-      setErrorName(true);
-    } else {
-      setErrorName(false);
-    }
+    // setName(name);
+    // if (name !== '' && name.length < 4) {
+    //   setErrorName(true);
+    // } else {
+    //   setErrorName(false);
+    // }
   };
-  const locationOnChange = location => {
-    setRoomLocation(location);
-    if (location !== '' && location.length < 2) {
-      setRoomLocationError(true);
-    } else {
-      setRoomLocationError(false);
-    }
-  };
+
+  // const locationOnChange = location => {
+  //   setRoomLocation(location);
+  //   if (location !== '' && location.length < 2) {
+  //     setRoomLocationError(true);
+  //   } else {
+  //     setRoomLocationError(false);
+  //   }
+  // };
+
   const houseNumberOnChange = houseNumber => {
     setHouseNumber(houseNumber);
-    if (houseNumber !== '' && houseNumber.length < 1) {
+    if (houseNumber !== '' && houseNumber.length < 2) {
       setHouseNumberError(true);
     } else {
       setHouseNumberError(false);
     }
   };
+
   const cityOnChange = city => {
     setCity(city);
     if (city !== '' && city.length < 2) {
@@ -141,6 +155,7 @@ const Upload = ({navigation}) => {
       setCityError(false);
     }
   };
+
   const descriptionOnChange = description => {
     setDescription(description);
     if (description !== '' && description.length < 2) {
@@ -149,6 +164,7 @@ const Upload = ({navigation}) => {
       setDescriptionError(false);
     }
   };
+
   const colonyOnChange = colony => {
     setColony(colony);
     if (colony !== '' && colony.length < 2) {
@@ -157,6 +173,7 @@ const Upload = ({navigation}) => {
       setColonyError(false);
     }
   };
+
   const rentOnChange = rent => {
     setRent(rent);
     if (rent !== '' && rent.length < 3) {
@@ -165,12 +182,31 @@ const Upload = ({navigation}) => {
       setRentError(false);
     }
   };
+
   const onWhichFloorOnChange = whichFloor => {
     setWhichFloor(whichFloor);
     if (whichFloor !== '' && whichFloor.length < 2) {
       setWhichFloorError(true);
     } else {
       setWhichFloorError(false);
+    }
+  };
+
+  const onChangeDeposit = deposit => {
+    setDeposit(deposit);
+    if (deposit !== '' && deposit.length < 2) {
+      setDepositError(true);
+    } else {
+      setDepositError(false);
+    }
+  };
+
+  const onChangeMaintenance = maintenance => {
+    setMaintenance(maintenance);
+    if (maintenance !== '' && maintenance.length < 2) {
+      setMaintenanceError(true);
+    } else {
+      setMaintenanceError(false);
     }
   };
 
@@ -181,96 +217,241 @@ const Upload = ({navigation}) => {
           style={{
             fontSize: RF(1.6),
             color: Colors.BLACK,
-            marginTop: hp(1),
           }}>
           {props?.label}
         </Text>
         <Text
           style={{
-            width: '40%',
+            width: '60%',
             fontSize: RF(1.6),
             color: Colors.WHITE,
-            marginTop: hp(0.3),
             backgroundColor: Colors.PRIMARYLITE,
             borderRadius: 3,
             padding: hp(1),
           }}>
-          0.0510502
+          {props.coordinate}
         </Text>
       </View>
     );
   };
-  const onNextPress = () => {
-    let data = {
-      rm_usr_fkey: 2,
-      rm_own_Fullname: name,
-      rm_own_mble_num: mobileNumber,
-      rm_size: roomSize,
-      rm_furnisd_status: furnishedStatus,
-      rm_availble: availableStatus,
-      rm_prking_avblity: parkingStatus,
-      rm_depndecy: dependencyStatus,
-      rm_flor: whichFloor,
-      rm_rent: rent,
-      rm_house_no: houseNumber,
-      rm_colny: colony,
-      rm_city: city,
-      rm_state: '',
-      rm_latitude: '22.7149',
-      rm_longitude: '75.8899',
-      rm_description: description,
-    };
-    dispatch(setUploadData(data));
-    navigation.navigate(ScreenName.UploadFormSTP2);
+
+  const onMapData = value => {
+    setRoomLocation(value);
   };
-  const mobileNumberOnChange = mobileNumber => {
-    setMobileNumber(mobileNumber);
-    if (mobileNumber !== '' && mobileNumber.length < 10) {
-      setMobileNumberError(true);
-    } else {
-      setMobileNumberError(false);
+
+  const handleMap = () => {
+    navigation.navigate(ScreenName.GetLocationByMap, {onMapData, roomLocation});
+  };
+
+  const openCamera = async () => {
+    let options = {
+      title: 'Select Image',
+      customButtons: [
+        {
+          name: 'customOptionKey',
+          title: 'Choose Photo from Custom Option',
+        },
+      ],
+      storageOptions: {
+        skipBackup: true,
+        path: 'images',
+      },
+      selectionLimit: 0,
+    };
+    await launchImageLibrary(options, response => {
+      let imageData = response?.assets;
+      let temp = [...image];
+      imageData?.forEach(item => {
+        if (!image.some(data => data.fileName === item.fileName))
+          temp.push(item);
+      });
+      setImage(temp);
+    });
+  };
+  const RemoveFile = data => {
+    let temp = image.filter(item => {
+      return item.fileName !== data.fileName;
+    });
+    setImage(temp);
+  };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
+  const uploadRoom = async () => {
+    try {
+      if (image?.length > 1) {
+        var userData = await localStorageOp(false, AsyncKeys.USERDATA, '');
+        const formdata = new FormData();
+        image?.forEach(item => {
+          formdata.append('Images', {
+            uri: item?.uri,
+            name: item?.fileName,
+            type: item?.type,
+          });
+        });
+        formdata.append('rm_usr_fkey', userData?.data?.usr_id);
+        formdata.append('rm_own_Fullname', accountData?.data?.usr_firstName);
+        formdata.append('rm_own_mble_num', accountData?.data?.usr_phone);
+        formdata.append('rm_furnisd_status', furnishedStatus);
+        formdata.append('rm_availble', availableStatus);
+        formdata.append('rm_prking_avblity', parkingStatus);
+        formdata.append('rm_depndecy', dependencyStatus);
+        formdata.append('rm_colny', colony);
+        formdata.append('rm_house_no', houseNumber);
+        formdata.append('rm_city', city);
+        formdata.append('rm_state', '');
+        formdata.append('rm_size', roomSize);
+        formdata.append('rm_rent', rent);
+        formdata.append('rm_flor', whichFloor);
+        formdata.append('deposit', isDeposit === 'Yes' ? deposit : '');
+        formdata.append(
+          'monthly_maintain',
+          isMaintenance === 'Yes' ? maintenance : '',
+        );
+        formdata.append('rm_latitude', roomLocation?.latitude);
+        formdata.append('rm_longitude', roomLocation?.longitude);
+        formdata.append('rm_description', description);
+        setIsLoading(true);
+
+        uploadImage(formdata, EndPoints.addRoom, 'POST')
+          .then(response => {
+            setIsLoading(false);
+            showToast(response?.message);
+            if (response?.status === true) {
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{name: ScreenName.TabComponent}],
+                }),
+              );
+            } else {
+            }
+          })
+          .catch(error => {
+            setIsLoading(false);
+          });
+      }
+    } catch {
+      setIsLoading(false);
     }
   };
+
+  const renderImages = () => {
+    return (
+      <FlatList
+        data={image}
+        contentContainerStyle={{paddingBottom: hp(2)}}
+        renderItem={({item}) => {
+          return (
+            <View style={style.containerImage}>
+              <Image source={{uri: item.uri}} style={style.imageStyle}></Image>
+              <View style={style.imageContainer}>
+                <Text style={{color: 'black', fontSize: 11}}>
+                  {item.fileName}
+                </Text>
+              </View>
+              <TouchableOpacity
+                disabled={isLoading}
+                onPress={() => RemoveFile(item)}
+                style={style.containerRemove}>
+                <Text style={style.labelRemove}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          );
+        }}></FlatList>
+    );
+  };
+
+  const navigateToEditProfile = () => {
+    navigation.navigate(ScreenName.EditProfile);
+  };
+
   return (
     <ScrollView style={StyleGlobel.containerStyle}>
       <View style={{marginBottom: hp(2)}}>
-        <Stapper fromSTP1={true} />
         <CustomInputText
+          disabled
           onChangeText={nameOnChange}
-          value={name}
+          value={accountData?.data?.usr_firstName}
           maxLength={30}
-          error={nameError}
           outerContainer={style.outerContainer}
-          placeholder={'Enter Name'}
+          placeholder={'Name'}
           errorMessage={'Enter valid Name'}
         />
         <CustomInputText
+          disabled
           maxLength={10}
           isNumeric={true}
-          onChangeText={mobileNumberOnChange}
-          value={mobileNumber}
-          error={mobileNumberError}
-          placeholder={'Enter Mobile Number'}
-          errorMessage={'Invalid Mobile Number'}
+          value={accountData?.data?.usr_phone}
+          placeholder={'Mobile Number'}
+          errorMessage={'Please add phone number to profile, tab to add'}
+          error={accountData?.data?.usr_phone ? false : true}
+          onPress={navigateToEditProfile}
+          onPressEnable
         />
 
         <CustomPicker
+          isLoading={isLoading}
           container={style.pickerstyle}
           onItemChange={value => setRoomSize(value?.value)}
           placeholder={'Select'}
-          labelTop={'Select room size'}
+          labelTop={'Room size'}
           data={data.ROOM_SIZE}
         />
 
         <CustomPicker
-          labelTop={'Select Furnished status'}
+          isLoading={isLoading}
+          labelTop={'Furnished status'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setFurnishedStatus(value?.value)}
           data={data.ROOM_STATUS_FR}
         />
         <CustomPicker
-          labelTop={'Select availability of room'}
+          value={isDeposit}
+          isLoading={isLoading}
+          labelTop={'Is deposit applicable'}
+          placeholder={'Select'}
+          container={style.pickerstyle}
+          onItemChange={value => setIsDeposit(value?.value)}
+          data={data.ROOM_PARKING_AVAILABILITY}
+        />
+        {isDeposit === 'Yes' && (
+          <CustomInputText
+            onChangeText={onChangeDeposit}
+            maxLength={10}
+            isNumeric={true}
+            value={deposit}
+            placeholder={'Deposit Amount'}
+            errorMessage={'Invalid Deposit Amount'}
+            error={depositError}
+          />
+        )}
+        <CustomPicker
+          value={isMaintenance}
+          isLoading={isLoading}
+          labelTop={'Is monthly isMaintenance applicable'}
+          placeholder={'Select'}
+          container={style.pickerstyle}
+          onItemChange={value => setIsisMaintenance(value?.value)}
+          data={data.ROOM_PARKING_AVAILABILITY}
+        />
+        {isMaintenance === 'Yes' && (
+          <CustomInputText
+            onChangeText={onChangeMaintenance}
+            maxLength={10}
+            isNumeric={true}
+            value={maintenance}
+            placeholder={'Maintenance Amount'}
+            errorMessage={'Invalid Maintenance Amount'}
+            error={maintenanceError}
+          />
+        )}
+        <CustomPicker
+          isLoading={isLoading}
+          labelTop={'Availability of room'}
           placeholder={'Select'}
           container={style.pickerstyle}
           onItemChange={value => setAvailableStatus(value?.value)}
@@ -278,137 +459,156 @@ const Upload = ({navigation}) => {
         />
 
         <CustomPicker
+          isLoading={isLoading}
           container={style.pickerstyle}
           placeholder={'Select'}
-          labelTop={'Select parking availability of room'}
+          labelTop={'Parking availability of room'}
           onItemChange={value => setParkingStatus(value?.value)}
           data={data.ROOM_PARKING_AVAILABILITY}
         />
 
         <CustomPicker
+          isLoading={isLoading}
           container={style.pickerstyle}
           placeholder={'Select'}
-          labelTop={'Select independency of room'}
+          labelTop={'Independency of room'}
           onItemChange={value => setDependencyStatus(value?.value)}
           data={data.ROOM_DEPENDENT_STATUS}
         />
 
         <CustomInputText
+          disabled={isLoading}
           onChangeText={onWhichFloorOnChange}
           value={whichFloor}
           maxLength={20}
           outerContainer={style.outerContainer}
           error={whichFloorError}
-          placeholder={'On which floor'}
+          placeholder={'floor'}
           errorMessage={'Enter floor'}
         />
 
-        <TouchableOpacity
-          style={{
-            // justifyContent: 'center',
-            alignSelf: 'center',
-            width: '90%',
-            backgroundColor: Colors.GREY1,
-            paddingLeft: hp(2),
-            backgroundColor: 'white',
-            elevation: 3,
-            borderColor: false ? Colors.RED : Colors.GREY,
-            borderRadius: hp(1),
-            borderWidth: hp(0.2),
-            marginTop: hp(1),
-            paddingBottom: hp(1.7),
-          }}>
-          <Text
-            style={{
-              fontSize: RF(1.6),
-              color: Colors.BLACK,
-              marginTop: hp(1),
-              alignSelf: 'center',
-            }}>
-            Tap to add room location for better room finding
-          </Text>
-          <CoordinateView label={'Latitude'} />
-          <CoordinateView label={'Longitude'} />
-        </TouchableOpacity>
-        <Text style={style.labelHouseNoMessage}>
-          Don't worry if your house number shows wrong.
-        </Text>
-        {/* <CustomInputText
-          onChangeText={locationOnChange}
-          value={roomLocation}
-          maxLength={100}
-          outerContainer={style.outerContainer}
-          error={roomLocationError}
-          placeholder={'Room Location'}
-          errorMessage={'Enter Room Location'}
-        /> */}
         <CustomInputText
+          disabled={isLoading}
           onChangeText={rentOnChange}
           value={rent}
           maxLength={12}
           outerContainer={style.outerContainer}
           error={rentError}
           isNumeric={true}
-          placeholder={'Enter Rent'}
+          placeholder={'Rent'}
           errorMessage={'Enter Rent'}
         />
         <CustomInputText
+          disabled={isLoading}
           maxLength={30}
           onChangeText={houseNumberOnChange}
           value={houseNumber}
           outerContainer={style.outerContainer}
           error={houseNumberError}
-          placeholder={'Enter House Number'}
+          placeholder={'House Number'}
           errorMessage={'Enter House Number'}
         />
 
         <CustomInputText
+          disabled={isLoading}
           maxLength={30}
           onChangeText={colonyOnChange}
           value={colony}
           outerContainer={style.outerContainer}
           error={colonyError}
-          placeholder={'Enter Colony'}
+          placeholder={'Colony'}
           errorMessage={'Enter Colony'}
         />
         <CustomInputText
+          disabled={isLoading}
           maxLength={30}
           onChangeText={cityOnChange}
           value={city}
           outerContainer={style.outerContainer}
           error={cityError}
-          placeholder={'Enter City'}
+          placeholder={'City'}
           errorMessage={'Enter City'}
         />
         <CustomInputText
+          disabled={isLoading}
           multiline={true}
           maxLength={300}
           onChangeText={descriptionOnChange}
           value={description}
           InputTextStyleP={style.InputTextStyle}
           error={descriptionError}
-          placeholder={'Enter Description'}
+          placeholder={'Description'}
           errorMessage={'Enter Description'}
         />
+        <TouchableOpacity
+          disabled={isLoading}
+          style={{
+            width: '90%',
+            justifyContent: 'center',
+            alignSelf: 'center',
+            flexDirection: 'column',
+            backgroundColor:
+              Object.keys(roomLocation).length !== 0
+                ? Colors.PRIMARY
+                : Colors.PRIMARYLITE1,
+            borderRadius: hp(1),
+            paddingVertical: hp(1),
+            paddingHorizontal: hp(2),
+            marginTop: hp(1),
+          }}
+          onPress={handleMap}>
+          <Text
+            style={{
+              fontSize: RF(1.6),
+              color: Colors.WHITE,
+              alignSelf: 'center',
+            }}>
+            {Object.keys(roomLocation).length !== 0
+              ? 'Location Added'
+              : 'Tap to add room location for better room finding'}
+          </Text>
+
+          {Object.keys(roomLocation).length !== 0 && (
+            <CoordinateView
+              coordinate={roomLocation?.latitude}
+              label={'Latitude'}
+            />
+          )}
+          {Object.keys(roomLocation).length !== 0 && (
+            <CoordinateView
+              coordinate={roomLocation?.longitude}
+              label={'Longitude'}
+            />
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          disabled={isLoading}
+          onPress={() => openCamera()}
+          style={style.uploadContainer}>
+          <Text style={style.labelUpload}>Upload photos of the residence</Text>
+          <Text style={style.labelLimit}>
+            Note : Upload minimum 2 and maximum 9 photos.
+          </Text>
+        </TouchableOpacity>
+        {renderImages()}
 
         <C_Button
-          isLoading={false}
-          onPress={() => onNextPress()}
-          // outerContainer={style.outerContainer}
+          isLoading={isLoading}
+          onPress={uploadRoom}
           isSubmitDisabled={isSubmitDisabled}
-          label={'Next'}
+          label={'Upload'}
         />
       </View>
     </ScrollView>
   );
 };
 
-export default UploadNavigator;
+export default Upload;
 
 const style = StyleSheet.create({
   pickerstyle: {
     elevation: 5,
-    // marginTop: hp(2.3),
   },
   outerContainer: {
     marginTop: hp(1),
@@ -423,5 +623,64 @@ const style = StyleSheet.create({
     fontSize: RF(1.3),
     marginLeft: hp(3),
     marginTop: hp(1),
+  },
+  labelLimit: {
+    color: Colors.BLACK,
+    fontSize: RF(1.2),
+  },
+  uploadContainer: {
+    height: hp(10),
+    marginHorizontal: hp(3),
+    marginTop: hp(2),
+    elevation: 5,
+    backgroundColor: Colors.WHITE,
+    borderRadius: hp(0.5),
+    borderColor: Colors.GREY,
+    borderWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  labelUpload: {
+    color: Colors.BLACK,
+    fontSize: RF(2.2),
+  },
+  labelRemove: {
+    color: 'red',
+    fontSize: 13,
+  },
+  containerRemove: {
+    marginRight: 10,
+  },
+  imageStyle: {
+    width: 40,
+    height: 40,
+    marginLeft: 10,
+    elevation: 10,
+    borderRadius: 5,
+    marginVertical: 2,
+  },
+  outerContainer: {
+    marginTop: hp(1),
+  },
+  labelHouseNoMessage: {
+    color: Colors.BLACK1,
+    fontSize: RF(1.3),
+    marginLeft: hp(3),
+    marginTop: hp(1),
+  },
+  imageContainer: {
+    flex: 1,
+    alignSelf: 'center',
+    marginHorizontal: 8,
+  },
+  containerImage: {
+    backgroundColor: Colors.WHITE,
+    marginTop: 5,
+    elevation: 5,
+    paddingVertical: 5,
+    marginHorizontal: hp(3),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: hp(0.2),
   },
 });

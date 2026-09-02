@@ -11,6 +11,10 @@ import ErrorModal from '../component/ErrorModal';
 import ScreenName from '../common/ScreenName';
 import localStorageOp from '../localStorage/LocalData';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import {getAccountImfo} from '../redux/Slice';
+import {useDispatch} from 'react-redux';
+import {CommonActions} from '@react-navigation/native';
+import {styles} from 'react-native-image-slider-banner/src/style';
 
 const EmailVerify = ({navigation}) => {
   const signInData = useSelector(state => state.AllData.signInData);
@@ -20,7 +24,7 @@ const EmailVerify = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
   const [apiError, setApiError] = useState(false);
-
+  const dispatch = useDispatch();
   const SignUp = () => {
     setLoading(true);
     sendRequest(
@@ -34,8 +38,14 @@ const EmailVerify = ({navigation}) => {
             .then(response => {
               setLoading(false);
               if (response.status === true) {
-                localStorageOp(true, AsyncKeys.USERDATA, response.data);
-                navigation.navigate(ScreenName.TabComponent);
+                localStorageOp(true, AsyncKeys.USERDATA, response);
+                dispatch(getAccountImfo(response));
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: ScreenName.TabComponent}],
+                  }),
+                );
               } else {
                 setApiError('Something went wrong');
                 setLoading(false);
@@ -45,7 +55,7 @@ const EmailVerify = ({navigation}) => {
               setLoading(false);
             });
         } else {
-          setApiError('Something went wrong');
+          setApiError(response?.message);
           setLoading(false);
         }
       })
@@ -75,9 +85,15 @@ const EmailVerify = ({navigation}) => {
         onPress={() => {
           setApiError('');
         }}
+        header={'Opps!'}
         label={apiError}
         visible={apiError ? true : false}></ErrorModal>
-      <CustomInputText value={signInData.email} disabled={true} />
+      <View style={styles.containerStyle} />
+      <CustomInputText
+        value={signInData.email}
+        disabled={true}
+        placeholder={'Email'}
+      />
       <CustomInputText
         error={otpError}
         maxLength={6}
@@ -85,7 +101,7 @@ const EmailVerify = ({navigation}) => {
         errorMessage={errorMessage}
         value={otp}
         onChangeText={otpOnChange}
-        placeholder={'Enter 6 digit otp'}
+        placeholder={'6 digit otp'}
       />
       <C_Button
         onPress={SignUp}

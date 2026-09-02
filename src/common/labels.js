@@ -17,5 +17,17 @@ const Labels = {
   RESET: 'RESET',
   ALL: 'ALL',
   Notification: 'Notification',
+  RoomLocation: 'Room Location',
+  AppSettings: 'App Settings',
+  Favourite: 'Favourite',
+  MyPost: 'My Post',
+  Chat: 'Chat',
+  Upload: 'Upload',
+  Map: 'Map',
+  Profile: 'Profile',
+  AllRooms: 'All Rooms  ',
+  defaultLocation: 'Default Location',
+  Review: 'Review',
+  Route: 'Route',
 };
 export default Labels;

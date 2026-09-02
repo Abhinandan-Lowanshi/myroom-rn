@@ -17,6 +17,17 @@ export const slice = createSlice({
     isFavUpdate: false,
     searchRooms: {},
     roomDataHome: [],
+    roomLocation: {},
+    isMapVisited: false,
+    searchUpdate: false,
+    currentLocationName: '',
+    filteredData: '',
+    gpsStatus: 'true',
+    LocationMode: '',
+    OwnerData: {},
+    reviews: {},
+    device_token: '',
+    filterData: [],
   },
   reducers: {
     startL: (state, actions) => {
@@ -58,6 +69,39 @@ export const slice = createSlice({
     searchRooms: (state, actions) => {
       state.searchRooms = actions.payload;
     },
+    roomLocationOP: (state, actions) => {
+      state.roomLocation = actions.payload;
+    },
+    isMapVisited: (state, actions) => {
+      state.isMapVisited = actions.payload;
+    },
+    searchUpdate: (state, actions) => {
+      state.searchUpdate = actions.payload;
+    },
+    currentLocationName: (state, actions) => {
+      state.currentLocationName = actions.payload;
+    },
+    filteredData: (state, actions) => {
+      state.filteredData = actions.payload;
+    },
+    gpsStatus: (state, actions) => {
+      state.gpsStatus = actions.payload;
+    },
+    LocationMode: (state, actions) => {
+      state.LocationMode = actions.payload;
+    },
+    OwnerData: (state, actions) => {
+      state.OwnerData = actions.payload;
+    },
+    reviews: (state, actions) => {
+      state.reviews = actions.payload;
+    },
+    device_token: (state, actions) => {
+      state.device_token = actions.payload;
+    },
+    filterData: (state, actions) => {
+      state.filterData = actions.payload;
+    },
   },
 });
 
@@ -75,6 +119,17 @@ export const {
   isHomeUpdate,
   isFavUpdate,
   searchRooms,
+  roomLocationOP,
+  isMapVisited,
+  searchUpdate,
+  currentLocationName,
+  filteredData,
+  gpsStatus,
+  LocationMode,
+  OwnerData,
+  reviews,
+  device_token,
+  filterData,
 } = slice.actions;
 
 export const startLoader = () => dispatch => {
@@ -118,6 +173,40 @@ export const updateFav = data => dispatch => {
 };
 export const setSearchRoomData = data => dispatch => {
   dispatch(searchRooms(data));
+};
+export const setRoomLocation = data => dispatch => {
+  dispatch(roomLocationOP(data));
+};
+export const setIsMapVisited = data => dispatch => {
+  dispatch(isMapVisited(data));
+};
+export const setSearchUpdate = data => dispatch => {
+  dispatch(searchUpdate(data));
+};
+export const setCurrentLocationName = data => dispatch => {
+  dispatch(currentLocationName(data));
+};
+
+export const setFilteredData = data => dispatch => {
+  dispatch(filteredData(data));
+};
+export const setGPSStatus = data => dispatch => {
+  dispatch(gpsStatus(data));
+};
+export const setLocationMode = data => dispatch => {
+  dispatch(LocationMode(data));
+};
+export const setOwnerData = data => dispatch => {
+  dispatch(OwnerData(data));
+};
+export const setReviews = data => dispatch => {
+  dispatch(reviews(data));
+};
+export const setDevice_token = data => dispatch => {
+  dispatch(device_token(data));
+};
+export const setFilterData = data => dispatch => {
+  dispatch(filterData(data));
 };
 
 export default slice.reducer;

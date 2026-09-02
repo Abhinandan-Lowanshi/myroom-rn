@@ -6,6 +6,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import TimeAgo from 'react-native-timeago';
 import Colors from '../common/Colors';
@@ -17,10 +18,21 @@ import EndPoints from '../networking/EndPoints';
 import StyleGlobel from '../Style/StyleGlobel';
 import ScreenName from '../common/ScreenName';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import {favFunction} from '../common/APIFunctions';
+import {useDispatch, useSelector} from 'react-redux';
+import Toast from 'react-native-simple-toast';
+import {setFilteredData, setRoomDataHome} from '../redux/Slice';
+import images from '../common/images';
+import {logout} from '../component/LogOut';
 
 const Notification = ({route, navigation}) => {
   const [notification, setNotification] = useState([]);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const roomDataHome = useSelector(state => state.AllData.roomDataHome);
+  const filteredData = useSelector(state => state.AllData.filteredData);
+  const accountData = useSelector(state => state.AllData.accountData);
+
   useEffect(() => {
     getNotification();
   }, []);
@@ -29,17 +41,22 @@ const Notification = ({route, navigation}) => {
     setLoading(true);
     sendRequest(
       {
-        id: 4,
+        id: accountData?.data?.usr_id,
       },
       EndPoints.getNotification,
       'POST',
     )
       .then(res => {
-        setLoading(false);
         if (res.status === true) {
-          if (res.data.length) {
-            setNotification(res.data);
-            console.log(res.data);
+          setLoading(false);
+          if (res.status === true) {
+            if (res.data.length) {
+              setNotification(res.data);
+            }
+          }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
           }
         }
       })
@@ -60,16 +77,81 @@ const Notification = ({route, navigation}) => {
           });
         }}>
         <View style={style.containerTitle}>
-          <View style={style.dot} />
-          <Text style={style.labelTitle}>{item?.payload?.title}</Text>
+          {/* <View style={style.dot} /> */}
+          <Image style={style.ownerImage} source={images.profileIcon}></Image>
+          <View style={style.containerMessage}>
+            <Text style={style.labelTitle}>{item?.payload?.title}</Text>
+            <TimeAgo style={style.labelTime} time={item?.createdAt} />
+          </View>
         </View>
-        <TimeAgo style={style.labelTime} time={item?.createdAt} />
         <View style={style.line} />
       </TouchableOpacity>
     );
   };
-  const onPressFav = () => {};
 
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
+  };
+
+  const performFavOp = data => {
+    let temp = JSON.parse(JSON.stringify(roomDataHome));
+    temp.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
+    let tempFil = JSON.parse(JSON.stringify(filteredData));
+    tempFil.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
+
+    dispatch(setRoomDataHome(temp));
+    dispatch(setFilteredData(tempFil));
+  };
+
+  const onPressFav = async value1 => {
+    let value = {...value1};
+    let data = {
+      user_id: 2,
+      room_id: value?.roomId,
+      fav_type: value?.like === true ? 1 : 0,
+    };
+    performFavOp(value);
+
+    try {
+      const response = await favFunction(data);
+      if (response.status === true) {
+        if (
+          response?.message === 'Room removed to favorite list successfully.' ||
+          response?.message === 'Room added to favorite list successfully.'
+        ) {
+          showToast(response?.message);
+          return true;
+        } else {
+          performFavOp({
+            ...value,
+            like: value?.like === true ? false : true,
+          });
+          return false;
+        }
+      } else {
+        performFavOp({
+          ...value,
+          like: value?.like === true ? false : true,
+        });
+        showToast(response?.message);
+        return false;
+      }
+    } catch (error) {
+      performFavOp({
+        ...value,
+        like: value?.like === true ? false : true,
+      });
+      return false;
+    }
+  };
   return (
     <SafeAreaView style={StyleGlobel.containerStyle}>
       <Header label={Labels?.Notification} navigation={navigation} />
@@ -87,13 +169,15 @@ const style = StyleSheet.create({
   },
   labelTitle: {
     color: Colors.BLACK,
-    marginLeft: hp(1),
     fontSize: RF(1.8),
+    marginLeft: hp(0.5),
   },
   labelTime: {
     color: Colors.BLACK,
-    marginLeft: hp(3),
     marginBottom: hp(1),
+    fontSize: RF(1.2),
+    marginLeft: hp(0.5),
+    // alignSelf: 'flex-end',
   },
   containerTitle: {
     flexDirection: 'row',
@@ -108,5 +192,14 @@ const style = StyleSheet.create({
   line: {
     height: hp(0.1),
     backgroundColor: Colors.GREY1,
+  },
+  ownerImage: {
+    height: hp(6),
+    width: hp(6),
+    borderRadius: hp(90),
+  },
+  containerMessage: {
+    alignSelf: 'center',
+    flex: 1,
   },
 });

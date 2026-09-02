@@ -13,40 +13,41 @@ import DeleteConformation from '../component/DeleteConformation';
 import {clearAllData} from '../localStorage/LocalData';
 import {CommonActions} from '@react-navigation/native';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Labels from '../common/labels';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import images from '../common/images';
+import {logout} from '../component/LogOut';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 const MyAccount = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const accountData = useSelector(state => state.AllData.accountData);
   const dispatch = useDispatch();
-  useEffect(() => {
-    setLoading(true);
-    sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
-      .then(res => {
-        setLoading(false);
-        if (res.status === true) {
-          dispatch(getAccountImfo(res.data));
-        }
-      })
-      .catch(e => {
-        setLoading(false);
-      });
-  }, []);
-
-  const logout = () => {
-    setVisible(false);
-    if (clearAllData()) {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: ScreenName.Login}],
-        }),
-      );
-    } else {
-      Alert('Something went wrong');
-    }
+  // useEffect(() => {
+  //   setLoading(true);
+  //   sendRequest({user_id: 'Dummy'}, EndPoints.myAccountDetails, 'POST')
+  //     .then(res => {
+  //       setLoading(false);
+  //       if (res.status === true) {
+  //         dispatch(getAccountImfo(res.data));
+  //       } else {
+  // if (response?.message === 'Invalid authentication.') {
+  //   setVisible(false);
+  //   logout(navigation);
+  // }
+  //     })
+  //     .catch(e => {
+  //       setLoading(false);
+  //     });
+  // }, []);
+  // Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      // Remember to remove the user from your app's state as well
+    } catch (error) {}
   };
-
   return (
     <ScrollView style={{flex: 1, backgroundColor: 'white'}}>
       {loading && <LowOpacityLoader />}
@@ -58,7 +59,11 @@ const MyAccount = ({navigation}) => {
           visible={visible}
           confirmationMessage={'Are you sure you want to  '}
           confirmationMessageHigh={'logout?'}
-          onPressPositive={logout}
+          onPressPositive={() => {
+            signOut();
+            logout(navigation);
+            setVisible(false);
+          }}
           closeModal={() => {
             // setError('');
             setVisible(false);
@@ -68,26 +73,23 @@ const MyAccount = ({navigation}) => {
           }}
         />
         <View style={styles.profileContainer}>
-          <Image
-            style={styles.profileImage}
-            source={{
-              uri: 'https://source.unsplash.com/user/c_v_r/1900x800',
-            }}
-          />
+          <Image style={styles.profileImage} source={images.profileIcon} />
           <View style={styles.personalInfoCTNR}>
             <Text style={styles.labelPersonal}>
-              {accountData?.usr_firstName}
+              {accountData?.data?.usr_firstName}
             </Text>
-            <Text style={styles.labelPersonal}>{accountData?.usr_email}</Text>
+            <Text style={styles.labelPersonal}>
+              {accountData?.data?.usr_email}
+            </Text>
           </View>
         </View>
 
         <View style={styles.staticsContainer}>
-          {accountData?.usr_phone && (
+          {accountData?.data?.usr_phone && (
             <View style={styles.staticsInnerContainer}>
               <Text style={styles.labelPersonalText(true)}>Phone number</Text>
               <Text style={styles.labelInnerContainer}>
-                {accountData?.usr_phone}
+                {accountData?.data?.usr_phone}
               </Text>
             </View>
           )}
@@ -98,13 +100,19 @@ const MyAccount = ({navigation}) => {
         </View>
         <AccountTouchableCom
           onPress={() => {
-            navigation.navigate(ScreenName.MyPost);
+            navigation.navigate(ScreenName.Fav);
           }}
-          label={'My Post'}
-          type={ScreenName.MyPost}
+          label={Labels.Favourite}
+          type={ScreenName.Fav}
           outerContainer={styles.outerContainer}
         />
-        <AccountTouchableCom label={'Settings'} type={ScreenName.Settings} />
+        <AccountTouchableCom
+          onPress={() => {
+            navigation.navigate(ScreenName.MyPost);
+          }}
+          label={Labels.MyPost}
+          type={ScreenName.MyPost}
+        />
         <AccountTouchableCom
           onPress={() => {
             navigation.navigate(ScreenName.EditProfile);
@@ -112,14 +120,38 @@ const MyAccount = ({navigation}) => {
           label={'Edit Profile'}
           type={ScreenName.EditProfile}
         />
+        {accountData?.data?.loginType !== 'google' && (
+          <AccountTouchableCom
+            onPress={() => {
+              navigation.navigate(ScreenName.changePassword);
+            }}
+            label={'Change Password'}
+            type={ScreenName.changePassword}
+          />
+        )}
         <AccountTouchableCom
+          label={'App Settings'}
+          type={ScreenName.Settings}
           onPress={() => {
-            navigation.navigate(ScreenName.changePassword);
+            navigation.navigate(ScreenName.AppSettings, {isHideBack: true});
           }}
-          label={'Change Password'}
-          type={ScreenName.changePassword}
         />
-        <AccountTouchableCom label={'Contact Us'} type={ScreenName.ContactUs} />
+
+        <AccountTouchableCom
+          label={'About Us'}
+          type={ScreenName.AboutUs}
+          onPress={() => {
+            navigation.navigate(ScreenName.AboutUs, {isHideBack: true});
+          }}
+        />
+
+        {/* <AccountTouchableCom
+          label={'Privacy Policy'}
+          type={ScreenName.PrivacyPolicy}
+          onPress={() => {
+            navigation.navigate(ScreenName.PrivacyPolicy, {isHideBack: true});
+          }}
+        /> */}
         <AccountTouchableCom
           label={'Logout'}
           type={ScreenName.Logout}
@@ -167,7 +199,7 @@ const styles = StyleSheet.create({
     marginLeft: hp(2),
   },
   labelPersonalText: isContaint => ({
-    fontSize: RF(2),
+    fontSize: RF(1.6),
     color: 'black',
     fontWeight: isContaint ? '700' : '600',
   }),
@@ -178,6 +210,7 @@ const styles = StyleSheet.create({
   labelInnerContainer: {
     flexDirection: 'row',
     color: 'black',
+    fontSize: RF(1.6),
   },
   outerContainer: {
     marginTop: hp(5),

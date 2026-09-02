@@ -1,40 +1,141 @@
 import React, {useEffect, useState} from 'react';
 import {
+  BackHandler,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  ToastAndroid,
+  Text,
+  TouchableOpacity,
   View,
+  Platform,
+  PermissionsAndroid,
+  Linking,
+  ActivityIndicator,
+  AppState,
+  FlatList,
 } from 'react-native';
 import FullScreenLoader from '../component/FullScreenLoader';
 import {useSelector, useDispatch} from 'react-redux';
-import {startL, updateHome} from '../redux/Slice';
+import {
+  startL,
+  updateHome,
+  setLocation,
+  setCurrentLocationName,
+  setLocationMode,
+} from '../redux/Slice';
 import StyleGlobel from '../Style/StyleGlobel';
 import getLocation from '../geoLocation/GetLocation';
 import sendRequest from '../networking/ApiFunctions';
 import RenderRoom from '../component/RenderRoom';
 import EndPoints from '../networking/EndPoints';
-import {setRoomDataHome, updateFav} from '../redux/Slice';
+import {
+  setRoomDataHome,
+  updateFav,
+  setSearchUpdate,
+  setFilteredData,
+} from '../redux/Slice';
 import ScreenName from '../common/ScreenName';
 import {favFunction} from '../common/APIFunctions';
 import {useIsFocused} from '@react-navigation/native';
 import NodataFound from '../component/NodataFound';
 import {ImageSlider} from 'react-native-image-slider-banner';
-import {hp} from '../common/CommonFunctions';
+import {RF, hp, updateRating} from '../common/CommonFunctions';
 import LowOpacityLoader from '../component/LowOpacityLoader';
+import Toast from 'react-native-simple-toast';
+import {LogBox} from 'react-native';
+import images from '../common/images';
+import SliderView from '../component/sliderView/SliderView';
+import {filterDataAll, filterRoom, getRoomCount} from '../common/FIlterData';
+import Colors from '../common/Colors';
+import MaterialIcons from 'react-native-vector-icons/dist/MaterialIcons';
+import AsyncKeys from '../localStorage/AsyncKeys';
+import localStorageOp from '../localStorage/LocalData';
+import RenderRoom2Column from '../component/RenderRoom2Column';
+import Geolocation from '@react-native-community/geolocation';
+import GPSDialogue from '../component/GPSDialogue';
+import {logout} from '../component/LogOut';
+
 const Home = ({route, navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [isFailed, setIsFailed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [filterList, setFilterList] = useState(filterDataAll);
   const [error, setError] = useState({error: '', header: ''});
   const data = useSelector(state => state.AllData.locationInfo);
   const favUpdate = useSelector(state => state.AllData.isFavUpdate);
+  const searchUpdate = useSelector(state => state.AllData.searchUpdate);
   const roomDataHome = useSelector(state => state.AllData.roomDataHome);
-  console.log(roomDataHome, 'home');
+  const filteredData = useSelector(state => state.AllData.filteredData);
+  const LocationMode = useSelector(state => state.AllData.LocationMode);
+  const reviews = useSelector(state => state.AllData.reviews);
+
+  const currentLocationName = useSelector(
+    state => state.AllData.currentLocationName,
+  );
+  const accountData = useSelector(state => state.AllData.accountData);
   const dispatch = useDispatch();
-  let counter = 10;
   const isFocused = useIsFocused();
+
+  useEffect(() => {
+    localStorageOp('', AsyncKeys.LOCATION_MODE, '')
+      .then(value => {
+        if (value) {
+          if (value.mode === AsyncKeys.DEFAULT) {
+            dispatch(setLocationMode({locationMode: 'Default'}));
+            localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+              .then(value => {
+                if (value) {
+                  dispatch(
+                    setCurrentLocationName({
+                      locationName: value?.formatted_address,
+                    }),
+                  );
+                  let Ob = {
+                    latitude: value?.geometry?.location?.lat,
+                    longitude: value?.geometry?.location?.lng,
+                  };
+                  dispatch(setLocation(Ob));
+                } else {
+                  localStorageOp(true, AsyncKeys.LOCATION_MODE, {
+                    mode: AsyncKeys.CUSTOM,
+                  });
+                  dispatch(setLocationMode({locationMode: 'Live'}));
+                  requestLocationPermission();
+                }
+              })
+              .catch(() => {});
+          } else {
+            dispatch(setLocationMode({locationMode: 'Live'}));
+            requestLocationPermission();
+          }
+        } else {
+          dispatch(setLocationMode({locationMode: 'Live'})),
+            requestLocationPermission();
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    let tmp = updateRating(roomDataHome, reviews);
+    dispatch(setFilteredData(tmp));
+  }, [reviews]);
+
+  const handleChange = value => {
+    if (value === 'active') {
+      setVisible(false);
+      requestLocationPermission();
+    }
+  };
+  useEffect(() => {
+    if (searchUpdate) {
+      dispatch(startL(true));
+      getData();
+      dispatch(setSearchUpdate(false));
+    }
+  }, [searchUpdate]);
 
   useEffect(() => {
     if (favUpdate) {
@@ -46,6 +147,7 @@ const Home = ({route, navigation}) => {
   useEffect(() => {
     setLoading(true);
     getData();
+    updateUserNotification();
   }, [data]);
   const onPressRoom = item => {
     navigation.navigate(ScreenName.DetailsScreen, {
@@ -54,6 +156,119 @@ const Home = ({route, navigation}) => {
     });
   };
 
+  useEffect(() => {
+    LogBox.ignoreLogs([
+      'VirtualizedLists should never be nested',
+      'Non-serializable values were found in the navigation state',
+    ]);
+  }, []);
+
+  const updateUserNotification = () => {
+    if (data?.longitude && data?.latitude) {
+      sendRequest(
+        {
+          user_id: '1',
+          usr_latitude: data?.latitude,
+          usr_longitude: data?.longitude,
+          isNotify: true,
+        },
+        EndPoints.updateUserNotificationDetails,
+        'POST',
+      )
+        .then(response => {})
+        .catch(() => {});
+    }
+  };
+
+  const getAddressFromCoordinates = (latitude, longitude) => {
+    return new Promise((resolve, reject) => {
+      fetch(
+        'https://maps.googleapis.com/maps/api/geocode/json?address=' +
+          latitude +
+          ',' +
+          longitude +
+          '&key=' +
+          'AIzaSyD8HnhMQpIt9ZGaPnkexNlGomWHOYerTVc',
+      )
+        .then(response => response.json())
+        .then(responseJson => {
+          if (responseJson.status === 'OK') {
+            dispatch(
+              setCurrentLocationName({
+                locationName: responseJson?.results?.[0]?.formatted_address,
+              }),
+            );
+            resolve(responseJson?.results?.[0]?.formatted_address);
+          } else {
+            reject('not found');
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  };
+
+  const getOneTimeLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        dispatch(setLocation(position.coords));
+        getAddressFromCoordinates(
+          position.coords?.latitude,
+          position.coords?.longitude,
+        );
+      },
+      error => {
+        // setVisible(true);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 30000,
+        maximumAge: 1000,
+      },
+    );
+  };
+
+  const handleOpenSettings = () => {
+    if (Platform.OS === 'ios') {
+      Linking.openURL('app-settings:');
+    } else {
+      Linking.openSettings();
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    if (Platform.OS === 'ios') {
+      getOneTimeLocation();
+    } else {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Access Required',
+            message: 'This App needs to Access your location',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getOneTimeLocation();
+        } else {
+          // setVisible(true);
+        }
+      } catch (err) {}
+    }
+  };
+
+  const calculateRoomCount = (filter, rooms) => {
+    let temp = getRoomCount(filter, rooms);
+    if (temp) {
+      temp.map(item => {
+        if (item?.id === 7) {
+          return (item.availableRooms = rooms?.length);
+        } else return item;
+      });
+      setFilterList(temp);
+    }
+  };
   const onReload = () => {
     setLoading(true);
     getData();
@@ -69,11 +284,20 @@ const Home = ({route, navigation}) => {
         return (item.favorite_key = data?.like);
       } else return item;
     });
+    let tempFil = JSON.parse(JSON.stringify(filteredData));
+    tempFil.map(item => {
+      if (item?.rm_pkey === data?.roomId) {
+        return (item.favorite_key = data?.like);
+      } else return item;
+    });
+    dispatch(setFilteredData(tempFil));
     dispatch(setRoomDataHome(temp));
   };
+
   const showToast = message => {
-    ToastAndroid.show(message, ToastAndroid.SHORT);
+    Toast.show(message, Toast.LONG);
   };
+
   const onPressFav = async value1 => {
     let value = {...value1};
     let data = {
@@ -110,7 +334,6 @@ const Home = ({route, navigation}) => {
         return false;
       }
     } catch (error) {
-      console.log(error, 'error|||||||||||||');
       performFavOp({
         ...value,
         like: value?.like === true ? false : true,
@@ -118,15 +341,23 @@ const Home = ({route, navigation}) => {
       return false;
     }
   };
+
+  const prepareData = data => {
+    let arr = data;
+    if (data.length > 0) {
+    }
+    return arr;
+  };
   const getData = () => {
     setIsFailed(false);
-    if (data.longitude && data.latitude) {
-      console.log(data.longitude, data.latitude, 'data.longitude');
+    if (data?.longitude && data?.latitude) {
       sendRequest(
         {
           user_id: 'Dummy',
-          latitude: 22.7658,
-          longitude: 75.8705,
+          // latitude: 22.7196,
+          // longitude: 75.8577,
+          latitude: data.latitude,
+          longitude: data.longitude,
           radius: 10,
         },
         EndPoints.findRoom,
@@ -137,16 +368,26 @@ const Home = ({route, navigation}) => {
           setRefreshing(false);
           dispatch(startL(false));
           if (res.status === true) {
-            console.log(res.data.length, 'res');
             if (res.data.length > 0) {
-              dispatch(setRoomDataHome(res?.data));
+              calculateRoomCount(filterDataAll, res?.data);
+              dispatch(setRoomDataHome(prepareData(res?.data)));
+              dispatch(setFilteredData(res?.data));
             } else {
-              // setError({
-              //   error: 'No rooms find at your location',
-              //   header: 'Sorry!',
-              // });
+              dispatch(setRoomDataHome([]));
+              dispatch(setFilteredData([]));
+              setError({
+                error:
+                  'No rooms find at your location \n You can also search nearby rooms by Area name ',
+                header: 'Sorry!',
+              });
+              setIsFailed(true);
             }
           } else {
+            if (res?.message === 'Invalid authentication.') {
+              logout(navigation);
+            }
+            dispatch(setRoomDataHome([]));
+            dispatch(setFilteredData([]));
             setIsFailed(true);
             setError({
               error: res.message,
@@ -159,12 +400,124 @@ const Home = ({route, navigation}) => {
           setIsFailed(true);
           setRefreshing(false);
           dispatch(startL(false));
+          dispatch(setRoomDataHome([]));
+          dispatch(setFilteredData([]));
           setError({
             error: '',
             header: '',
           });
         });
     }
+  };
+
+  const gotoUpload = () => {
+    navigation.navigate(ScreenName.UploadNavigator);
+  };
+
+  const gotoSearch = () => {
+    navigation.navigate(ScreenName.Search);
+  };
+
+  const checkFilterApplied = () => {
+    return filterList?.some(item => {
+      return item?.isApplied === true;
+    });
+  };
+
+  const checkLastFilter = item => {
+    if (item?.isApplied === true) {
+      let count = 0;
+      filterList?.forEach(item => {
+        if (item?.isApplied === true) {
+          count = count + 1;
+        }
+      });
+      if (count > 1) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
+  const manageFilter = item => {
+    if (item?.id === 7 || checkLastFilter(item)) {
+      dispatch(setFilteredData(roomDataHome));
+      let temp = JSON.parse(JSON.stringify(filterList));
+      temp?.map(item1 => {
+        return (item1.isApplied = false);
+      });
+      temp[0].isApplied = true;
+      setFilterList(temp);
+    } else {
+      let tempSearchRoom = [];
+      let temp = JSON.parse(JSON.stringify(filterList));
+      temp?.map(item1 => {
+        if (item1?.id === item?.id) {
+          item1.isApplied = !item1?.isApplied;
+        }
+        return item1;
+      });
+      temp[0].isApplied = false;
+      setFilterList(temp);
+      tempSearchRoom = filterRoom(temp, roomDataHome);
+      dispatch(setFilteredData(tempSearchRoom));
+    }
+  };
+
+  const filterRender = ({item}) => {
+    return (
+      <>
+        <TouchableOpacity
+          style={style.containerFilter(item?.isApplied)}
+          onPress={() => {
+            if (item?.availableRooms > 0) {
+              manageFilter(item);
+            } else {
+              Toast.show(`No room Available for filter ${item?.value}`);
+            }
+          }}>
+          <Text
+            style={
+              style.labelFilter
+            }>{`${item?.value} (${item?.availableRooms})`}</Text>
+        </TouchableOpacity>
+      </>
+    );
+  };
+
+  const onPressMore = () => {
+    navigation.navigate(ScreenName.MoreRooms);
+  };
+
+  const handleDefault = () => {
+    localStorageOp('', AsyncKeys.DEFAULT_LOCATION, '')
+      .then(value => {
+        if (value) {
+          let Ob = {
+            latitude: value?.geometry?.location?.lat,
+            longitude: value?.geometry?.location?.lng,
+          };
+          dispatch(setLocation(Ob));
+          dispatch(
+            setCurrentLocationName({
+              locationName: value?.formatted_address,
+            }),
+          );
+          setVisible(false);
+        } else {
+          showToast('Set Default Location first');
+          dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: ScreenName.AppSettings}],
+            }),
+          );
+        }
+      })
+      .catch(() => {});
   };
 
   return (
@@ -174,39 +527,85 @@ const Home = ({route, navigation}) => {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
-      {getLocation()}
+      <GPSDialogue
+        labelTop={'Your GPS seems to disabled?'}
+        labelPositive={'Turn on GPS'}
+        labelNegative={'default location'}
+        visible={visible}
+        confirmationMessage={'Are you want to use default location Now'}
+        // confirmationMessageHigh={'logout?'}
+        handleOpenSettings={handleOpenSettings}
+        useDefaultLocation={handleDefault}
+        closeApp={() => {
+          BackHandler.exitApp();
+        }}
+      />
+      <View style={style.locationNameContainer}>
+        <View style={style.innerContainerName}>
+          <MaterialIcons
+            size={hp(2.5)}
+            color={Colors.PRIMARY}
+            name={'my-location'}
+            style={style.iconLOcation}
+          />
+          <Text style={style.labelOwnerName}>
+            {`Welcome ${accountData?.data?.usr_firstName}`}
+          </Text>
+        </View>
+        <View style={style.containerLocationMode}>
+          <Text style={style.labelLocationMode}>
+            {LocationMode?.locationMode}
+          </Text>
+          <Text style={style.labelLocation}>
+            {LocationMode?.locationMode === 'Live'
+              ? loading
+                ? 'Getting location '
+                : currentLocationName?.locationName
+              : currentLocationName?.locationName}
+          </Text>
+        </View>
+      </View>
+      <SliderView
+        isFocused={isFocused}
+        onPresUpload={() => {
+          gotoUpload();
+        }}
+        onPresSearch={() => {
+          gotoSearch();
+        }}
+      />
+      {filteredData?.length > 0 && !isFailed ? (
+        <FlatList
+          horizontal
+          data={filterList}
+          renderItem={filterRender}
+          style={style.filterFlatlist}
+        />
+      ) : null}
       {loading ? (
-        <LowOpacityLoader />
-      ) : isFailed ? (
+        <View style={style.loader}>
+          <ActivityIndicator size={hp(6)} color={Colors.PRIMARY} />
+        </View>
+      ) : // <LowOpacityLoader />
+      isFailed ? (
         <NodataFound message={error.error} header={error.header} />
       ) : (
         <View>
-          <ImageSlider
-            previewImageContainerStyle={style.previewImageContainerStyle}
-            data={[
-              {
-                img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5a5uCP-n4teeW2SApcIqUrcQApev8ZVCJkA&usqp=CAU',
-              },
-              {
-                img: 'https://thumbs.dreamstime.com/b/environment-earth-day-hands-trees-growing-seedlings-bokeh-green-background-female-hand-holding-tree-nature-field-gra-130247647.jpg',
-              },
-              {
-                img: 'https://cdn.pixabay.com/photo/2015/04/19/08/32/marguerite-729510__340.jpg',
-              },
-            ]}
-            autoPlay={true}
-            closeIconColor="#fff"
-          />
-          <View style={{marginHorizontal: hp(1)}}>
-            {roomDataHome?.length > 0 ? (
-              <RenderRoom
-                myRoomList={roomDataHome}
-                onPress={onPressRoom}
-                onPressFav={onPressFav}
-                refreshing={false}
-              />
-            ) : null}
-          </View>
+          {filteredData?.length > 0 ? (
+            <RenderRoom2Column
+              myRoomList={filteredData}
+              // myRoomList={
+              //   filteredData?.length > 5
+              //     ? filteredData?.slice(0, 5)
+              //     : filteredData
+              // }
+              // moreVisible={filteredData?.length > 5 ? true : false}
+              onPress={onPressRoom}
+              onPressFav={onPressFav}
+              refreshing={false}
+              onPressMore={onPressMore}
+            />
+          ) : null}
         </View>
       )}
     </ScrollView>
@@ -215,7 +614,85 @@ const Home = ({route, navigation}) => {
 
 export default Home;
 const style = StyleSheet.create({
-  previewImageContainerStyle: {
-    borderRadius: hp(2),
+  containerFilter: isApplied => ({
+    flexDirection: 'row',
+    backgroundColor: isApplied ? Colors.WHITE : Colors.GREY5,
+    borderRadius: hp(1.5),
+    marginHorizontal: hp(0.4),
+    marginVertical: hp(1),
+    elevation: hp(1),
+    paddingHorizontal: hp(1),
+    paddingVertical: hp(0.3),
+    maxHeight: hp(3.8),
+  }),
+  labelFilter: {
+    color: Colors.BLACK,
+    alignSelf: 'center',
+    fontSize: RF(1.6),
+    marginHorizontal: hp(1),
+    marginVertical: hp(0.5),
+  },
+  labelCount: {
+    color: Colors.BLACK,
+    alignSelf: 'center',
+    marginLeft: hp(0.4),
+    marginVertical: hp(0.3),
+    fontSize: RF(1.6),
+  },
+  containerCount: {
+    borderRadius: hp(90),
+    backgroundColor: Colors.WHITE,
+    justifyContent: 'center',
+    alignSelf: 'center',
+    position: 'absolute',
+    top: hp(1),
+    right: hp(2),
+    elevation: hp(2),
+  },
+  filterFlatlist: {
+    maxHeight: hp(9),
+    marginHorizontal: hp(1),
+    marginTop: hp(3),
+  },
+  locationNameContainer: {
+    marginHorizontal: hp(1.2),
+    marginBottom: hp(2),
+  },
+  labelOwnerName: {
+    color: Colors.BLACK,
+    fontSize: RF(2.2),
+    marginLeft: hp(0.4),
+    fontWeight: '600',
+  },
+  labelLocation: {
+    maxWidth: '85%',
+    color: Colors.BLACK,
+    fontSize: RF(1.4),
+    fontWeight: '600',
+  },
+  iconLOcation: {},
+  iconArrow: {},
+  innerContainerName: {
+    flexDirection: 'row',
+    marginTop: hp(1),
+  },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  containerLocationMode: {
+    flexDirection: 'row',
+    marginTop: hp(0.5),
+  },
+  labelLocationMode: {
+    maxHeight: hp(2.5),
+    backgroundColor: Colors.RED,
+    color: Colors.WHITE,
+    fontSize: RF(1.3),
+    paddingHorizontal: hp(1),
+    borderRadius: hp(0.5),
+    marginRight: hp(0.5),
+    maxWidth: '15%',
   },
 });

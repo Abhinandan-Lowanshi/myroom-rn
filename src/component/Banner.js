@@ -30,7 +30,6 @@
 //         renderItem={({index}) => (
 //           <TouchableOpacity
 //             onPress={() => {
-//               console.log(index);
 //             }}
 //             style={{
 //               backgroundColor: 'red',

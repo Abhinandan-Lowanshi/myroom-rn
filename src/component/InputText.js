@@ -9,37 +9,48 @@ import {
 import {hp, RF} from '../common/CommonFunctions';
 import Colors from '../common/Colors';
 import Icon from 'react-native-vector-icons/Entypo';
-const CustomInputText = ({
-  containerStyleP,
-  InputTextStyleP,
-  placeholder,
-  errorMessage,
-  error,
-  onChangeText,
-  value,
-  outerContainer,
-  toplabel,
-  disabled,
-  isEyeVisible,
-  isNumeric,
-  maxLength,
-  multiline,
-}) => {
+const CustomInputText = props => {
   const [isPassWordHidden, setIsPasswordHidden] = React.useState(true);
+  const [focus, setFocus] = React.useState(false);
+  const {
+    containerStyleP,
+    InputTextStyleP,
+    placeholder,
+    errorMessage,
+    error,
+    onChangeText,
+    value,
+    outerContainer,
+    topLabel,
+    disabled,
+    isEyeVisible,
+    isNumeric,
+    maxLength,
+    multiline,
+    showLimit,
+    onPressEnable,
+  } = props;
+
   return (
     <View style={[style.outerContainer, outerContainer]}>
-      <View style={[style.containerStyle(error), containerStyleP]}>
+      <TouchableOpacity
+        disabled={!onPressEnable}
+        onPress={props?.onPress}
+        style={[style.containerStyle(error, disabled, focus), containerStyleP]}>
         <TextInput
+          {...props}
           maxLength={maxLength || 50}
           editable={!disabled}
           selectTextOnFocus={!disabled}
           style={[style.InputTextStyle(error), InputTextStyleP]}
-          placeholder={placeholder}
+          placeholder={focus ? null : placeholder}
           value={value}
           placeholderTextColor={Colors.BLACK}
           onChangeText={value => onChangeText(value)}
           multiline={multiline}
           secureTextEntry={isEyeVisible && isPassWordHidden}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
           keyboardType={
             isNumeric
               ? 'number-pad'
@@ -61,8 +72,20 @@ const CustomInputText = ({
             />
           </TouchableOpacity>
         ) : null}
+      </TouchableOpacity>
+      <View style={style.containerError}>
+        {error && (
+          <Text style={style.textError}>{errorMessage || 'Error'}</Text>
+        )}
+        {showLimit && (
+          <Text style={style.labelCount}>{`${value?.length}/${
+            maxLength || 50
+          }`}</Text>
+        )}
       </View>
-      {error && <Text style={style.textError}>{errorMessage || 'Error'}</Text>}
+      {(focus || value) && (
+        <Text style={[style.topLabel, topLabel]}>{placeholder}</Text>
+      )}
     </View>
   );
 };
@@ -75,14 +98,19 @@ const style = StyleSheet.create({
     flex: 1,
     borderRadius: hp(1),
   }),
-  containerStyle: error => ({
+  containerStyle: (error, disabled, focus = false) => ({
     flexDirection: 'row',
     width: '90%',
     backgroundColor: Colors.GREY1,
     paddingLeft: hp(2),
     backgroundColor: 'white',
     elevation: 3,
-    borderColor: error ? Colors.RED : Colors.GREY,
+    borderColor:
+      disabled || (focus && !error)
+        ? Colors.PRIMARY
+        : error
+        ? Colors.RED
+        : Colors.GREY,
     borderRadius: hp(1),
     borderWidth: hp(0.2),
   }),
@@ -90,13 +118,15 @@ const style = StyleSheet.create({
     color: 'red',
     fontSize: RF(1.1),
     marginLeft: 5,
-    marginTop: hp(0.6),
+    marginTop: hp(0.5),
   },
   outerContainer: {
     alignSelf: 'center',
     // elevation: 5,
     borderRadius: hp(1),
     marginTop: hp(2),
+    marginTop: 5,
+    paddingTop: hp(1),
   },
   checkBoxContainerStyle: {
     flexDirection: 'row',
@@ -113,5 +143,25 @@ const style = StyleSheet.create({
   iconStyle: {
     alignSelf: 'center',
     marginRight: hp(2),
+  },
+  topLabel: {
+    color: Colors.BLACK,
+    fontSize: RF(1.8),
+    position: 'absolute',
+    left: hp(2),
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: hp(1),
+    fontWeight: '600',
+  },
+  labelCount: {
+    color: Colors.BLACK,
+    fontSize: RF(1.3),
+    marginRight: hp(0.5),
+    position: 'absolute',
+    right: hp(0.5),
+  },
+  containerError: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

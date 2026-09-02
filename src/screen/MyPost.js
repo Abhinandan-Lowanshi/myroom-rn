@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, useWindowDimensions, View} from 'react-native';
+import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
 import {SceneMap, TabView} from 'react-native-tab-view';
 import RenderRoom from '../component/RenderRoom';
 import StyleGlobel from '../Style/StyleGlobel';
@@ -13,7 +13,9 @@ import ScreenName from '../common/ScreenName';
 import FullScreenLoader from '../component/FullScreenLoader';
 import Header from '../component/Header';
 import LowOpacityLoader from '../component/LowOpacityLoader';
-
+import Toast from 'react-native-simple-toast';
+import {hp} from '../common/CommonFunctions';
+import {logout} from '../component/LogOut';
 const MyPost = ({navigation}) => {
   const [visible, setVisible] = useState(false);
   const [error, setError] = useState('');
@@ -36,16 +38,26 @@ const MyPost = ({navigation}) => {
     setLoading(true);
     sendRequest(data, EndPoints.toRoomStatus, 'POST')
       .then(res => {
-        setLoading(false);
-        setRefreshing(false);
         if (res?.status === true) {
-          updateRoomStatus(data);
+          setLoading(false);
+          setRefreshing(false);
+          if (res?.status === true) {
+            updateRoomStatus(data);
+          }
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(e => {
         setLoading(false);
         setRefreshing(false);
       });
+  };
+
+  const showToast = message => {
+    Toast.show(message, Toast.LONG);
   };
 
   const updateRoomStatus = data => {
@@ -59,8 +71,16 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressEditSuccess = value => {
+    let tmp = myRoomList?.map(data => {
+      return data?.rm_pkey === value?.rm_pkey ? value : data;
+    });
+    dispatch(getAllMyRooms(tmp));
+  };
+
   const onPressEdit = item => {
-    navigation.navigate(ScreenName.EditRoom, item);
+    navigation.navigate(ScreenName.EditRoom, {item, onPressEditSuccess});
   };
 
   const onPressDelete = id => {
@@ -83,6 +103,10 @@ const MyPost = ({navigation}) => {
         setRefreshing(false);
         if (res?.status === true) {
           dispatch(getAllMyRooms(res?.data));
+        } else {
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(e => {
@@ -103,10 +127,15 @@ const MyPost = ({navigation}) => {
       .then(response => {
         setIsLoading(false);
         if (response.status === true) {
+          showToast('Room deleted successfully');
           setVisible(false);
           removeRoom(roomId);
         } else {
           setError(response?.message);
+
+          if (response?.message === 'Invalid authentication.') {
+            logout(navigation);
+          }
         }
       })
       .catch(error => {
@@ -123,12 +152,18 @@ const MyPost = ({navigation}) => {
     });
     dispatch(getAllMyRooms(temp));
   };
+
+  const onPressCancel = () => {
+    navigation.goBack();
+  };
+
   const All = () => (
     <View style={{flex: 1, backgroundColor: Colors.WHITE}}>
       <Header label={'My Post'} navigation={navigation} />
-      {loading && <LowOpacityLoader />}
+      {loading && <LowOpacityLoader onPress={onPressCancel} />}
 
       <RenderRoom
+        container={style.container}
         onPress={onPressRoom}
         myRoomList={myRoomList}
         isFromMyPost={true}
@@ -165,3 +200,9 @@ const MyPost = ({navigation}) => {
 };
 
 export default MyPost;
+const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginHorizontal: hp(0.5),
+  },
+});
