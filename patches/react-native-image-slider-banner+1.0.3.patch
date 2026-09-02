@@ -1,0 +1,18 @@
+diff --git a/node_modules/react-native-image-slider-banner/src/index.tsx b/node_modules/react-native-image-slider-banner/src/index.tsx
+index 2ff7832..b22b619 100644
+--- a/node_modules/react-native-image-slider-banner/src/index.tsx
++++ b/node_modules/react-native-image-slider-banner/src/index.tsx
+@@ -212,10 +212,10 @@ export const ImageSlider = ({
+                                     activeOpacity={.9}
+                                     onPress={() => {
+                                         if (!preview) {
+-                                            onClick(item, index)
++                                            // onClick(item, index)
+                                         } else {
+-                                            setSelectedIndex(index)
+-                                            setImageViewer(!imageViewer)
++                                            // setSelectedIndex(index)
++                                            // setImageViewer(!imageViewer)
+                                         }
+                                     }}
+                                 >
